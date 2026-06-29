@@ -111,6 +111,7 @@
 
     /* PICK CONTROLS */
     .prediction-area { padding: 0 12px 12px; }
+    /* ot-row/ot-btn: mantenidos solo para vista admin en modal */
     .ot-row { display: flex; gap: 5px; margin-bottom: 7px; }
     .ot-btn {
       flex: 1; background: var(--gray-2); border: 1.5px solid var(--gray-3);
@@ -121,6 +122,31 @@
     .ot-btn.sel-1 { border-color: var(--blue);   background: rgba(74,158,255,.15); color: var(--blue); }
     .ot-btn.sel-x { border-color: var(--gold);   background: rgba(244,196,48,.15); color: var(--gold); }
     .ot-btn.sel-2 { border-color: var(--danger); background: rgba(224,82,82,.15);  color: var(--danger); }
+    /* OT derivado — badge informativo */
+    .ot-derived {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; margin-bottom: 7px;
+      padding: 6px 10px; border-radius: var(--rs);
+      font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+      background: var(--gray-2); border: 1.5px solid var(--gray-3);
+    }
+    .ot-derived.home { border-color: var(--blue);   background: rgba(74,158,255,.12); color: var(--blue); }
+    .ot-derived.draw { border-color: var(--gold);   background: rgba(244,196,48,.12); color: var(--gold); }
+    .ot-derived.away { border-color: var(--danger); background: rgba(224,82,82,.12);  color: var(--danger); }
+    .ot-derived.empty { color: var(--muted); border-style: dashed; }
+    /* Selector de clasificado (solo en empate) */
+    .advance-row {
+      display: flex; align-items: center; gap: 6px; margin-bottom: 7px;
+      padding: 8px 10px; background: rgba(244,196,48,.06);
+      border: 1px solid rgba(244,196,48,.25); border-radius: var(--rs);
+    }
+    .advance-label { font-size: 10px; color: var(--gold); font-weight: 700; white-space: nowrap; }
+    .advance-btn {
+      flex: 1; background: var(--gray-2); border: 1.5px solid var(--gray-3);
+      border-radius: 6px; padding: 6px 4px; font-size: 10px; font-weight: 700;
+      color: var(--muted); cursor: pointer; text-align: center; transition: all 0.14s;
+    }
+    .advance-btn.sel { border-color: var(--gold); background: rgba(244,196,48,.18); color: var(--gold); }
     .score-row { display: flex; align-items: center; gap: 6px; }
     .score-label { font-size: 10px; color: var(--muted); white-space: nowrap; font-weight: 600; }
     .score-inputs { display: flex; align-items: center; gap: 4px; flex: 1; justify-content: center; }
@@ -662,15 +688,34 @@ function fmtTime(iso) {
    PUNTUACIÓN
 ═══════════════════════════════════════════════════════════════ */
 function calcPickPts(pick, match) {
-  if (!match.done || !match.result || !pick?.ot) return { ot:0, exact:0, advance:0, total:0 };
+  if (!match.done || !match.result || pick?.home_score === null || pick?.home_score === undefined)
+    return { ot:0, exact:0, advance:0, total:0 };
   const { homeScore:rh, awayScore:ra } = match.result;
   const realOT  = rh > ra ? "1" : rh === ra ? "X" : "2";
-  const otOk    = pick.ot === realOT;
-  const exactOk = pick.home_score !== null && pick.away_score !== null
-                  && parseInt(pick.home_score) === rh && parseInt(pick.away_score) === ra;
-  const pts_ot      = otOk    ? 1 : 0;
-  const pts_exact   = exactOk ? 3 : 0;
-  const pts_advance = otOk    ? 1 : 0;
+
+  // OT derivado del marcador apostado
+  const ph = parseInt(pick.home_score), pa = parseInt(pick.away_score);
+  if (isNaN(ph) || isNaN(pa)) return { ot:0, exact:0, advance:0, total:0 };
+  const pickOT  = ph > pa ? "1" : ph === pa ? "X" : "2";
+
+  const otOk    = pickOT === realOT;
+  const exactOk = ph === rh && pa === ra;
+
+  // Clasificado: si el marcador fue empate, se usa pick.advance; si no, el OT lo define
+  let advanceOk = false;
+  if (pickOT === "X") {
+    // Empate apostado: el clasificado debe coincidir con match.winner
+    const realWinner = match.winner; // 'home' | 'away'
+    advanceOk = realWinner && pick.advance === realWinner;
+  } else {
+    // No empate: el clasificado es el equipo que el marcador indica ganador
+    const pickWinner = ph > pa ? "home" : "away";
+    advanceOk = otOk && pickWinner === match.winner;
+  }
+
+  const pts_ot      = otOk      ? 1 : 0;
+  const pts_exact   = exactOk   ? 3 : 0;
+  const pts_advance = advanceOk ? 1 : 0;
   return { ot: pts_ot, exact: pts_exact, advance: pts_advance, total: pts_ot + pts_exact + pts_advance };
 }
 
@@ -824,37 +869,69 @@ function renderMatchCard(match) {
   let predArea = "";
   if (locked) {
     let badgeHtml = "";
-    if (pick?.ot) {
-      const otClass  = { "1":"ot-1", "X":"ot-x", "2":"ot-2" }[pick.ot] || "";
-      const otLabel  = { "1":"LOCAL", "X":"EMPATE", "2":"VISITA" }[pick.ot];
-      const scoreStr = pick.home_score !== null && pick.home_score !== undefined
-        ? `${pick.home_score} - ${pick.away_score}` : "Sin marcador";
+    if (pick?.home_score !== null && pick?.home_score !== undefined) {
+      const ph = parseInt(pick.home_score), pa = parseInt(pick.away_score);
+      const derivedOT = isNaN(ph)||isNaN(pa) ? null : ph>pa?"1":ph===pa?"X":"2";
+      const otClass  = { "1":"ot-1","X":"ot-x","2":"ot-2" }[derivedOT] || "";
+      const otLabel  = { "1":"LOCAL","X":"EMPATE","2":"VISITA" }[derivedOT] || "–";
+      const scoreStr = `${pick.home_score} - ${pick.away_score}`;
+      let advanceBadge = "";
+      if (derivedOT === "X" && pick.advance) {
+        const advName = pick.advance === "home" ? match.home : match.away;
+        const advFlag = pick.advance === "home" ? match.homeFlag : match.awayFlag;
+        advanceBadge = `<span class="pick-tag" style="border-color:var(--gold);color:var(--gold)">🏆 ${advFlag} ${advName}</span>`;
+      }
       badgeHtml = `<div class="my-pick-badge">
         <span class="pick-tag ${otClass}">${otLabel}</span>
         <span class="pick-tag score">${scoreStr}</span>
+        ${advanceBadge}
       </div>`;
     }
     predArea = `<div class="locked-msg"><span class="lock-icon">🔒</span>${match.done ? "Partido finalizado" : "Pronósticos cerrados"}</div>${badgeHtml}`;
   } else {
-    const ptsHint = pick?.ot
-      ? `<div class="points-hint">Máximo posible: <b>${pick.home_score !== null ? "5" : "2"} pts</b></div>` : "";
+    // OT derivado del marcador ingresado
+    const hs = pick?.home_score, as_ = pick?.away_score;
+    const hasScore = hs !== null && hs !== undefined && hs !== "" && as_ !== null && as_ !== undefined && as_ !== "";
+    const ph = hasScore ? parseInt(hs) : NaN, pa = hasScore ? parseInt(as_) : NaN;
+    const derivedOT = isNaN(ph) || isNaN(pa) ? null : ph > pa ? "1" : ph === pa ? "X" : "2";
+    const isDrawn   = derivedOT === "X";
+
+    const otLabel = derivedOT === "1" ? `🏠 LOCAL gana ${match.homeFlag}`
+                  : derivedOT === "X" ? "🤝 EMPATE — elige clasificado"
+                  : derivedOT === "2" ? `✈️ VISITA gana ${match.awayFlag}`
+                  : "Ingresa el marcador para continuar";
+    const otClass = { "1":"home","X":"draw","2":"away" }[derivedOT] || "empty";
+
+    const advanceRow = isDrawn ? `
+        <div class="advance-row">
+          <span class="advance-label">¿CLASIFICA?</span>
+          <button class="advance-btn ${pick?.advance==="home"?"sel":""}"
+            onclick="setAdvance('${match.id}','home')">
+            ${match.homeFlag} ${match.home}
+          </button>
+          <button class="advance-btn ${pick?.advance==="away"?"sel":""}"
+            onclick="setAdvance('${match.id}','away')">
+            ${match.awayFlag} ${match.away}
+          </button>
+        </div>` : "";
+
+    const ptsHint = hasScore
+      ? `<div class="points-hint">Máximo posible: <b>5 pts</b></div>` : "";
+
     predArea = `
       <div class="prediction-area">
-        <div class="ot-row">
-          <button class="ot-btn ${pick?.ot==="1"?"sel-1":""}" onclick="setPick('${match.id}','1')">🏠 LOCAL</button>
-          <button class="ot-btn ${pick?.ot==="X"?"sel-x":""}" onclick="setPick('${match.id}','X')">🤝 EMPATE</button>
-          <button class="ot-btn ${pick?.ot==="2"?"sel-2":""}" onclick="setPick('${match.id}','2')">✈️ VISITA</button>
-        </div>
+        <div class="ot-derived ${otClass}">${otLabel}</div>
+        ${advanceRow}
         <div class="score-row">
           <span class="score-label">MARCADOR</span>
           <div class="score-inputs">
             <input class="score-input" type="number" min="0" max="20"
               id="hs_${match.id}" value="${pick?.home_score ?? ""}" placeholder="–"
-              oninput="autoSave('${match.id}')" />
+              oninput="onScoreInput('${match.id}')" />
             <span class="score-sep">:</span>
             <input class="score-input" type="number" min="0" max="20"
               id="as_${match.id}" value="${pick?.away_score ?? ""}" placeholder="–"
-              oninput="autoSave('${match.id}')" />
+              oninput="onScoreInput('${match.id}')" />
           </div>
           <button class="save-btn" onclick="savePick('${match.id}')">GUARDAR</button>
         </div>
@@ -881,35 +958,108 @@ function renderMatchCard(match) {
 }
 
 let autoSaveTimers = {};
-function autoSave(matchId) {
+
+// Se llama al escribir en los inputs de marcador → re-renderiza el badge OT en tiempo real
+function onScoreInput(matchId) {
+  const match = DB.matches.find(m => m.id === matchId);
+  const hs  = document.getElementById(`hs_${matchId}`)?.value;
+  const as_ = document.getElementById(`as_${matchId}`)?.value;
+
+  // Actualiza cache local para que renderMatchCard refleje el estado actual
+  let pick = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === matchId);
+  if (!pick) {
+    pick = { user_id: currentUser.id, match_id: matchId, ot: null, home_score: null, away_score: null, advance: null };
+    DB.picks.push(pick);
+  }
+  pick.home_score = hs !== "" ? hs : null;
+  pick.away_score = as_ !== "" ? as_ : null;
+
+  // Si el marcador deja de ser empate, borra el clasificado
+  const ph = parseInt(hs), pa = parseInt(as_);
+  if (!isNaN(ph) && !isNaN(pa) && ph !== pa) pick.advance = null;
+
+  // Re-renderiza solo la tarjeta sin perder foco (usa innerHTML para preservar inputs)
+  const card = document.getElementById(`card_${matchId}`);
+  if (card) {
+    const newHtml = renderMatchCard(match);
+    const tmp = document.createElement("div");
+    tmp.innerHTML = newHtml;
+    // Reemplaza todo excepto los inputs con foco para no perder lo que se está escribiendo
+    card.outerHTML = newHtml;
+    // Restaura valores actuales en los inputs
+    const hsEl = document.getElementById(`hs_${matchId}`);
+    const asEl = document.getElementById(`as_${matchId}`);
+    if (hsEl) { hsEl.value = hs; hsEl.focus(); }
+    if (asEl && document.activeElement?.id === `as_${matchId}`) asEl.focus();
+  }
+
+  // Auto-guardado con debounce
   clearTimeout(autoSaveTimers[matchId]);
-  autoSaveTimers[matchId] = setTimeout(() => savePick(matchId, true), 1500);
+  autoSaveTimers[matchId] = setTimeout(() => savePick(matchId, true), 1800);
 }
 
-async function setPick(matchId, value) {
+function setAdvance(matchId, value) {
   const match = DB.matches.find(m => m.id === matchId);
-  if (isLocked(match)) { showToast("Este partido ya está cerrado", "error"); return; }
+  if (isLocked(match)) return;
   let pick = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === matchId);
-  const newOt = pick?.ot === value ? null : value;
-  if (pick) { pick.ot = newOt; } else { pick = { user_id: currentUser.id, match_id: matchId, ot: newOt, home_score: null, away_score: null }; DB.picks.push(pick); }
-  try { await supabase.upsert("picks", { user_id: currentUser.id, match_id: matchId, ot: newOt, home_score: pick.home_score, away_score: pick.away_score }); }
-  catch(e) { showToast("Error al guardar", "error"); console.error(e); }
-  // Re-render solo la tarjeta
+  if (!pick) {
+    pick = { user_id: currentUser.id, match_id: matchId, ot: null, home_score: null, away_score: null, advance: null };
+    DB.picks.push(pick);
+  }
+  pick.advance = pick.advance === value ? null : value;
+  // Re-renderiza la tarjeta
   const card = document.getElementById(`card_${matchId}`);
-  if (card) card.outerHTML = renderMatchCard(match);
+  if (card) {
+    const hsVal = document.getElementById(`hs_${matchId}`)?.value;
+    const asVal = document.getElementById(`as_${matchId}`)?.value;
+    card.outerHTML = renderMatchCard(match);
+    if (hsVal) { const el = document.getElementById(`hs_${matchId}`); if(el) el.value = hsVal; }
+    if (asVal) { const el = document.getElementById(`as_${matchId}`); if(el) el.value = asVal; }
+  }
 }
 
 async function savePick(matchId, silent = false) {
   const match = DB.matches.find(m => m.id === matchId);
   if (isLocked(match)) { if (!silent) showToast("Este partido ya está cerrado 🔒", "error"); return; }
+
+  const hs  = document.getElementById(`hs_${matchId}`)?.value ?? "";
+  const as_ = document.getElementById(`as_${matchId}`)?.value ?? "";
+
+  if (hs === "" || as_ === "") { if (!silent) showToast("Ingresa el marcador completo", "error"); return; }
+
+  const ph = parseInt(hs), pa = parseInt(as_);
+  if (isNaN(ph) || isNaN(pa)) { if (!silent) showToast("Marcador inválido", "error"); return; }
+
+  // OT derivado automáticamente del marcador
+  const derivedOT = ph > pa ? "1" : ph === pa ? "X" : "2";
+
   let pick = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === matchId);
-  if (!pick?.ot) { if (!silent) showToast("Elige LOCAL, EMPATE o VISITA primero", "error"); return; }
-  const hs  = document.getElementById(`hs_${matchId}`)?.value ?? null;
-  const as_ = document.getElementById(`as_${matchId}`)?.value ?? null;
-  pick.home_score = hs !== "" ? hs : null;
-  pick.away_score = as_ !== "" ? as_ : null;
+  if (!pick) {
+    pick = { user_id: currentUser.id, match_id: matchId, ot: null, home_score: null, away_score: null, advance: null };
+    DB.picks.push(pick);
+  }
+
+  // Validar: si es empate debe elegir clasificado
+  if (derivedOT === "X" && !pick.advance) {
+    if (!silent) showToast("Elige qué equipo clasifica en el empate", "error");
+    return;
+  }
+
+  pick.ot         = derivedOT;
+  pick.home_score = ph;
+  pick.away_score = pa;
+  // Si no es empate, el clasificado se limpia (no aplica)
+  if (derivedOT !== "X") pick.advance = null;
+
   try {
-    await supabase.upsert("picks", { user_id: currentUser.id, match_id: matchId, ot: pick.ot, home_score: pick.home_score, away_score: pick.away_score });
+    await supabase.upsert("picks", {
+      user_id:    currentUser.id,
+      match_id:   matchId,
+      ot:         pick.ot,
+      home_score: pick.home_score,
+      away_score: pick.away_score,
+      advance:    pick.advance,
+    });
     if (!silent) showToast("✅ Pronóstico guardado", "success");
     document.getElementById(`card_${matchId}`)?.classList.add("saved");
   } catch(e) { if (!silent) showToast("Error al guardar", "error"); console.error(e); }
