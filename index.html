@@ -278,12 +278,13 @@
     .admin-save-btn:active { background: var(--success); }
     .admin-picks-summary { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--gray-2); }
     .admin-picks-title { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.8px; margin-bottom: 5px; }
-    .admin-pick-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding: 3px 0; border-bottom: 1px solid var(--gray-2); }
+    .admin-pick-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding: 3px 0; border-bottom: 1px solid var(--gray-2); gap: 2px; }
     .admin-pick-row:last-child { border-bottom: none; }
     .admin-pick-name { flex: 1; color: var(--white); }
-    .admin-pick-ot { width: 30px; text-align: center; font-weight: 700; }
-    .admin-pick-sc { width: 50px; text-align: center; color: var(--muted); }
-    .admin-pick-pts { width: 28px; text-align: right; font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 15px; color: var(--gold); }
+    .admin-pick-ot  { width: 30px; text-align: center; font-weight: 700; flex-shrink: 0; }
+    .admin-pick-sc  { width: 48px; text-align: center; color: var(--muted); flex-shrink: 0; }
+    .admin-pick-adv { width: 32px; text-align: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .admin-pick-pts { width: 26px; text-align: right; font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 15px; color: var(--gold); flex-shrink: 0; }
     .admin-pick-pts.zero { color: var(--gray-3); }
 
     /* PARTICIPANTS */
@@ -1183,14 +1184,20 @@ function renderAdmin() {
     const pickRows = DB.users.map(u => {
       const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
       if (!pick?.ot) return `<div class="admin-pick-row"><span class="admin-pick-name">${u.name}</span><span class="admin-pick-ot" style="color:var(--muted)">–</span><span class="admin-pick-sc">–</span><span class="admin-pick-pts zero">–</span></div>`;
-      const p = calcPickPts(pick, m);
-      const otLabel = { "1":"LOC","X":"EMP","2":"VIS" }[pick.ot];
-      const otColor = { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot];
-      const sc = pick.home_score !== null ? `${pick.home_score} - ${pick.away_score}` : "–";
+      const p        = calcPickPts(pick, m);
+      const otLabel  = { "1":"LOC","X":"EMP","2":"VIS" }[pick.ot];
+      const otColor  = { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot];
+      const sc       = pick.home_score !== null ? `${pick.home_score} - ${pick.away_score}` : "–";
+      // Clasificado: solo visible cuando el pick fue empate
+      const advLabel = pick.ot === "X" && pick.advance
+        ? (pick.advance === "home" ? `→ ${m.homeFlag}` : `→ ${m.awayFlag}`)
+        : "";
+      const advColor = pick.ot === "X" && pick.advance ? "var(--gold)" : "transparent";
       return `<div class="admin-pick-row">
         <span class="admin-pick-name">${u.name}</span>
         <span class="admin-pick-ot" style="color:${otColor}">${otLabel}</span>
         <span class="admin-pick-sc">${sc}</span>
+        <span class="admin-pick-adv" style="width:32px;text-align:center;font-size:11px;font-weight:700;color:${advColor}">${advLabel}</span>
         <span class="admin-pick-pts ${p.total===0?"zero":""}">${m.done ? p.total : "–"}</span>
       </div>`;
     }).join("") || `<div style="font-size:11px;color:var(--muted);padding:4px 0">Sin participantes aún</div>`;
@@ -1224,10 +1231,11 @@ function renderAdmin() {
         </div>
         <div class="admin-picks-summary">
           <div class="admin-picks-title">PICKS DE PARTICIPANTES</div>
-          <div style="display:grid;grid-template-columns:1fr 42px 58px 32px;margin-bottom:3px;padding-bottom:4px;border-bottom:1px solid var(--gray-3)">
+          <div style="display:grid;grid-template-columns:1fr 38px 54px 32px 28px;margin-bottom:3px;padding-bottom:4px;border-bottom:1px solid var(--gray-3)">
             <span style="font-size:9px;color:var(--muted);font-weight:700">JUGADOR</span>
             <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RES.</span>
             <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARCADOR</span>
+            <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">CLAS.</span>
             <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
           </div>
           ${pickRows}
