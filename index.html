@@ -1361,34 +1361,55 @@ function _renderModalContent(userId) {
       DB.matches.map(m => {
         const pick    = DB.picks.find(p => p.user_id === user.id && p.match_id === m.id);
         const p       = calcPickPts(pick, m);
-        const curOt   = pick?.ot || null;
         const curHs   = pick?.home_score ?? "";
         const curAs   = pick?.away_score ?? "";
-        const ptsStr  = m.done ? p.total : (pick?.ot ? "?" : "–");
+        const curAdv  = pick?.advance || null;
+        const ptsStr  = m.done ? p.total : (pick?.home_score !== null && pick?.home_score !== undefined ? "?" : "–");
         const ptsZero = m.done && p.total === 0;
         const uid_mid = `${userId}_${m.id}`.replace(/-/g,"_");
+
+        // OT derivado del marcador actual
+        const ph = parseInt(curHs), pa = parseInt(curAs);
+        const hasSc      = curHs !== "" && curAs !== "" && !isNaN(ph) && !isNaN(pa);
+        const derivedOT  = !hasSc ? null : ph > pa ? "1" : ph === pa ? "X" : "2";
+        const isDrawn    = derivedOT === "X";
+        const otLabel    = derivedOT === "1" ? `🏠 LOCAL gana ${m.homeFlag}`
+                         : derivedOT === "X" ? "🤝 EMPATE — elige clasificado"
+                         : derivedOT === "2" ? `✈️ VISITA gana ${m.awayFlag}`
+                         : "Ingresa el marcador";
+        const otClass    = { "1":"home","X":"draw","2":"away" }[derivedOT] || "empty";
+
+        const advanceRow = isDrawn ? `
+            <div class="advance-row">
+              <span class="advance-label">¿CLASIFICA?</span>
+              <button class="advance-btn ${curAdv==="home"?"sel":""}"
+                onclick="adminSetAdvance('${userId}','${m.id}','home','${uid_mid}')">
+                ${m.homeFlag} ${m.home}
+              </button>
+              <button class="advance-btn ${curAdv==="away"?"sel":""}"
+                onclick="adminSetAdvance('${userId}','${m.id}','away','${uid_mid}')">
+                ${m.awayFlag} ${m.away}
+              </button>
+            </div>` : "";
+
         return `
           <div class="modal-pick-edit-row" id="editrow_${uid_mid}">
             <div class="modal-pick-edit-match">
               <span>${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag}</span>
               <span class="modal-pick-edit-pts ${ptsZero ? "zero" : ""}">${ptsStr !== "–" ? ptsStr + " pts" : "–"}</span>
             </div>
-            <div class="edit-ot-row">
-              <button class="edit-ot-btn ${curOt==="1"?"sel-1":""}" id="eot1_${uid_mid}"
-                onclick="adminToggleOt('${userId}','${m.id}','1','${uid_mid}')">🏠 LOCAL</button>
-              <button class="edit-ot-btn ${curOt==="X"?"sel-x":""}" id="eotx_${uid_mid}"
-                onclick="adminToggleOt('${userId}','${m.id}','X','${uid_mid}')">🤝 EMPATE</button>
-              <button class="edit-ot-btn ${curOt==="2"?"sel-2":""}" id="eot2_${uid_mid}"
-                onclick="adminToggleOt('${userId}','${m.id}','2','${uid_mid}')">✈️ VISITA</button>
-            </div>
+            <div class="ot-derived ${otClass}" style="margin-bottom:7px;font-size:11px">${otLabel}</div>
+            ${advanceRow}
             <div class="edit-score-row">
               <span class="edit-score-label">MARCADOR</span>
               <div class="edit-score-inputs">
                 <input class="edit-score-input" type="number" min="0" max="20"
-                  id="ehs_${uid_mid}" value="${curHs}" placeholder="–" />
+                  id="ehs_${uid_mid}" value="${curHs}" placeholder="–"
+                  oninput="adminOnScoreInput('${userId}','${m.id}','${uid_mid}')" />
                 <span class="edit-score-sep">:</span>
                 <input class="edit-score-input" type="number" min="0" max="20"
-                  id="eas_${uid_mid}" value="${curAs}" placeholder="–" />
+                  id="eas_${uid_mid}" value="${curAs}" placeholder="–"
+                  oninput="adminOnScoreInput('${userId}','${m.id}','${uid_mid}')" />
               </div>
               <button class="edit-save-btn"
                 onclick="adminSavePickForUser('${userId}','${m.id}','${uid_mid}')">💾</button>
@@ -1433,58 +1454,115 @@ function _renderModalContent(userId) {
 }
 
 /* ── Helpers de edición admin en modal ─────────────────────── */
-function adminToggleOt(userId, matchId, value, uid_mid) {
-  // Actualiza estado visual sin guardar aún
-  const pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
-  const curOt = pick?.ot;
-  const newOt = curOt === value ? null : value;
 
-  // Actualiza cache local para que el botón se vea seleccionado
-  if (pick) { pick._draft_ot = newOt; }
-  else {
-    // Crea entrada draft en memoria
-    const draft = { user_id: userId, match_id: matchId, ot: null, home_score: null, away_score: null, _draft_ot: newOt };
-    DB.picks.push(draft);
+// Re-renderiza la fila de un partido en el modal admin al escribir el marcador
+function adminOnScoreInput(userId, matchId, uid_mid) {
+  const hsEl  = document.getElementById(`ehs_${uid_mid}`);
+  const asEl  = document.getElementById(`eas_${uid_mid}`);
+  const hs    = hsEl?.value ?? "";
+  const as_   = asEl?.value ?? "";
+  const ph    = parseInt(hs), pa = parseInt(as_);
+  const hasSc = hs !== "" && as_ !== "" && !isNaN(ph) && !isNaN(pa);
+
+  // Actualiza cache local del pick
+  let pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
+  if (!pick) {
+    pick = { user_id: userId, match_id: matchId, ot: null, home_score: null, away_score: null, advance: null };
+    DB.picks.push(pick);
   }
+  pick.home_score = hasSc ? ph : null;
+  pick.away_score = hasSc ? pa : null;
+  // Si deja de ser empate, limpia el clasificado
+  if (hasSc && ph !== pa) pick.advance = null;
 
-  // Refresca solo los botones de este partido
-  ["1","X","2"].forEach(v => {
-    const clsMap = { "1":"sel-1", "X":"sel-x", "2":"sel-2" };
-    const idMap  = { "1":`eot1_${uid_mid}`, "X":`eotx_${uid_mid}`, "2":`eot2_${uid_mid}` };
-    const btn = document.getElementById(idMap[v]);
-    if (!btn) return;
-    btn.className = "edit-ot-btn" + (v === newOt ? " " + clsMap[v] : "");
+  // Actualiza solo el badge OT y la fila de clasificado dentro de la tarjeta
+  const row = document.getElementById(`editrow_${uid_mid}`);
+  if (!row) return;
+
+  const match = DB.matches.find(m => m.id === matchId);
+  const derivedOT = !hasSc ? null : ph > pa ? "1" : ph === pa ? "X" : "2";
+  const otLabel   = derivedOT === "1" ? `🏠 LOCAL gana ${match.homeFlag}`
+                  : derivedOT === "X" ? "🤝 EMPATE — elige clasificado"
+                  : derivedOT === "2" ? `✈️ VISITA gana ${match.awayFlag}`
+                  : "Ingresa el marcador";
+  const otClass   = { "1":"home","X":"draw","2":"away" }[derivedOT] || "empty";
+
+  // Actualiza badge
+  const badge = row.querySelector(".ot-derived");
+  if (badge) { badge.className = `ot-derived ${otClass}`; badge.textContent = otLabel; }
+
+  // Muestra/oculta selector de clasificado
+  let advRow = row.querySelector(".advance-row");
+  if (derivedOT === "X") {
+    if (!advRow) {
+      advRow = document.createElement("div");
+      advRow.className = "advance-row";
+      advRow.innerHTML = `
+        <span class="advance-label">¿CLASIFICA?</span>
+        <button class="advance-btn ${pick.advance==="home"?"sel":""}"
+          onclick="adminSetAdvance('${userId}','${matchId}','home','${uid_mid}')">
+          ${match.homeFlag} ${match.home}
+        </button>
+        <button class="advance-btn ${pick.advance==="away"?"sel":""}"
+          onclick="adminSetAdvance('${userId}','${matchId}','away','${uid_mid}')">
+          ${match.awayFlag} ${match.away}
+        </button>`;
+      badge?.insertAdjacentElement("afterend", advRow);
+    }
+  } else {
+    advRow?.remove();
+  }
+}
+
+function adminSetAdvance(userId, matchId, value, uid_mid) {
+  let pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
+  if (!pick) return;
+  pick.advance = pick.advance === value ? null : value;
+  // Actualiza clases de los botones de clasificado en la fila
+  const row = document.getElementById(`editrow_${uid_mid}`);
+  if (!row) return;
+  row.querySelectorAll(".advance-btn").forEach((btn, i) => {
+    const v = i === 0 ? "home" : "away";
+    btn.className = "advance-btn" + (pick.advance === v ? " sel" : "");
   });
 }
 
 async function adminSavePickForUser(userId, matchId, uid_mid) {
-  let pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
-  // Leer OT del estado draft o del pick real
-  const ot  = pick?._draft_ot !== undefined ? pick._draft_ot : pick?.ot;
-  const hs  = document.getElementById(`ehs_${uid_mid}`)?.value;
-  const as_ = document.getElementById(`eas_${uid_mid}`)?.value;
+  const hs  = document.getElementById(`ehs_${uid_mid}`)?.value ?? "";
+  const as_ = document.getElementById(`eas_${uid_mid}`)?.value ?? "";
 
-  if (!ot) { showToast("Elige LOCAL, EMPATE o VISITA", "error"); return; }
+  if (hs === "" || as_ === "") { showToast("Ingresa el marcador completo", "error"); return; }
+  const ph = parseInt(hs), pa = parseInt(as_);
+  if (isNaN(ph) || isNaN(pa)) { showToast("Marcador inválido", "error"); return; }
+
+  const derivedOT = ph > pa ? "1" : ph === pa ? "X" : "2";
+
+  let pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
+  if (!pick) {
+    pick = { user_id: userId, match_id: matchId, ot: null, home_score: null, away_score: null, advance: null };
+    DB.picks.push(pick);
+  }
+
+  // Validar: empate requiere clasificado
+  if (derivedOT === "X" && !pick.advance) {
+    showToast("Elige qué equipo clasifica en el empate", "error"); return;
+  }
 
   const payload = {
     user_id:    userId,
     match_id:   matchId,
-    ot,
-    home_score: hs !== "" ? parseInt(hs) : null,
-    away_score: as_ !== "" ? parseInt(as_) : null,
+    ot:         derivedOT,
+    home_score: ph,
+    away_score: pa,
+    advance:    derivedOT === "X" ? pick.advance : null,
   };
 
   try {
     await supabase.upsert("picks", payload);
-    // Actualiza cache local
-    if (pick) {
-      pick.ot = ot; pick.home_score = payload.home_score;
-      pick.away_score = payload.away_score; delete pick._draft_ot;
-    } else {
-      DB.picks.push({ ...payload });
-    }
+    pick.ot = derivedOT; pick.home_score = ph; pick.away_score = pa;
+    pick.advance = payload.advance;
+    delete pick._draft_ot;
     showToast("✅ Pick guardado", "success");
-    // Re-renderiza el modal para reflejar puntos actualizados
     _renderModalContent(userId);
     renderRanking();
     renderAdmin();
