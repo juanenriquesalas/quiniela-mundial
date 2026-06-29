@@ -414,6 +414,25 @@
       padding: 9px; font-size: 12px; font-weight: 700; color: var(--green-deep); cursor: pointer;
     }
 
+
+    /* RANKING — detalle por fase */
+    .phase-block { margin-bottom: 10px; }
+    .phase-block:last-child { margin-bottom: 0; }
+    .phase-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 8px; background: var(--gray-1);
+      border-radius: 6px; margin-bottom: 5px;
+    }
+    .phase-name {
+      font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif;
+      font-size: 13px; letter-spacing: 1.5px; color: var(--gold);
+    }
+    .phase-pts {
+      font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif;
+      font-size: 18px; color: var(--gold);
+    }
+    .phase-pts-lbl { font-size: 9px; color: var(--muted); margin-left: 2px; }
+
     /* LOADING */
     .loading-overlay { position: fixed; inset: 0; background: rgba(10,22,40,.88); z-index: 900; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
     .loading-overlay.hidden { display: none; }
@@ -558,23 +577,26 @@ const CONFIG = {
 /* ═══════════════════════════════════════════════════════════════
    FIXTURE
 ═══════════════════════════════════════════════════════════════ */
+// Campo "phase" identifica la fase de cada partido.
+// Valores posibles: "16vos" | "8vos" | "Cuartos" | "Semis" | "Final"
+// Al agregar fases futuras, incluye el campo phase con el valor correspondiente.
 const MATCHES = [
-  { id:"m01", day:"Dom 28 Jun", timeISO:"2026-06-28T15:00:00-04:00", home:"Sudáfrica",      homeFlag:"RSA", away:"Canadá",      awayFlag:"CAN" },
-  { id:"m02", day:"Lun 29 Jun", timeISO:"2026-06-29T13:00:00-04:00", home:"Brasil",          homeFlag:"BRA", away:"Japón",       awayFlag:"JPN" },
-  { id:"m03", day:"Lun 29 Jun", timeISO:"2026-06-29T16:30:00-04:00", home:"Alemania",        homeFlag:"GER", away:"Paraguay",    awayFlag:"PAR" },
-  { id:"m04", day:"Lun 29 Jun", timeISO:"2026-06-29T21:00:00-04:00", home:"Países Bajos",    homeFlag:"NED", away:"Marruecos",   awayFlag:"MAR" },
-  { id:"m05", day:"Mar 30 Jun", timeISO:"2026-06-30T13:00:00-04:00", home:"Costa de Marfil", homeFlag:"CIV", away:"Noruega",     awayFlag:"NOR" },
-  { id:"m06", day:"Mar 30 Jun", timeISO:"2026-06-30T17:00:00-04:00", home:"Francia",          homeFlag:"FRA", away:"Suecia",      awayFlag:"SWE" },
-  { id:"m07", day:"Mar 30 Jun", timeISO:"2026-06-30T21:00:00-04:00", home:"México",           homeFlag:"MEX", away:"Ecuador",     awayFlag:"ECU" },
-  { id:"m08", day:"Mié 01 Jul", timeISO:"2026-07-01T12:00:00-04:00", home:"Inglaterra",       homeFlag:"ENG", away:"RD Congo",   awayFlag:"COD" },
-  { id:"m09", day:"Mié 01 Jul", timeISO:"2026-07-01T16:00:00-04:00", home:"Bélgica",          homeFlag:"BEL", away:"Senegal",     awayFlag:"SEN" },
-  { id:"m10", day:"Mié 01 Jul", timeISO:"2026-07-01T20:00:00-04:00", home:"EE.UU.",           homeFlag:"USA", away:"Bosnia H.",   awayFlag:"BIH" },
-  { id:"m11", day:"Jue 02 Jul", timeISO:"2026-07-02T15:00:00-04:00", home:"España",           homeFlag:"ESP", away:"Austria",     awayFlag:"AUT" },
-  { id:"m12", day:"Jue 02 Jul", timeISO:"2026-07-02T19:00:00-04:00", home:"Portugal",         homeFlag:"POR", away:"Croacia",     awayFlag:"CRO" },
-  { id:"m13", day:"Jue 02 Jul", timeISO:"2026-07-02T23:00:00-04:00", home:"Suiza",            homeFlag:"SUI", away:"Argelia",     awayFlag:"ALG" },
-  { id:"m14", day:"Vie 03 Jul", timeISO:"2026-07-03T14:00:00-04:00", home:"Australia",        homeFlag:"AUS", away:"Egipto",      awayFlag:"EGY" },
-  { id:"m15", day:"Vie 03 Jul", timeISO:"2026-07-03T18:00:00-04:00", home:"Argentina",        homeFlag:"ARG", away:"Cabo Verde",  awayFlag:"CPV" },
-  { id:"m16", day:"Vie 03 Jul", timeISO:"2026-07-03T21:30:00-04:00", home:"Colombia",         homeFlag:"COL", away:"Ghana",       awayFlag:"GHA" },
+  { id:"m01", phase:"16vos", day:"Dom 28 Jun", timeISO:"2026-06-28T15:00:00-04:00", home:"Sudáfrica",      homeFlag:"RSA", away:"Canadá",      awayFlag:"CAN" },
+  { id:"m02", phase:"16vos", day:"Lun 29 Jun", timeISO:"2026-06-29T13:00:00-04:00", home:"Brasil",          homeFlag:"BRA", away:"Japón",       awayFlag:"JPN" },
+  { id:"m03", phase:"16vos", day:"Lun 29 Jun", timeISO:"2026-06-29T16:30:00-04:00", home:"Alemania",        homeFlag:"GER", away:"Paraguay",    awayFlag:"PAR" },
+  { id:"m04", phase:"16vos", day:"Lun 29 Jun", timeISO:"2026-06-29T21:00:00-04:00", home:"Países Bajos",    homeFlag:"NED", away:"Marruecos",   awayFlag:"MAR" },
+  { id:"m05", phase:"16vos", day:"Mar 30 Jun", timeISO:"2026-06-30T13:00:00-04:00", home:"Costa de Marfil", homeFlag:"CIV", away:"Noruega",     awayFlag:"NOR" },
+  { id:"m06", phase:"16vos", day:"Mar 30 Jun", timeISO:"2026-06-30T17:00:00-04:00", home:"Francia",          homeFlag:"FRA", away:"Suecia",      awayFlag:"SWE" },
+  { id:"m07", phase:"16vos", day:"Mar 30 Jun", timeISO:"2026-06-30T21:00:00-04:00", home:"México",           homeFlag:"MEX", away:"Ecuador",     awayFlag:"ECU" },
+  { id:"m08", phase:"16vos", day:"Mié 01 Jul", timeISO:"2026-07-01T12:00:00-04:00", home:"Inglaterra",       homeFlag:"ENG", away:"RD Congo",   awayFlag:"COD" },
+  { id:"m09", phase:"16vos", day:"Mié 01 Jul", timeISO:"2026-07-01T16:00:00-04:00", home:"Bélgica",          homeFlag:"BEL", away:"Senegal",     awayFlag:"SEN" },
+  { id:"m10", phase:"16vos", day:"Mié 01 Jul", timeISO:"2026-07-01T20:00:00-04:00", home:"EE.UU.",           homeFlag:"USA", away:"Bosnia H.",   awayFlag:"BIH" },
+  { id:"m11", phase:"16vos", day:"Jue 02 Jul", timeISO:"2026-07-02T15:00:00-04:00", home:"España",           homeFlag:"ESP", away:"Austria",     awayFlag:"AUT" },
+  { id:"m12", phase:"16vos", day:"Jue 02 Jul", timeISO:"2026-07-02T19:00:00-04:00", home:"Portugal",         homeFlag:"POR", away:"Croacia",     awayFlag:"CRO" },
+  { id:"m13", phase:"16vos", day:"Jue 02 Jul", timeISO:"2026-07-02T23:00:00-04:00", home:"Suiza",            homeFlag:"SUI", away:"Argelia",     awayFlag:"ALG" },
+  { id:"m14", phase:"16vos", day:"Vie 03 Jul", timeISO:"2026-07-03T14:00:00-04:00", home:"Australia",        homeFlag:"AUS", away:"Egipto",      awayFlag:"EGY" },
+  { id:"m15", phase:"16vos", day:"Vie 03 Jul", timeISO:"2026-07-03T18:00:00-04:00", home:"Argentina",        homeFlag:"ARG", away:"Cabo Verde",  awayFlag:"CPV" },
+  { id:"m16", phase:"16vos", day:"Vie 03 Jul", timeISO:"2026-07-03T21:30:00-04:00", home:"Colombia",         homeFlag:"COL", away:"Ghana",       awayFlag:"GHA" },
 ];
 
 const CHAMPION_TEAMS = [
@@ -1100,20 +1122,43 @@ function renderRanking() {
   document.getElementById("rankingList").innerHTML = ranking.map((u, i) => {
     const ct  = CHAMPION_TEAMS.find(t => t.id === u.champion);
     const isMe = u.id === currentUser.id;
-    const pickRows = DB.matches.map(m => {
-      const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
-      if (!pick?.ot) return `<div class="detail-pick-row"><span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span><span class="detail-pick-sel" style="color:var(--muted)">–</span><span class="detail-pick-score">–</span><span class="detail-pick-pts zero">–</span></div>`;
-      const p = calcPickPts(pick, m);
-      const otLabel = { "1":"LOC","X":"EMP","2":"VIS" }[pick.ot];
-      const otColor = { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot];
-      const sc = pick.home_score !== null ? `${pick.home_score}-${pick.away_score}` : "–";
-      return `<div class="detail-pick-row">
-        <span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span>
-        <span class="detail-pick-sel" style="color:${otColor}">${otLabel}</span>
-        <span class="detail-pick-score">${sc}</span>
-        <span class="detail-pick-pts ${p.total===0?"zero":""}">${m.done ? p.total : "–"}</span>
-      </div>`;
+    // Agrupar partidos por fase para el detalle expandible
+    const phases = [...new Set(DB.matches.map(m => m.phase || "General"))];
+    const phaseBlocks = phases.map(phase => {
+      const phaseMatches = DB.matches.filter(m => (m.phase || "General") === phase);
+      let phasePts = 0;
+      const rows = phaseMatches.map(m => {
+        const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
+        const p    = calcPickPts(pick, m);
+        if (m.done) phasePts += p.total;
+        if (!pick?.ot) return `<div class="detail-pick-row">
+          <span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span>
+          <span class="detail-pick-sel" style="color:var(--muted)">–</span>
+          <span class="detail-pick-score">–</span>
+          <span class="detail-pick-pts zero">–</span>
+        </div>`;
+        const otLabel = { "1":"LOC","X":"EMP","2":"VIS" }[pick.ot];
+        const otColor = { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot];
+        const sc = pick.home_score !== null ? `${pick.home_score}-${pick.away_score}` : "–";
+        const advLabel = pick.ot === "X" && pick.advance
+          ? (pick.advance === "home" ? ` →${m.homeFlag}` : ` →${m.awayFlag}`) : "";
+        return `<div class="detail-pick-row">
+          <span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span>
+          <span class="detail-pick-sel" style="color:${otColor}">${otLabel}${advLabel}</span>
+          <span class="detail-pick-score">${sc}</span>
+          <span class="detail-pick-pts ${p.total===0?"zero":""}">${m.done ? p.total : "–"}</span>
+        </div>`;
+      }).join("");
+      return `
+        <div class="phase-block">
+          <div class="phase-header">
+            <span class="phase-name">${phase}</span>
+            <span><span class="phase-pts">${phasePts}</span><span class="phase-pts-lbl">pts</span></span>
+          </div>
+          ${rows}
+        </div>`;
     }).join("");
+
     return `
       <div class="ranking-row ${isMe?"me":""}" id="rrow_${u.id}" onclick="toggleDetail('${u.id}')">
         <div class="rank-pos ${i<3?"top":""}">${i+1}</div>
@@ -1129,8 +1174,8 @@ function renderRanking() {
           <div class="detail-cell"><div class="detail-val">${Math.floor(u.exact/3)}</div><div class="detail-lbl">Exactos</div></div>
           <div class="detail-cell"><div class="detail-val">${u.champ}</div><div class="detail-lbl">Campeón</div></div>
         </div>
-        <div class="detail-picks-title">PICKS POR PARTIDO</div>
-        ${pickRows}
+        <div class="detail-picks-title">PICKS POR FASE</div>
+        ${phaseBlocks}
       </div>`;
   }).join("");
 }
@@ -1230,7 +1275,10 @@ function renderAdmin() {
           <button class="admin-save-btn" onclick="adminSaveMatch('${m.id}')">💾 GUARDAR RESULTADO</button>
         </div>
         <div class="admin-picks-summary">
-          <div class="admin-picks-title">PICKS DE PARTICIPANTES</div>
+          <div class="admin-picks-title" style="display:flex;justify-content:space-between;align-items:center">
+            <span>PICKS DE PARTICIPANTES</span>
+            <span style="font-size:9px;color:var(--gold);font-weight:700;letter-spacing:1px">${m.phase?.toUpperCase() || ""} · ${m.day}</span>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 38px 54px 32px 28px;margin-bottom:3px;padding-bottom:4px;border-bottom:1px solid var(--gray-3)">
             <span style="font-size:9px;color:var(--muted);font-weight:700">JUGADOR</span>
             <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RES.</span>
