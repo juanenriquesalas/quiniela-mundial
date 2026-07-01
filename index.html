@@ -309,6 +309,63 @@
     .pstat-val { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 18px; color: var(--gold); line-height: 1; }
     .pstat-lbl { font-size: 8px; color: var(--muted); margin-top: 1px; }
 
+
+
+    /* ADMIN — acordeón resultados */
+    .admin-accordion-header {
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; padding: 10px 13px;
+      background: var(--gray-2); border-radius: var(--rs);
+      margin-bottom: 6px; user-select: none;
+      border: 1px solid var(--gray-3); transition: border-color 0.15s;
+    }
+    .admin-accordion-header:active { border-color: var(--gold); }
+    .admin-accordion-left { display: flex; align-items: center; gap: 8px; }
+    .admin-accordion-phase {
+      font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif;
+      font-size: 14px; letter-spacing: 1.5px; color: var(--gold);
+    }
+    .admin-accordion-meta { font-size: 10px; color: var(--muted); }
+    .admin-accordion-right { display: flex; align-items: center; gap: 8px; }
+    .admin-accordion-pts {
+      font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif;
+      font-size: 11px; color: var(--muted);
+    }
+    .admin-accordion-arrow {
+      font-size: 11px; color: var(--muted);
+      transition: transform 0.2s; display: inline-block;
+    }
+    .admin-accordion-arrow.open { transform: rotate(180deg); }
+    .admin-accordion-body { display: none; }
+    .admin-accordion-body.open { display: block; }
+
+    /* ADMIN — eliminar participante */
+    .participant-card { position: relative; }
+    .delete-user-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: transparent; border: none;
+      color: var(--muted); font-size: 14px; cursor: pointer;
+      width: 22px; height: 22px; display: flex; align-items: center;
+      justify-content: center; border-radius: 50%;
+      transition: all 0.15s; line-height: 1;
+    }
+    .delete-user-btn:hover { background: rgba(224,82,82,.18); color: var(--danger); }
+    .participant-card.confirm-delete { border-color: var(--danger) !important; background: rgba(224,82,82,.07); }
+    .confirm-delete-bar {
+      display: flex; gap: 5px; margin-top: 8px; padding-top: 8px;
+      border-top: 1px solid rgba(224,82,82,.3);
+    }
+    .confirm-yes-btn {
+      flex: 1; background: var(--danger); border: none; border-radius: 6px;
+      padding: 6px 4px; font-size: 10px; font-weight: 700; color: var(--white);
+      cursor: pointer; letter-spacing: 0.3px;
+    }
+    .confirm-no-btn {
+      flex: 1; background: var(--gray-2); border: 1px solid var(--gray-3);
+      border-radius: 6px; padding: 6px 4px; font-size: 10px; font-weight: 700;
+      color: var(--muted); cursor: pointer;
+    }
+
     /* MODAL */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 500; align-items: flex-end; justify-content: center; }
     .modal-overlay.open { display: flex; }
@@ -597,6 +654,11 @@ const MATCHES = [
   { id:"m14", phase:"16vos", day:"Vie 03 Jul", timeISO:"2026-07-03T14:00:00-04:00", home:"Australia",        homeFlag:"AUS", away:"Egipto",      awayFlag:"EGY" },
   { id:"m15", phase:"16vos", day:"Vie 03 Jul", timeISO:"2026-07-03T18:00:00-04:00", home:"Argentina",        homeFlag:"ARG", away:"Cabo Verde",  awayFlag:"CPV" },
   { id:"m16", phase:"16vos", day:"Vie 03 Jul", timeISO:"2026-07-03T21:30:00-04:00", home:"Colombia",         homeFlag:"COL", away:"Ghana",       awayFlag:"GHA" },
+  // ── 8VOS DE FINAL ────────────────────────────────────────────────────────
+  { id:"m17", phase:"8vos", day:"Sáb 04 Jul", timeISO:"2026-07-04T13:00:00-04:00", home:"Canadá",           homeFlag:"CAN", away:"Marruecos",   awayFlag:"MAR" },
+  { id:"m18", phase:"8vos", day:"Sáb 04 Jul", timeISO:"2026-07-04T17:00:00-04:00", home:"Paraguay",         homeFlag:"PAR", away:"Francia",      awayFlag:"FRA" },
+  { id:"m19", phase:"8vos", day:"Dom 05 Jul", timeISO:"2026-07-05T16:00:00-04:00", home:"Brasil",           homeFlag:"BRA", away:"Noruega",      awayFlag:"NOR" },
+  { id:"m20", phase:"8vos", day:"Dom 05 Jul", timeISO:"2026-07-05T20:00:00-04:00", home:"México",           homeFlag:"MEX", away:"Inglaterra",   awayFlag:"ENG" },
 ];
 
 const CHAMPION_TEAMS = [
@@ -1128,9 +1190,19 @@ function renderRanking() {
       const phaseMatches = DB.matches.filter(m => (m.phase || "General") === phase);
       let phasePts = 0;
       const rows = phaseMatches.map(m => {
-        const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
-        const p    = calcPickPts(pick, m);
+        const pick   = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
+        const p      = calcPickPts(pick, m);
+        const locked = isLocked(m);
         if (m.done) phasePts += p.total;
+
+        // Si el partido aún está abierto para apostar, ocultar el pronóstico
+        if (!locked && !m.done) return `<div class="detail-pick-row">
+          <span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span>
+          <span class="detail-pick-sel" style="color:var(--muted)">🔓 abierto</span>
+          <span class="detail-pick-score">–</span>
+          <span class="detail-pick-pts zero">–</span>
+        </div>`;
+
         if (!pick?.ot) return `<div class="detail-pick-row">
           <span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span>
           <span class="detail-pick-sel" style="color:var(--muted)">–</span>
@@ -1180,6 +1252,16 @@ function renderRanking() {
   }).join("");
 }
 
+
+function toggleAdminAccordion(id) {
+  const body  = document.getElementById(id);
+  const arrow = document.getElementById(`arr_${id}`);
+  if (!body) return;
+  const isOpen = body.classList.contains("open");
+  body.classList.toggle("open", !isOpen);
+  if (arrow) arrow.classList.toggle("open", !isOpen);
+}
+
 function toggleDetail(userId) {
   const detail = document.getElementById(`rdetail_${userId}`);
   const row    = document.getElementById(`rrow_${userId}`);
@@ -1212,82 +1294,108 @@ function renderAdmin() {
         }).join("");
         const picksCount = DB.matches.filter(m => DB.picks.find(p => p.user_id === u.id && p.match_id === m.id && p.ot)).length;
         return `
-          <div class="participant-card ${u.is_admin?"admin-user":""}" onclick="openParticipantModal('${u.id}')">
-            <div class="participant-name">${u.name}</div>
-            <span class="participant-badge ${u.is_admin?"admin":"user"}">${u.is_admin?"⚙️ ADMIN":"✅ ACTIVO"}</span>
-            <div class="participant-champ">Campeón: <b>${ct ? ct.id+" "+ct.name : "Sin elegir"}</b></div>
-            <div class="participant-progress">${dots}</div>
-            <div class="participant-stats">
-              <div class="pstat"><div class="pstat-val">${picksCount}</div><div class="pstat-lbl">PICKS</div></div>
-              <div class="pstat"><div class="pstat-val">${playedCount}</div><div class="pstat-lbl">JUGADOS</div></div>
-              <div class="pstat"><div class="pstat-val">${stats.pts}</div><div class="pstat-lbl">PUNTOS</div></div>
+          <div class="participant-card ${u.is_admin?"admin-user":""}" id="pcard_${u.id}">
+            <button class="delete-user-btn" title="Eliminar jugador"
+              onclick="event.stopPropagation(); confirmDeleteUser('${u.id}')">✕</button>
+            <div onclick="openParticipantModal('${u.id}')">
+              <div class="participant-name">${u.name}</div>
+              <span class="participant-badge ${u.is_admin?"admin":"user"}">${u.is_admin?"⚙️ ADMIN":"✅ ACTIVO"}</span>
+              <div class="participant-champ">Campeón: <b>${ct ? ct.id+" "+ct.name : "Sin elegir"}</b></div>
+              <div class="participant-progress">${dots}</div>
+              <div class="participant-stats">
+                <div class="pstat"><div class="pstat-val">${picksCount}</div><div class="pstat-lbl">PICKS</div></div>
+                <div class="pstat"><div class="pstat-val">${playedCount}</div><div class="pstat-lbl">JUGADOS</div></div>
+                <div class="pstat"><div class="pstat-val">${stats.pts}</div><div class="pstat-lbl">PUNTOS</div></div>
+              </div>
             </div>
           </div>`;
       }).join("");
 
-  const matchCards = DB.matches.map(m => {
-    const pickRows = DB.users.map(u => {
-      const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
-      if (!pick?.ot) return `<div class="admin-pick-row"><span class="admin-pick-name">${u.name}</span><span class="admin-pick-ot" style="color:var(--muted)">–</span><span class="admin-pick-sc">–</span><span class="admin-pick-pts zero">–</span></div>`;
-      const p        = calcPickPts(pick, m);
-      const otLabel  = { "1":"LOC","X":"EMP","2":"VIS" }[pick.ot];
-      const otColor  = { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot];
-      const sc       = pick.home_score !== null ? `${pick.home_score} - ${pick.away_score}` : "–";
-      // Clasificado: solo visible cuando el pick fue empate
-      const advLabel = pick.ot === "X" && pick.advance
-        ? (pick.advance === "home" ? `→ ${m.homeFlag}` : `→ ${m.awayFlag}`)
-        : "";
-      const advColor = pick.ot === "X" && pick.advance ? "var(--gold)" : "transparent";
-      return `<div class="admin-pick-row">
-        <span class="admin-pick-name">${u.name}</span>
-        <span class="admin-pick-ot" style="color:${otColor}">${otLabel}</span>
-        <span class="admin-pick-sc">${sc}</span>
-        <span class="admin-pick-adv" style="width:32px;text-align:center;font-size:11px;font-weight:700;color:${advColor}">${advLabel}</span>
-        <span class="admin-pick-pts ${p.total===0?"zero":""}">${m.done ? p.total : "–"}</span>
-      </div>`;
-    }).join("") || `<div style="font-size:11px;color:var(--muted);padding:4px 0">Sin participantes aún</div>`;
+  // Agrupar partidos por fase para el acordeón
+  const matchPhases = [...new Set(DB.matches.map(m => m.phase || "General"))];
+  const phaseOrder  = ["16vos","8vos","Cuartos","Semis","Final","General"];
+  matchPhases.sort((a,b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b));
 
+  const matchCards = matchPhases.map(phase => {
+    const phaseMatches = DB.matches.filter(m => (m.phase || "General") === phase);
+    const doneCnt  = phaseMatches.filter(m => m.done).length;
+    const totalCnt = phaseMatches.length;
+
+    const cards = phaseMatches.map(m => {
+      const pickRows = DB.users.map(u => {
+        const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
+        if (!pick?.ot) return `<div class="admin-pick-row"><span class="admin-pick-name">${u.name}</span><span class="admin-pick-ot" style="color:var(--muted)">–</span><span class="admin-pick-sc">–</span><span class="admin-pick-adv" style="width:32px"></span><span class="admin-pick-pts zero">–</span></div>`;
+        const p       = calcPickPts(pick, m);
+        const otLabel = { "1":"LOC","X":"EMP","2":"VIS" }[pick.ot];
+        const otColor = { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot];
+        const sc      = pick.home_score !== null ? `${pick.home_score} - ${pick.away_score}` : "–";
+        const advLabel = pick.ot === "X" && pick.advance
+          ? (pick.advance === "home" ? `→ ${m.homeFlag}` : `→ ${m.awayFlag}`) : "";
+        const advColor = advLabel ? "var(--gold)" : "transparent";
+        return `<div class="admin-pick-row">
+          <span class="admin-pick-name">${u.name}</span>
+          <span class="admin-pick-ot" style="color:${otColor}">${otLabel}</span>
+          <span class="admin-pick-sc">${sc}</span>
+          <span class="admin-pick-adv" style="width:32px;text-align:center;font-size:11px;font-weight:700;color:${advColor}">${advLabel}</span>
+          <span class="admin-pick-pts ${p.total===0?"zero":""}">${m.done ? p.total : "–"}</span>
+        </div>`;
+      }).join("") || `<div style="font-size:11px;color:var(--muted);padding:4px 0">Sin participantes aún</div>`;
+
+      return `
+        <div class="admin-match-card ${m.done?"done-card":""}" id="admc_${m.id}">
+          <div class="admin-match-title">${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag} · ${m.day} ${fmtTime(m.timeISO)}</div>
+          <div class="admin-row">
+            <span class="admin-label">MARCADOR</span>
+            <input class="admin-score-input" type="number" min="0" max="20" id="adm_hs_${m.id}" value="${m.result?.homeScore??""}" placeholder="–" />
+            <span style="color:var(--gray-3);font-size:20px;font-family:'Bebas Neue',Arial,sans-serif"> : </span>
+            <input class="admin-score-input" type="number" min="0" max="20" id="adm_as_${m.id}" value="${m.result?.awayScore??""}" placeholder="–" />
+          </div>
+          <div class="admin-row">
+            <span class="admin-label">CLASIFICADO</span>
+            <select class="admin-select" id="adm_w_${m.id}">
+              <option value="">-- Seleccionar --</option>
+              <option value="home" ${m.winner==="home"?"selected":""}>${m.homeFlag} ${m.home}</option>
+              <option value="away" ${m.winner==="away"?"selected":""}>${m.awayFlag} ${m.away}</option>
+            </select>
+          </div>
+          <div class="admin-row">
+            <span class="admin-label">ESTADO</span>
+            <select class="admin-select" id="adm_done_${m.id}">
+              <option value="0" ${!m.done?"selected":""}>Pendiente / En juego</option>
+              <option value="1" ${m.done?"selected":""}>✅ Finalizado</option>
+            </select>
+          </div>
+          <div class="admin-footer">
+            <button class="admin-save-btn" onclick="adminSaveMatch('${m.id}')">💾 GUARDAR RESULTADO</button>
+          </div>
+          <div class="admin-picks-summary">
+            <div class="admin-picks-title" style="display:flex;justify-content:space-between;align-items:center">
+              <span>PICKS DE PARTICIPANTES</span>
+              <span style="font-size:9px;color:var(--gold);font-weight:700;letter-spacing:1px">${m.phase?.toUpperCase()||""} · ${m.day}</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 38px 54px 32px 28px;margin-bottom:3px;padding-bottom:4px;border-bottom:1px solid var(--gray-3)">
+              <span style="font-size:9px;color:var(--muted);font-weight:700">JUGADOR</span>
+              <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RES.</span>
+              <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARCADOR</span>
+              <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">CLAS.</span>
+              <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
+            </div>
+            ${pickRows}
+          </div>
+        </div>`;
+    }).join("");
+
+    const accordionId = `acc_${phase.replace(/[^a-z0-9]/gi, "")}`;
     return `
-      <div class="admin-match-card ${m.done?"done-card":""}" id="admc_${m.id}">
-        <div class="admin-match-title">${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag} · ${fmtTime(m.timeISO)}</div>
-        <div class="admin-row">
-          <span class="admin-label">MARCADOR</span>
-          <input class="admin-score-input" type="number" min="0" max="20" id="adm_hs_${m.id}" value="${m.result?.homeScore??""}" placeholder="–" />
-          <span style="color:var(--gray-3);font-size:20px;font-family:'Bebas Neue',Arial,sans-serif"> : </span>
-          <input class="admin-score-input" type="number" min="0" max="20" id="adm_as_${m.id}" value="${m.result?.awayScore??""}" placeholder="–" />
-        </div>
-        <div class="admin-row">
-          <span class="admin-label">CLASIFICADO</span>
-          <select class="admin-select" id="adm_w_${m.id}">
-            <option value="">-- Seleccionar --</option>
-            <option value="home" ${m.winner==="home"?"selected":""}>${m.homeFlag} ${m.home}</option>
-            <option value="away" ${m.winner==="away"?"selected":""}>${m.awayFlag} ${m.away}</option>
-          </select>
-        </div>
-        <div class="admin-row">
-          <span class="admin-label">ESTADO</span>
-          <select class="admin-select" id="adm_done_${m.id}">
-            <option value="0" ${!m.done?"selected":""}>Pendiente / En juego</option>
-            <option value="1" ${m.done?"selected":""}>✅ Finalizado</option>
-          </select>
-        </div>
-        <div class="admin-footer">
-          <button class="admin-save-btn" onclick="adminSaveMatch('${m.id}')">💾 GUARDAR RESULTADO</button>
-        </div>
-        <div class="admin-picks-summary">
-          <div class="admin-picks-title" style="display:flex;justify-content:space-between;align-items:center">
-            <span>PICKS DE PARTICIPANTES</span>
-            <span style="font-size:9px;color:var(--gold);font-weight:700;letter-spacing:1px">${m.phase?.toUpperCase() || ""} · ${m.day}</span>
+      <div style="margin-bottom:8px">
+        <div class="admin-accordion-header" onclick="toggleAdminAccordion('${accordionId}')">
+          <div class="admin-accordion-left">
+            <span class="admin-accordion-phase">${phase}</span>
+            <span class="admin-accordion-meta">${doneCnt}/${totalCnt} finalizados</span>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 38px 54px 32px 28px;margin-bottom:3px;padding-bottom:4px;border-bottom:1px solid var(--gray-3)">
-            <span style="font-size:9px;color:var(--muted);font-weight:700">JUGADOR</span>
-            <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RES.</span>
-            <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARCADOR</span>
-            <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">CLAS.</span>
-            <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
-          </div>
-          ${pickRows}
+          <span class="admin-accordion-arrow" id="arr_${accordionId}">▼</span>
         </div>
+        <div class="admin-accordion-body" id="${accordionId}">${cards}</div>
       </div>`;
   }).join("");
 
@@ -1669,6 +1777,79 @@ async function adminSaveChampionForUser(userId) {
     renderAdmin();
   } catch(e) {
     showToast("Error al guardar", "error"); console.error(e);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ELIMINAR JUGADOR
+═══════════════════════════════════════════════════════════════ */
+function confirmDeleteUser(userId) {
+  const card = document.getElementById(`pcard_${userId}`);
+  if (!card) return;
+
+  // Si ya está en modo confirmación, cancela
+  if (card.classList.contains("confirm-delete")) {
+    card.classList.remove("confirm-delete");
+    card.querySelector(".confirm-delete-bar")?.remove();
+    return;
+  }
+
+  // Proteger al admin actual
+  if (userId === currentUser.id) {
+    showToast("No puedes eliminarte a ti mismo", "error");
+    return;
+  }
+
+  const user = DB.users.find(u => u.id === userId);
+  card.classList.add("confirm-delete");
+
+  // Insertar barra de confirmación al final de la tarjeta
+  const bar = document.createElement("div");
+  bar.className = "confirm-delete-bar";
+  bar.innerHTML = `
+    <button class="confirm-no-btn"  onclick="event.stopPropagation(); cancelDeleteUser('${userId}')">CANCELAR</button>
+    <button class="confirm-yes-btn" onclick="event.stopPropagation(); deleteUser('${userId}')">🗑 ELIMINAR</button>`;
+  card.appendChild(bar);
+}
+
+function cancelDeleteUser(userId) {
+  const card = document.getElementById(`pcard_${userId}`);
+  if (!card) return;
+  card.classList.remove("confirm-delete");
+  card.querySelector(".confirm-delete-bar")?.remove();
+}
+
+async function deleteUser(userId) {
+  const user = DB.users.find(u => u.id === userId);
+  if (!user) return;
+
+  showLoading(`Eliminando a ${user.name}...`);
+  try {
+    // Supabase: eliminar picks del usuario (ON DELETE CASCADE lo haría,
+    // pero lo hacemos explícito por seguridad)
+    await fetch(
+      `${CONFIG.SUPABASE_URL}/rest/v1/picks?user_id=eq.${userId}`,
+      { method: "DELETE", headers: { ...SB_HEADERS() } }
+    );
+    // Eliminar usuario
+    await fetch(
+      `${CONFIG.SUPABASE_URL}/rest/v1/users?id=eq.${userId}`,
+      { method: "DELETE", headers: { ...SB_HEADERS() } }
+    );
+
+    // Actualizar cache local
+    DB.picks  = DB.picks.filter(p => p.user_id !== userId);
+    DB.users  = DB.users.filter(u => u.id !== userId);
+
+    hideLoading();
+    showToast(`✅ ${user.name} eliminado`, "success");
+    renderAdmin();
+    renderRanking();
+  } catch(e) {
+    hideLoading();
+    showToast("Error al eliminar", "error");
+    console.error(e);
   }
 }
 
