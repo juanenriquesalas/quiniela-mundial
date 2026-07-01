@@ -74,6 +74,37 @@
       font-size: 12px; letter-spacing: 3px; color: var(--gold); margin-bottom: 10px; padding: 0 2px;
     }
 
+
+    /* MIS PICKS — acordeón por fase */
+    .picks-accordion { margin-bottom: 10px; border-radius: var(--r); overflow: hidden; border: 1px solid var(--gray-2); }
+    .picks-acc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px; background: var(--gray-2);
+      cursor: pointer; user-select: none; gap: 10px;
+    }
+    .picks-acc-header:active { background: var(--gray-3); }
+    .picks-acc-left  { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .picks-acc-phase {
+      font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif;
+      font-size: 16px; letter-spacing: 1.5px; color: var(--gold); white-space: nowrap;
+    }
+    .picks-acc-chips { display: flex; gap: 5px; flex-wrap: wrap; }
+    .picks-acc-chip  {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+      padding: 2px 7px; border-radius: 10px; white-space: nowrap;
+    }
+    .chip-open   { background: rgba(76,175,135,.18);  color: var(--success); }
+    .chip-done   { background: rgba(160,160,180,.13); color: var(--muted); }
+    .chip-picks  { background: rgba(244,196,48,.15);  color: var(--gold); }
+    .chip-missing{ background: rgba(224,82,82,.15);   color: var(--danger); }
+    .picks-acc-arrow {
+      font-size: 11px; color: var(--muted);
+      transition: transform 0.2s; display: inline-block; flex-shrink: 0;
+    }
+    .picks-acc-arrow.open { transform: rotate(180deg); }
+    .picks-acc-body { display: none; padding: 10px 10px 4px; background: var(--green-deep); }
+    .picks-acc-body.open { display: block; }
+
     /* DAY GROUP */
     .day-group { margin-bottom: 18px; }
     .day-header { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
@@ -935,15 +966,76 @@ async function saveChampion() {
    PARTIDOS
 ═══════════════════════════════════════════════════════════════ */
 function renderMatches() {
-  const days = {};
-  DB.matches.forEach(m => { if (!days[m.day]) days[m.day] = []; days[m.day].push(m); });
-  document.getElementById("matchesByDay").innerHTML =
-    `<div class="section-label">16VOS DE FINAL</div>` +
-    Object.entries(days).map(([day, matches]) => `
+  const phaseOrder = ["16vos","8vos","Cuartos","Semis","Final","General"];
+  const phases = [...new Set(DB.matches.map(m => m.phase || "General"))];
+  phases.sort((a,b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b));
+
+  const accordions = phases.map(phase => {
+    const phaseMatches = DB.matches.filter(m => (m.phase || "General") === phase);
+
+    // Chips de estado
+    const openCount    = phaseMatches.filter(m => !isLocked(m) && !m.done).length;
+    const doneCount    = phaseMatches.filter(m => m.done).length;
+    const pickedCount  = phaseMatches.filter(m => {
+      const pick = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === m.id);
+      return !!pick?.ot;
+    }).length;
+    const missingOpen  = phaseMatches.filter(m => {
+      const open = !isLocked(m) && !m.done;
+      const pick = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === m.id);
+      return open && !pick?.ot;
+    }).length;
+
+    const chips = [];
+    if (openCount > 0)
+      chips.push(`<span class="picks-acc-chip chip-open">🔓 ${openCount} abierto${openCount>1?"s":""}</span>`);
+    if (doneCount > 0 && doneCount < phaseMatches.length)
+      chips.push(`<span class="picks-acc-chip chip-done">✓ ${doneCount} finalizado${doneCount>1?"s":""}</span>`);
+    if (doneCount === phaseMatches.length)
+      chips.push(`<span class="picks-acc-chip chip-done">✓ Fase completa</span>`);
+    if (pickedCount > 0)
+      chips.push(`<span class="picks-acc-chip chip-picks">🎯 ${pickedCount}/${phaseMatches.length} picks</span>`);
+    if (missingOpen > 0)
+      chips.push(`<span class="picks-acc-chip chip-missing">⚠️ ${missingOpen} pendiente${missingOpen>1?"s":""}</span>`);
+
+    // Agrupar por día dentro de la fase
+    const days = {};
+    phaseMatches.forEach(m => { if (!days[m.day]) days[m.day] = []; days[m.day].push(m); });
+    const dayGroups = Object.entries(days).map(([day, matches]) => `
       <div class="day-group">
         <div class="day-header"><span class="day-label">${day}</span><div class="day-line"></div></div>
         ${matches.map(m => renderMatchCard(m)).join("")}
       </div>`).join("");
+
+    // Expandir por defecto si hay partidos abiertos o sin pick
+    const accId   = `pacc_${phase.replace(/[^a-z0-9]/gi,"")}`;
+    const startOpen = openCount > 0 || missingOpen > 0;
+
+    return `
+      <div class="picks-accordion">
+        <div class="picks-acc-header" onclick="togglePicksAccordion('${accId}')">
+          <div class="picks-acc-left">
+            <span class="picks-acc-phase">${phase}</span>
+            <div class="picks-acc-chips">${chips.join("")}</div>
+          </div>
+          <span class="picks-acc-arrow ${startOpen?"open":""}" id="parr_${accId}">▼</span>
+        </div>
+        <div class="picks-acc-body ${startOpen?"open":""}" id="${accId}">
+          ${dayGroups}
+        </div>
+      </div>`;
+  }).join("");
+
+  document.getElementById("matchesByDay").innerHTML = accordions;
+}
+
+function togglePicksAccordion(id) {
+  const body  = document.getElementById(id);
+  const arrow = document.getElementById(`parr_${id}`);
+  if (!body) return;
+  const isOpen = body.classList.contains("open");
+  body.classList.toggle("open", !isOpen);
+  if (arrow) arrow.classList.toggle("open", !isOpen);
 }
 
 function renderMatchCard(match) {
