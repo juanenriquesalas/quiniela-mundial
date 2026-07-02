@@ -238,6 +238,62 @@
     .save-champ-btn:disabled { opacity: 0.38; cursor: not-allowed; }
 
 
+
+    /* STATS — acordeón por partido */
+    .stats-match-acc {
+      background: var(--gray-1); border: 1px solid var(--gray-2);
+      border-radius: var(--r); margin-bottom: 8px; overflow: hidden;
+    }
+    .stats-match-acc-header {
+      padding: 10px 12px; cursor: pointer; user-select: none;
+      transition: background 0.15s;
+    }
+    .stats-match-acc-header:active { background: var(--gray-2); }
+    .stats-match-top {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .stats-match-teams { font-size: 12px; font-weight: 700; color: var(--white); }
+    .stats-match-meta  { font-size: 9px; color: var(--muted); margin-top: 2px; }
+    .stats-match-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .stats-match-scorebox {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 18px; color: var(--gold); line-height: 1;
+      background: var(--gray-2); border-radius: 6px;
+      padding: 3px 10px; white-space: nowrap;
+    }
+    .stats-match-scorebox.pending { font-size: 11px; color: var(--muted); padding: 5px 10px; }
+    .stats-match-acc-arrow {
+      font-size: 11px; color: var(--muted);
+      transition: transform 0.2s; display: inline-block;
+    }
+    .stats-match-acc-arrow.open { transform: rotate(180deg); }
+    /* Picks count chips en el header */
+    .stats-match-chips { display: flex; gap: 4px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+    .stats-cnt-chip {
+      font-size: 9px; font-weight: 700; padding: 2px 6px;
+      border-radius: 8px; white-space: nowrap;
+    }
+    .cnt-home { background: rgba(74,158,255,.15);  color: var(--blue); }
+    .cnt-draw { background: rgba(244,196,48,.15);  color: var(--gold); }
+    .cnt-away { background: rgba(224,82,82,.15);   color: var(--danger); }
+    .cnt-none { background: rgba(160,160,180,.12); color: var(--muted); }
+    /* Cuerpo del acordeón de partido */
+    .stats-match-acc-body {
+      display: none; border-top: 1px solid var(--gray-2);
+      padding: 10px 12px 12px; background: var(--gray-2);
+    }
+    .stats-match-acc-body.open { display: block; }
+    /* Tabla de picks en acordeón */
+    .stats-picks-table {
+      display: grid;
+      grid-template-columns: 1fr 44px 54px 28px;
+      gap: 3px 6px; font-size: 11px; align-items: center;
+    }
+    .stats-picks-table-header span {
+      font-size: 9px; color: var(--muted); font-weight: 700; letter-spacing: 0.5px;
+    }
+
     /* ─── COUNTDOWN ─────────────────────────────────────────────── */
     .match-countdown {
       font-size: 10px; font-weight: 700; color: var(--gold);
@@ -1043,7 +1099,6 @@ function renderStats() {
   const champMap = {};
   DB.users.forEach(u => { if (u.champion) champMap[u.champion] = (champMap[u.champion]||0) + 1; });
   const champSorted = Object.entries(champMap).sort((a,b) => b[1]-a[1]).slice(0,8);
-
   const champGrid = champSorted.length === 0
     ? `<div style="font-size:12px;color:var(--muted)">Nadie ha elegido campeón aún.</div>`
     : champSorted.map(([id, cnt]) => {
@@ -1056,94 +1111,124 @@ function renderStats() {
         </div>`;
       }).join("");
 
-  // Acordeones por fase
+  // Acordeones por fase → dentro cada partido es otro acordeón
   const phaseAccordions = phases.map(phase => {
     const pMatches  = DB.matches.filter(m => (m.phase||"General") === phase);
     const doneCnt   = pMatches.filter(m => m.done).length;
-    const accId     = `sacc_${phase.replace(/[^a-z0-9]/gi,"")}`;
-    const startOpen = doneCnt > 0;
+    const phAccId   = `sacc_${phase.replace(/[^a-z0-9]/gi,"")}`;
+    const phOpen    = doneCnt > 0;
 
-    const matchCards = pMatches.map(m => {
+    const matchAccordions = pMatches.map(m => {
+      const mAccId     = `smatch_${m.id}`;
       const matchPicks = DB.picks.filter(p => p.match_id === m.id && p.ot);
-      const total = matchPicks.length;
-      const cntHome = matchPicks.filter(p => {
-        const ph=parseInt(p.home_score),pa=parseInt(p.away_score);
-        return !isNaN(ph)&&!isNaN(pa)&&ph>pa;
-      }).length;
-      const cntDraw = matchPicks.filter(p => {
-        const ph=parseInt(p.home_score),pa=parseInt(p.away_score);
-        return !isNaN(ph)&&!isNaN(pa)&&ph===pa;
-      }).length;
-      const cntAway = matchPicks.filter(p => {
-        const ph=parseInt(p.home_score),pa=parseInt(p.away_score);
-        return !isNaN(ph)&&!isNaN(pa)&&ph<pa;
-      }).length;
+      const total      = matchPicks.length;
+      const locked     = isLocked(m);
 
+      // Conteo por resultado derivado del marcador
+      const cntHome = matchPicks.filter(p => { const ph=parseInt(p.home_score),pa=parseInt(p.away_score); return !isNaN(ph)&&!isNaN(pa)&&ph>pa; }).length;
+      const cntDraw = matchPicks.filter(p => { const ph=parseInt(p.home_score),pa=parseInt(p.away_score); return !isNaN(ph)&&!isNaN(pa)&&ph===pa; }).length;
+      const cntAway = matchPicks.filter(p => { const ph=parseInt(p.home_score),pa=parseInt(p.away_score); return !isNaN(ph)&&!isNaN(pa)&&ph<pa; }).length;
       const pct = n => total > 0 ? Math.round(n/total*100) : 0;
 
-      // Barras 1X2
-      const bars = `
-        <div class="stats-bars">
+      // Resultado / estado
+      const resultStr = m.done && m.result
+        ? `${m.result.homeScore} – ${m.result.awayScore}`
+        : locked ? "EN JUEGO" : "PRÓXIMO";
+      const resultPending = !m.done;
+
+      // Chips de distribución visible en el header
+      const distChips = total > 0
+        ? `<span class="stats-cnt-chip cnt-home">🏠 ${pct(cntHome)}%</span>
+           <span class="stats-cnt-chip cnt-draw">🤝 ${pct(cntDraw)}%</span>
+           <span class="stats-cnt-chip cnt-away">✈️ ${pct(cntAway)}%</span>
+           <span class="stats-cnt-chip cnt-none">${total} picks</span>`
+        : `<span class="stats-cnt-chip cnt-none">Sin picks</span>`;
+
+      // Barras de distribución (en el body)
+      const bars = total > 0 ? `
+        <div class="stats-bars" style="margin-bottom:10px">
           <div class="stats-bar-block">
             <div class="stats-bar-label">${m.homeFlag} LOCAL</div>
             <div class="stats-bar-track"><div class="stats-bar-fill fill-home" style="width:${pct(cntHome)}%"></div></div>
-            <div class="stats-bar-pct fill-home-txt">${pct(cntHome)}%</div>
+            <div class="stats-bar-pct fill-home-txt">${cntHome} · ${pct(cntHome)}%</div>
           </div>
           <div class="stats-bar-block">
             <div class="stats-bar-label">EMPATE</div>
             <div class="stats-bar-track"><div class="stats-bar-fill fill-draw" style="width:${pct(cntDraw)}%"></div></div>
-            <div class="stats-bar-pct fill-draw-txt">${pct(cntDraw)}%</div>
+            <div class="stats-bar-pct fill-draw-txt">${cntDraw} · ${pct(cntDraw)}%</div>
           </div>
           <div class="stats-bar-block">
             <div class="stats-bar-label">${m.awayFlag} VISITA</div>
             <div class="stats-bar-track"><div class="stats-bar-fill fill-away" style="width:${pct(cntAway)}%"></div></div>
-            <div class="stats-bar-pct fill-away-txt">${pct(cntAway)}%</div>
+            <div class="stats-bar-pct fill-away-txt">${cntAway} · ${pct(cntAway)}%</div>
           </div>
-        </div>`;
+        </div>` : `<div style="font-size:11px;color:var(--muted);margin-bottom:8px">Sin pronósticos registrados</div>`;
 
-      // Tabla de picks individuales — solo si el partido está cerrado
-      let picksTable = "";
-      if (isLocked(m)) {
-        const rows = DB.users.map(u => {
+      // Tabla de picks individuales
+      let picksRows = "";
+      if (locked) {
+        // Ordenar: primero los que acertaron (si hay resultado), luego los demás
+        const sorted = [...DB.users].sort((a, b) => {
+          if (!m.done) return 0;
+          const pa = calcPickPts(DB.picks.find(p=>p.user_id===a.id&&p.match_id===m.id), m).total;
+          const pb = calcPickPts(DB.picks.find(p=>p.user_id===b.id&&p.match_id===m.id), m).total;
+          return pb - pa;
+        });
+        picksRows = sorted.map(u => {
           const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
           const pts  = m.done ? calcPickPts(pick, m).total : null;
-          if (!pick?.ot) return `<span class="stats-pick-name">${u.name}</span><span class="stats-pick-ot" style="color:var(--muted)">–</span><span class="stats-pick-sc">–</span><span class="stats-pick-pts zero">–</span>`;
-          const ph=parseInt(pick.home_score),pa=parseInt(pick.away_score);
-          const pickOT = isNaN(ph)||isNaN(pa)?pick.ot:ph>pa?"1":ph===pa?"X":"2";
-          const otLabel= {"1":"LOC","X":"EMP","2":"VIS"}[pickOT];
-          const otColor= {"1":"var(--blue)","X":"var(--gold)","2":"var(--danger)"}[pickOT];
-          const sc = pick.home_score!==null?`${pick.home_score}-${pick.away_score}`:"–";
-          const adv = pickOT==="X"&&pick.advance ? (pick.advance==="home"?` →${m.homeFlag}`:` →${m.awayFlag}`) : "";
-          return `<span class="stats-pick-name">${u.name}</span>
-            <span class="stats-pick-ot" style="color:${otColor}">${otLabel}${adv}</span>
+          if (!pick?.ot) return `
+            <span class="stats-pick-name" style="color:var(--muted)">${u.name}</span>
+            <span class="stats-pick-ot" style="color:var(--muted)">–</span>
+            <span class="stats-pick-sc">–</span>
+            <span class="stats-pick-pts zero">–</span>`;
+          const ph=parseInt(pick.home_score), pa_=parseInt(pick.away_score);
+          const pickOT  = isNaN(ph)||isNaN(pa_) ? pick.ot : ph>pa_?"1":ph===pa_?"X":"2";
+          const otLabel = {"1":"LOCAL","X":"EMPATE","2":"VISITA"}[pickOT] || pickOT;
+          const otColor = {"1":"var(--blue)","X":"var(--gold)","2":"var(--danger)"}[pickOT] || "var(--muted)";
+          const sc      = pick.home_score!==null ? `${pick.home_score} – ${pick.away_score}` : "–";
+          const adv     = pickOT==="X" && pick.advance
+            ? `<span style="color:var(--gold);font-size:9px"> → ${pick.advance==="home"?m.homeFlag:m.awayFlag}</span>` : "";
+          const ptsStr  = pts!==null ? pts : "?";
+          const ptsZero = pts===0;
+          return `
+            <span class="stats-pick-name">${u.name}</span>
+            <span class="stats-pick-ot" style="color:${otColor};font-size:10px">${otLabel}${adv}</span>
             <span class="stats-pick-sc">${sc}</span>
-            <span class="stats-pick-pts ${pts===0?"zero":""}">${pts!==null?pts:"–"}</span>`;
+            <span class="stats-pick-pts ${ptsZero?"zero":""}">${ptsStr}</span>`;
         }).join("");
-        picksTable = `
-          <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--gray-2)">
-            <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:2px 6px;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid var(--gray-3)">
-              <span style="font-size:9px;color:var(--muted);font-weight:700">JUGADOR</span>
-              <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RES.</span>
-              <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARC.</span>
-              <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
-            </div>
-            <div class="stats-picks-grid">${rows}</div>
-          </div>`;
-      } else {
-        picksTable = `<div style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center">🔓 Los pronósticos se revelan cuando el partido cierra</div>`;
       }
 
-      const resultStr = m.done && m.result ? `${m.result.homeScore} – ${m.result.awayScore}` : (isLocked(m)?"EN JUEGO":"PRÓXIMO");
+      const picksTable = locked
+        ? `<div class="stats-picks-table">
+            <span class="stats-pick-name" style="font-size:9px;color:var(--muted);font-weight:700">JUGADOR</span>
+            <span class="stats-pick-ot"   style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RESULTADO</span>
+            <span class="stats-pick-sc"   style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARCADOR</span>
+            <span class="stats-pick-pts"  style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
+            ${picksRows}
+           </div>`
+        : `<div style="font-size:10px;color:var(--muted);text-align:center;padding:4px 0">
+             🔓 Los picks se revelan cuando cierra el partido
+           </div>`;
 
+      // Acordeón por partido: header siempre visible, body desplegable
       return `
-        <div class="stats-match-card">
-          <div class="stats-match-header">
-            <span class="stats-match-title">${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag}</span>
-            <span class="stats-match-result">${resultStr}</span>
+        <div class="stats-match-acc">
+          <div class="stats-match-acc-header" onclick="toggleMatchStatsAcc('${mAccId}')">
+            <div class="stats-match-top">
+              <div>
+                <div class="stats-match-teams">${m.homeFlag} ${m.home} <span style="color:var(--gray-3)">vs</span> ${m.away} ${m.awayFlag}</div>
+                <div class="stats-match-meta">${m.day} · ${fmtTime(m.timeISO)}</div>
+              </div>
+              <div class="stats-match-right">
+                <span class="stats-match-scorebox ${resultPending?"pending":""}">${resultStr}</span>
+                <span class="stats-match-acc-arrow" id="marr_${mAccId}">▼</span>
+              </div>
+            </div>
+            <div class="stats-match-chips">${distChips}</div>
           </div>
-          <div class="stats-body">
-            ${total>0 ? bars : `<div style="font-size:11px;color:var(--muted)">Sin pronósticos registrados</div>`}
-            <div style="font-size:10px;color:var(--muted);text-align:right;margin-top:2px">${total} pick${total!==1?"s":""} · ${m.day} ${fmtTime(m.timeISO)}</div>
+          <div class="stats-match-acc-body" id="${mAccId}">
+            ${bars}
             ${picksTable}
           </div>
         </div>`;
@@ -1151,35 +1236,25 @@ function renderStats() {
 
     return `
       <div class="stats-accordion">
-        <div class="stats-acc-header" onclick="toggleStatsAccordion('${accId}')">
+        <div class="stats-acc-header" onclick="toggleStatsAccordion('${phAccId}')">
           <div>
             <span class="stats-acc-phase">${phase}</span>
             <span class="stats-acc-meta" style="margin-left:8px">${doneCnt}/${pMatches.length} jugados</span>
           </div>
-          <span class="stats-acc-arrow ${startOpen?"open":""}" id="sarr_${accId}">▼</span>
+          <span class="stats-acc-arrow ${phOpen?"open":""}" id="sarr_${phAccId}">▼</span>
         </div>
-        <div class="stats-acc-body ${startOpen?"open":""}" id="${accId}">${matchCards}</div>
+        <div class="stats-acc-body ${phOpen?"open":""}" id="${phAccId}">
+          ${matchAccordions}
+        </div>
       </div>`;
   }).join("");
 
   document.getElementById("statsPanel").innerHTML = `
     <div class="stats-global-grid">
-      <div class="stats-global-card">
-        <div class="stats-global-val">${totalUsers}</div>
-        <div class="stats-global-lbl">PARTICIPANTES</div>
-      </div>
-      <div class="stats-global-card">
-        <div class="stats-global-val">${totalPicks}</div>
-        <div class="stats-global-lbl">PICKS TOTALES</div>
-      </div>
-      <div class="stats-global-card">
-        <div class="stats-global-val">${playedCount}</div>
-        <div class="stats-global-lbl">PARTIDOS JUGADOS</div>
-      </div>
-      <div class="stats-global-card">
-        <div class="stats-global-val">${avgPts}</div>
-        <div class="stats-global-lbl">PROM. PTS GRUPO</div>
-      </div>
+      <div class="stats-global-card"><div class="stats-global-val">${totalUsers}</div><div class="stats-global-lbl">PARTICIPANTES</div></div>
+      <div class="stats-global-card"><div class="stats-global-val">${totalPicks}</div><div class="stats-global-lbl">PICKS TOTALES</div></div>
+      <div class="stats-global-card"><div class="stats-global-val">${playedCount}</div><div class="stats-global-lbl">PARTIDOS JUGADOS</div></div>
+      <div class="stats-global-card"><div class="stats-global-val">${avgPts}</div><div class="stats-global-lbl">PROM. PTS GRUPO</div></div>
     </div>
     <div class="stats-champ-section">
       <div class="section-label">CAMPEÓN MÁS APOSTADO</div>
@@ -1192,6 +1267,15 @@ function renderStats() {
 function toggleStatsAccordion(id) {
   const body  = document.getElementById(id);
   const arrow = document.getElementById(`sarr_${id}`);
+  if (!body) return;
+  const open = body.classList.contains("open");
+  body.classList.toggle("open", !open);
+  if (arrow) arrow.classList.toggle("open", !open);
+}
+
+function toggleMatchStatsAcc(id) {
+  const body  = document.getElementById(id);
+  const arrow = document.getElementById(`marr_${id}`);
   if (!body) return;
   const open = body.classList.contains("open");
   body.classList.toggle("open", !open);
