@@ -820,7 +820,7 @@ let DB = {
    CARGA INICIAL DESDE SUPABASE
 ═══════════════════════════════════════════════════════════════ */
 async function loadAll() {
-  showLoading("Sincronizando datos...");
+  // No muestra loading aquí — el llamador decide cuándo mostrarlo
   const [users, matchResults, picks, settings] = await Promise.all([
     supabase.get("users", "?order=created_at"),
     supabase.get("match_results", "?select=*"),
@@ -830,7 +830,6 @@ async function loadAll() {
 
   DB.users = users;
 
-  // Mezcla fixture local con resultados de la base de datos
   const resultMap = Object.fromEntries(matchResults.map(r => [r.match_id, r]));
   DB.matches = MATCHES.map(m => {
     const r = resultMap[m.id];
@@ -846,8 +845,6 @@ async function loadAll() {
 
   const champSetting = settings.find(s => s.key === "champion_winner");
   DB.championWinner  = champSetting?.value || null;
-
-  hideLoading();
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -927,33 +924,49 @@ function calcRanking() {
 async function doLogin() {
   const name = document.getElementById("loginName").value.trim();
   const code = document.getElementById("loginCode").value.trim().toLowerCase();
+
   if (!name) { showToast("Ingresa tu nombre", "error"); return; }
   if (code !== CONFIG.GROUP_CODE.toLowerCase() && code !== CONFIG.ADMIN_CODE.toLowerCase()) {
     showToast("Código incorrecto", "error"); return;
   }
+
   const isAdmin = code === CONFIG.ADMIN_CODE.toLowerCase();
-  showLoading("Registrando sesión...");
+  const btn = document.querySelector(".login-btn");
+  if (btn) { btn.disabled = true; btn.textContent = "Conectando..."; }
+
   try {
-    // Upsert usuario (crea si no existe, actualiza is_admin si corresponde)
+    // Recarga usuarios frescos antes de buscar
+    const users = await supabase.get("users", "?order=created_at");
+    DB.users = users;
+
     const existing = DB.users.find(u => u.name.toLowerCase() === name.toLowerCase());
     if (!existing) {
-      const [created] = await supabase.upsert("users", { name, is_admin: isAdmin });
+      const result = await supabase.upsert("users", { name, is_admin: isAdmin });
+      const created = Array.isArray(result) ? result[0] : result;
+      if (!created?.id) throw new Error("No se pudo crear el usuario");
       DB.users.push(created);
       currentUser = created;
     } else {
-      currentUser = existing;
+      currentUser = { ...existing };
       if (isAdmin && !existing.is_admin) {
         await supabase.patch("users", `?id=eq.${existing.id}`, { is_admin: true });
         currentUser.is_admin = true;
       }
     }
+
     sessionStorage.setItem("qm26_uid", currentUser.id);
+
+    // Carga el resto de datos antes de mostrar la app
+    showLoading("Cargando datos...");
+    await loadAll();
     hideLoading();
     bootApp();
+
   } catch(e) {
     hideLoading();
-    showToast("Error de conexión. Verifica la configuración de Supabase.", "error");
-    console.error(e);
+    if (btn) { btn.disabled = false; btn.textContent = "ENTRAR A LA QUINIELA →"; }
+    showToast("Error al conectar. Intenta de nuevo.", "error");
+    console.error("doLogin error:", e);
   }
 }
 
@@ -1198,7 +1211,15 @@ function bootApp() {
   renderRanking();
   if (currentUser.is_admin) renderAdmin();
   // Refresco automático cada 60 s
-  setInterval(async () => { await loadAll(); renderMatches(); renderRanking(); if(currentUser.is_admin) renderAdmin(); }, 60000);
+  setInterval(async () => {
+    try {
+      await loadAll();
+      renderMatches();
+      renderRanking();
+      if (currentUser.is_admin) renderAdmin();
+      if (document.getElementById("screen-stats")?.classList.contains("active")) renderStats();
+    } catch(e) { console.error("Refresco automático falló:", e); }
+  }, 60000);
   startCountdownTick();
 }
 
@@ -1789,21 +1810,4 @@ function renderAdmin() {
             <span class="admin-accordion-phase">${phase}</span>
             <span class="admin-accordion-meta">${doneCnt}/${totalCnt} finalizados</span>
           </div>
-          <span class="admin-accordion-arrow" id="arr_${accordionId}">▼</span>
-        </div>
-        <div class="admin-accordion-body" id="${accordionId}">${cards}</div>
-      </div>`;
-  }).join("");
-
-  document.getElementById("adminPanel").innerHTML = `
-    <div class="admin-section">
-      <div class="admin-title">PARTICIPANTES (${DB.users.length})</div>
-      <div class="participants-grid">${participantCards}</div>
-    </div>
-    <div class="admin-section">
-      <div class="admin-title">RESULTADOS DE PARTIDOS</div>
-      ${matchCards}
-    </div>
-    <div class="admin-section">
-      <div class="admin-title">CAMPEÓN DEL TORNEO</div>
-      <div class="admin-ma
+          <span class="admin-accordio
