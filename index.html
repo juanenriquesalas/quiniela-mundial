@@ -1810,4 +1810,541 @@ function renderAdmin() {
             <span class="admin-accordion-phase">${phase}</span>
             <span class="admin-accordion-meta">${doneCnt}/${totalCnt} finalizados</span>
           </div>
-          <span class="admin-accordio
+          <span class="admin-accordion-arrow" id="arr_${accordionId}">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="${accordionId}">${cards}</div>
+      </div>`;
+  }).join("");
+
+  document.getElementById("adminPanel").innerHTML = `
+    <div class="admin-section">
+      <div class="admin-title">PARTICIPANTES (${DB.users.length})</div>
+      <div class="participants-grid">${participantCards}</div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-title">RESULTADOS DE PARTIDOS</div>
+      ${matchCards}
+    </div>
+    <div class="admin-section">
+      <div class="admin-title">CAMPEÓN DEL TORNEO</div>
+      <div class="admin-match-card">
+        <div class="admin-row">
+          <span class="admin-label">GANADOR</span>
+          <select class="admin-select" id="adm_champ_winner">
+            <option value="">-- No definido --</option>
+            ${CHAMPION_TEAMS.map(t => `<option value="${t.id}" ${DB.championWinner===t.id?"selected":""}>${t.id} ${t.name}</option>`).join("")}
+          </select>
+        </div>
+        <div class="admin-footer">
+          <button class="admin-save-btn" onclick="adminSaveChampion()">💾 GUARDAR CAMPEÓN</button>
+        </div>
+      </div>
+    </div>
+    <button class="recalc-btn" onclick="recalcAll()">🔄 ACTUALIZAR TABLA DE POSICIONES</button>`;
+}
+
+async function adminSaveMatch(matchId) {
+  const match  = DB.matches.find(m => m.id === matchId);
+  const hs     = parseInt(document.getElementById(`adm_hs_${matchId}`).value);
+  const as_    = parseInt(document.getElementById(`adm_as_${matchId}`).value);
+  const winner = document.getElementById(`adm_w_${matchId}`).value;
+  const done   = document.getElementById(`adm_done_${matchId}`).value === "1";
+  const payload = { match_id: matchId, home_score: isNaN(hs)?null:hs, away_score: isNaN(as_)?null:as_, winner: winner||null, done };
+  try {
+    await supabase.upsert("match_results", payload);
+    if (!isNaN(hs) && !isNaN(as_)) match.result = { homeScore: hs, awayScore: as_ };
+    match.winner = winner || null;
+    match.done   = done;
+    showToast(`✅ ${match.homeFlag} vs ${match.awayFlag} guardado`, "success");
+    renderMatches(); renderRanking(); renderAdmin();
+  } catch(e) { showToast("Error al guardar", "error"); console.error(e); }
+}
+
+async function adminSaveChampion() {
+  const val = document.getElementById("adm_champ_winner").value || null;
+  try {
+    await supabase.upsert("settings", { key: "champion_winner", value: val });
+    DB.championWinner = val;
+    const t = CHAMPION_TEAMS.find(t => t.id === val);
+    showToast(t ? `✅ Campeón: ${t.id} ${t.name}` : "✅ Campeón eliminado", "success");
+    renderRanking();
+  } catch(e) { showToast("Error al guardar", "error"); console.error(e); }
+}
+
+async function recalcAll() {
+  showLoading("Actualizando...");
+  await loadAll();
+  hideLoading();
+  renderRanking();
+  showToast("✅ Tabla actualizada", "success");
+  switchTab("ranking");
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MODAL PARTICIPANTE
+═══════════════════════════════════════════════════════════════ */
+// ID del usuario actualmente en el modal (para edición admin)
+let _modalUserId = null;
+
+function openParticipantModal(userId) {
+  _modalUserId = userId;
+  _renderModalContent(userId);
+  document.getElementById("participantModal").classList.add("open");
+}
+
+function _renderModalContent(userId) {
+  const user    = DB.users.find(u => u.id === userId);
+  if (!user) return;
+  const isAdmin = currentUser?.is_admin;
+  const stats   = calcUserStats(user);
+  const ct      = CHAMPION_TEAMS.find(t => t.id === user.champion);
+  document.getElementById("modalTitle").textContent = user.name + (isAdmin ? " ✏️" : "");
+
+  // ── Sección campeón ──────────────────────────────────────────
+  let champHtml = "";
+  if (isAdmin) {
+    // Admin: selector editable de campeón
+    const champGrid = CHAMPION_TEAMS.map(t => `
+      <button class="champ-edit-btn ${user.champion === t.id ? "selected" : ""}"
+        onclick="adminSetChampionForUser('${userId}','${t.id}',this)">
+        <span class="champ-edit-flag">${t.id}</span>
+        <span class="champ-edit-name">${t.name}</span>
+      </button>`).join("");
+    champHtml = `
+      <div class="modal-champ-edit-row">
+        <div class="modal-champ-edit-label">🏆 CAMPEÓN ELEGIDO</div>
+        <div class="champ-edit-grid">${champGrid}</div>
+        <button class="champ-edit-save-btn" onclick="adminSaveChampionForUser('${userId}')">
+          💾 GUARDAR CAMPEÓN DE ${user.name.toUpperCase()}
+        </button>
+      </div>`;
+  } else {
+    champHtml = `
+      <div class="modal-champ-row">
+        <span class="modal-champ-icon">🏆</span>
+        <div class="modal-champ-text">Campeón elegido: <b>${ct ? ct.id + " " + ct.name : "Sin elegir"}</b>
+          ${DB.championWinner ? (DB.championWinner === user.champion
+            ? " · <span style='color:var(--success)'>✅ +5 pts</span>"
+            : " · <span style='color:var(--danger)'>✗ 0 pts</span>") : ""}
+        </div>
+      </div>`;
+  }
+
+  // ── Filas de picks ────────────────────────────────────────────
+  let pickRows = "";
+  if (isAdmin) {
+    // Admin: formulario editable por partido
+    pickRows = `
+      <div class="modal-edit-header">
+        <span class="modal-edit-title">PICKS POR PARTIDO</span>
+        <span class="modal-edit-badge">⚙️ MODO ADMIN</span>
+      </div>` +
+      DB.matches.map(m => {
+        const pick    = DB.picks.find(p => p.user_id === user.id && p.match_id === m.id);
+        const p       = calcPickPts(pick, m);
+        const curHs   = pick?.home_score ?? "";
+        const curAs   = pick?.away_score ?? "";
+        const curAdv  = pick?.advance || null;
+        const ptsStr  = m.done ? p.total : (pick?.home_score !== null && pick?.home_score !== undefined ? "?" : "–");
+        const ptsZero = m.done && p.total === 0;
+        const uid_mid = `${userId}_${m.id}`.replace(/-/g,"_");
+
+        // OT derivado del marcador actual
+        const ph = parseInt(curHs), pa = parseInt(curAs);
+        const hasSc      = curHs !== "" && curAs !== "" && !isNaN(ph) && !isNaN(pa);
+        const derivedOT  = !hasSc ? null : ph > pa ? "1" : ph === pa ? "X" : "2";
+        const isDrawn    = derivedOT === "X";
+        const otLabel    = derivedOT === "1" ? `🏠 LOCAL gana ${m.homeFlag}`
+                         : derivedOT === "X" ? "🤝 EMPATE — elige clasificado"
+                         : derivedOT === "2" ? `✈️ VISITA gana ${m.awayFlag}`
+                         : "Ingresa el marcador";
+        const otClass    = { "1":"home","X":"draw","2":"away" }[derivedOT] || "empty";
+
+        const advanceRow = isDrawn ? `
+            <div class="advance-row">
+              <span class="advance-label">¿CLASIFICA?</span>
+              <button class="advance-btn ${curAdv==="home"?"sel":""}"
+                onclick="adminSetAdvance('${userId}','${m.id}','home','${uid_mid}')">
+                ${m.homeFlag} ${m.home}
+              </button>
+              <button class="advance-btn ${curAdv==="away"?"sel":""}"
+                onclick="adminSetAdvance('${userId}','${m.id}','away','${uid_mid}')">
+                ${m.awayFlag} ${m.away}
+              </button>
+            </div>` : "";
+
+        return `
+          <div class="modal-pick-edit-row" id="editrow_${uid_mid}">
+            <div class="modal-pick-edit-match">
+              <span>${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag}</span>
+              <span class="modal-pick-edit-pts ${ptsZero ? "zero" : ""}">${ptsStr !== "–" ? ptsStr + " pts" : "–"}</span>
+            </div>
+            <div class="ot-derived ${otClass}" style="margin-bottom:7px;font-size:11px">${otLabel}</div>
+            ${advanceRow}
+            <div class="edit-score-row">
+              <span class="edit-score-label">MARCADOR</span>
+              <div class="edit-score-inputs">
+                <input class="edit-score-input" type="number" min="0" max="20"
+                  id="ehs_${uid_mid}" value="${curHs}" placeholder="–"
+                  oninput="adminOnScoreInput('${userId}','${m.id}','${uid_mid}')" />
+                <span class="edit-score-sep">:</span>
+                <input class="edit-score-input" type="number" min="0" max="20"
+                  id="eas_${uid_mid}" value="${curAs}" placeholder="–"
+                  oninput="adminOnScoreInput('${userId}','${m.id}','${uid_mid}')" />
+              </div>
+              <button class="edit-save-btn"
+                onclick="adminSavePickForUser('${userId}','${m.id}','${uid_mid}')">💾</button>
+              <button class="edit-clear-btn"
+                onclick="adminClearPickForUser('${userId}','${m.id}','${uid_mid}')">✕</button>
+            </div>
+          </div>`;
+      }).join("");
+  } else {
+    // Vista normal de solo lectura
+    pickRows = DB.matches.map(m => {
+      const pick    = DB.picks.find(p => p.user_id === user.id && p.match_id === m.id);
+      const p       = calcPickPts(pick, m);
+      const otLabel = pick?.ot ? { "1":"LOCAL","X":"EMPATE","2":"VISITA" }[pick.ot] : "–";
+      const otColor = pick?.ot ? { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot] : "var(--muted)";
+      const sc      = pick?.home_score !== null && pick?.home_score !== undefined
+                      ? `${pick.home_score} - ${pick.away_score}` : "–";
+      const ptsStr  = m.done ? p.total : (pick?.ot ? "?" : "–");
+      return `<div class="modal-pick-row">
+        <div class="modal-pick-match"><b>${m.homeFlag} vs ${m.awayFlag}</b><br>${m.home} · ${m.away}</div>
+        <div class="modal-pick-ot" style="color:${otColor}">${otLabel}</div>
+        <div class="modal-pick-sc">${sc}</div>
+        <div class="modal-pick-pts ${p.total===0 && m.done ? "zero" : ""}">${ptsStr}</div>
+      </div>`;
+    }).join("");
+    pickRows = `
+      <div style="display:grid;grid-template-columns:1fr 54px 54px 28px;gap:4px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--gray-2)">
+        <span style="font-size:9px;color:var(--muted);font-weight:700">PARTIDO</span>
+        <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RESULTADO</span>
+        <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARCADOR</span>
+        <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
+      </div>` + pickRows;
+  }
+
+  document.getElementById("modalBody").innerHTML = `
+    ${champHtml}
+    ${pickRows}
+    <div class="modal-total-row">
+      <span class="modal-total-label">TOTAL ACUMULADO</span>
+      <span class="modal-total-pts">${stats.pts} <span style="font-size:14px;color:var(--muted)">pts</span></span>
+    </div>`;
+}
+
+/* ── Helpers de edición admin en modal ─────────────────────── */
+
+// Re-renderiza la fila de un partido en el modal admin al escribir el marcador
+function adminOnScoreInput(userId, matchId, uid_mid) {
+  const hsEl  = document.getElementById(`ehs_${uid_mid}`);
+  const asEl  = document.getElementById(`eas_${uid_mid}`);
+  const hs    = hsEl?.value ?? "";
+  const as_   = asEl?.value ?? "";
+  const ph    = parseInt(hs), pa = parseInt(as_);
+  const hasSc = hs !== "" && as_ !== "" && !isNaN(ph) && !isNaN(pa);
+
+  // Actualiza cache local del pick
+  let pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
+  if (!pick) {
+    pick = { user_id: userId, match_id: matchId, ot: null, home_score: null, away_score: null, advance: null };
+    DB.picks.push(pick);
+  }
+  pick.home_score = hasSc ? ph : null;
+  pick.away_score = hasSc ? pa : null;
+  // Si deja de ser empate, limpia el clasificado
+  if (hasSc && ph !== pa) pick.advance = null;
+
+  // Actualiza solo el badge OT y la fila de clasificado dentro de la tarjeta
+  const row = document.getElementById(`editrow_${uid_mid}`);
+  if (!row) return;
+
+  const match = DB.matches.find(m => m.id === matchId);
+  const derivedOT = !hasSc ? null : ph > pa ? "1" : ph === pa ? "X" : "2";
+  const otLabel   = derivedOT === "1" ? `🏠 LOCAL gana ${match.homeFlag}`
+                  : derivedOT === "X" ? "🤝 EMPATE — elige clasificado"
+                  : derivedOT === "2" ? `✈️ VISITA gana ${match.awayFlag}`
+                  : "Ingresa el marcador";
+  const otClass   = { "1":"home","X":"draw","2":"away" }[derivedOT] || "empty";
+
+  // Actualiza badge
+  const badge = row.querySelector(".ot-derived");
+  if (badge) { badge.className = `ot-derived ${otClass}`; badge.textContent = otLabel; }
+
+  // Muestra/oculta selector de clasificado
+  let advRow = row.querySelector(".advance-row");
+  if (derivedOT === "X") {
+    if (!advRow) {
+      advRow = document.createElement("div");
+      advRow.className = "advance-row";
+      advRow.innerHTML = `
+        <span class="advance-label">¿CLASIFICA?</span>
+        <button class="advance-btn ${pick.advance==="home"?"sel":""}"
+          onclick="adminSetAdvance('${userId}','${matchId}','home','${uid_mid}')">
+          ${match.homeFlag} ${match.home}
+        </button>
+        <button class="advance-btn ${pick.advance==="away"?"sel":""}"
+          onclick="adminSetAdvance('${userId}','${matchId}','away','${uid_mid}')">
+          ${match.awayFlag} ${match.away}
+        </button>`;
+      badge?.insertAdjacentElement("afterend", advRow);
+    }
+  } else {
+    advRow?.remove();
+  }
+}
+
+function adminSetAdvance(userId, matchId, value, uid_mid) {
+  let pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
+  if (!pick) return;
+  pick.advance = pick.advance === value ? null : value;
+  // Actualiza clases de los botones de clasificado en la fila
+  const row = document.getElementById(`editrow_${uid_mid}`);
+  if (!row) return;
+  row.querySelectorAll(".advance-btn").forEach((btn, i) => {
+    const v = i === 0 ? "home" : "away";
+    btn.className = "advance-btn" + (pick.advance === v ? " sel" : "");
+  });
+}
+
+async function adminSavePickForUser(userId, matchId, uid_mid) {
+  const hs  = document.getElementById(`ehs_${uid_mid}`)?.value ?? "";
+  const as_ = document.getElementById(`eas_${uid_mid}`)?.value ?? "";
+
+  if (hs === "" || as_ === "") { showToast("Ingresa el marcador completo", "error"); return; }
+  const ph = parseInt(hs), pa = parseInt(as_);
+  if (isNaN(ph) || isNaN(pa)) { showToast("Marcador inválido", "error"); return; }
+
+  const derivedOT = ph > pa ? "1" : ph === pa ? "X" : "2";
+
+  let pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
+  if (!pick) {
+    pick = { user_id: userId, match_id: matchId, ot: null, home_score: null, away_score: null, advance: null };
+    DB.picks.push(pick);
+  }
+
+  // Validar: empate requiere clasificado
+  if (derivedOT === "X" && !pick.advance) {
+    showToast("Elige qué equipo clasifica en el empate", "error"); return;
+  }
+
+  const payload = {
+    user_id:    userId,
+    match_id:   matchId,
+    ot:         derivedOT,
+    home_score: ph,
+    away_score: pa,
+    advance:    derivedOT === "X" ? pick.advance : null,
+  };
+
+  try {
+    await supabase.upsert("picks", payload);
+    pick.ot = derivedOT; pick.home_score = ph; pick.away_score = pa;
+    pick.advance = payload.advance;
+    delete pick._draft_ot;
+    showToast("✅ Pick guardado", "success");
+    _renderModalContent(userId);
+    renderRanking();
+    renderAdmin();
+  } catch(e) {
+    showToast("Error al guardar", "error"); console.error(e);
+  }
+}
+
+async function adminClearPickForUser(userId, matchId, uid_mid) {
+  if (!confirm("¿Eliminar el pronóstico de este partido?")) return;
+  try {
+    await fetch(
+      `${CONFIG.SUPABASE_URL}/rest/v1/picks?user_id=eq.${userId}&match_id=eq.${matchId}`,
+      { method: "DELETE", headers: { ...SB_HEADERS(), "Prefer": "" } }
+    );
+    const idx = DB.picks.findIndex(p => p.user_id === userId && p.match_id === matchId);
+    if (idx !== -1) DB.picks.splice(idx, 1);
+    showToast("✅ Pronóstico eliminado", "success");
+    _renderModalContent(userId);
+    renderRanking();
+    renderAdmin();
+  } catch(e) {
+    showToast("Error al eliminar", "error"); console.error(e);
+  }
+}
+
+function adminSetChampionForUser(userId, teamId, btn) {
+  // Solo marca visualmente; se guarda con el botón guardar
+  const user = DB.users.find(u => u.id === userId);
+  if (!user) return;
+  user._draft_champion = user._draft_champion === teamId ? null : teamId;
+  // Refresca clases en la grilla
+  btn.closest(".champ-edit-grid").querySelectorAll(".champ-edit-btn").forEach(b => b.classList.remove("selected"));
+  if (user._draft_champion) btn.classList.add("selected");
+}
+
+async function adminSaveChampionForUser(userId) {
+  const user = DB.users.find(u => u.id === userId);
+  if (!user) return;
+  const champion = user._draft_champion !== undefined ? user._draft_champion : user.champion;
+  try {
+    await supabase.patch("users", `?id=eq.${userId}`, { champion });
+    user.champion = champion;
+    delete user._draft_champion;
+    showToast("✅ Campeón actualizado", "success");
+    _renderModalContent(userId);
+    renderRanking();
+    renderAdmin();
+  } catch(e) {
+    showToast("Error al guardar", "error"); console.error(e);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ELIMINAR JUGADOR
+═══════════════════════════════════════════════════════════════ */
+function confirmDeleteUser(userId) {
+  const card = document.getElementById(`pcard_${userId}`);
+  if (!card) return;
+
+  // Si ya está en modo confirmación, cancela
+  if (card.classList.contains("confirm-delete")) {
+    card.classList.remove("confirm-delete");
+    card.querySelector(".confirm-delete-bar")?.remove();
+    return;
+  }
+
+  // Proteger al admin actual
+  if (userId === currentUser.id) {
+    showToast("No puedes eliminarte a ti mismo", "error");
+    return;
+  }
+
+  const user = DB.users.find(u => u.id === userId);
+  card.classList.add("confirm-delete");
+
+  // Insertar barra de confirmación al final de la tarjeta
+  const bar = document.createElement("div");
+  bar.className = "confirm-delete-bar";
+  bar.innerHTML = `
+    <button class="confirm-no-btn"  onclick="event.stopPropagation(); cancelDeleteUser('${userId}')">CANCELAR</button>
+    <button class="confirm-yes-btn" onclick="event.stopPropagation(); deleteUser('${userId}')">🗑 ELIMINAR</button>`;
+  card.appendChild(bar);
+}
+
+function cancelDeleteUser(userId) {
+  const card = document.getElementById(`pcard_${userId}`);
+  if (!card) return;
+  card.classList.remove("confirm-delete");
+  card.querySelector(".confirm-delete-bar")?.remove();
+}
+
+async function deleteUser(userId) {
+  const user = DB.users.find(u => u.id === userId);
+  if (!user) return;
+
+  showLoading(`Eliminando a ${user.name}...`);
+  try {
+    // Supabase: eliminar picks del usuario (ON DELETE CASCADE lo haría,
+    // pero lo hacemos explícito por seguridad)
+    await fetch(
+      `${CONFIG.SUPABASE_URL}/rest/v1/picks?user_id=eq.${userId}`,
+      { method: "DELETE", headers: { ...SB_HEADERS() } }
+    );
+    // Eliminar usuario
+    await fetch(
+      `${CONFIG.SUPABASE_URL}/rest/v1/users?id=eq.${userId}`,
+      { method: "DELETE", headers: { ...SB_HEADERS() } }
+    );
+
+    // Actualizar cache local
+    DB.picks  = DB.picks.filter(p => p.user_id !== userId);
+    DB.users  = DB.users.filter(u => u.id !== userId);
+
+    hideLoading();
+    showToast(`✅ ${user.name} eliminado`, "success");
+    renderAdmin();
+    renderRanking();
+  } catch(e) {
+    hideLoading();
+    showToast("Error al eliminar", "error");
+    console.error(e);
+  }
+}
+
+function closeParticipantModal(event) {
+  if (event && event.target !== document.getElementById("participantModal")) return;
+  // Limpia drafts al cerrar
+  DB.picks.forEach(p => delete p._draft_ot);
+  DB.users.forEach(u => delete u._draft_champion);
+  _modalUserId = null;
+  document.getElementById("participantModal").classList.remove("open");
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILIDADES
+═══════════════════════════════════════════════════════════════ */
+function showLoading(msg = "Cargando...") {
+  document.getElementById("loadingText").textContent = msg;
+  document.getElementById("loadingOverlay").classList.remove("hidden");
+}
+function hideLoading() { document.getElementById("loadingOverlay").classList.add("hidden"); }
+
+let toastTimer;
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = `toast ${type} visible`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("visible"), 2800);
+}
+
+function showUserMenu() {
+  if (confirm(`Sesión activa: ${currentUser.name}\n\n¿Cerrar sesión?`)) {
+    sessionStorage.removeItem("qm26_uid");
+    location.reload();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INICIO
+═══════════════════════════════════════════════════════════════ */
+(async function init() {
+  const loginCard = document.getElementById("loginScreen").querySelector(".login-card");
+
+  // Verificar config
+  if (CONFIG.SUPABASE_URL.includes("TU_PROYECTO") || CONFIG.SUPABASE_ANON === "TU_ANON_KEY") {
+    loginCard.insertAdjacentHTML("afterbegin",
+      `<div class="config-banner"><b>⚠️ Configuración pendiente</b>Reemplaza <code>SUPABASE_URL</code> y <code>SUPABASE_ANON</code> en el bloque CONFIG del archivo HTML.</div>`);
+    document.getElementById("loginScreen").style.display = "flex";
+    return;
+  }
+
+  // Intenta reanudar sesión guardada
+  const uid = sessionStorage.getItem("qm26_uid");
+
+  try {
+    showLoading("Conectando...");
+    await loadAll();
+    hideLoading();
+
+    if (uid) {
+      const user = DB.users.find(u => u.id === uid);
+      if (user) {
+        currentUser = user;
+        bootApp();
+        return;
+      }
+      // UID guardado pero usuario no encontrado (fue eliminado): limpia sesión
+      sessionStorage.removeItem("qm26_uid");
+    }
+  } catch(e) {
+    hideLoading();
+    console.error("init error:", e);
+    // No bloqueamos el login aunque haya fallado la precarga
+    // doLogin() hará su propia carga de usuarios
+  }
+
+  // Mostrar pantalla de login
+  document.getElementById("loginScreen").style.display = "flex";
+})();
+</script>
+</body>
+</html>
