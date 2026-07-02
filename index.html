@@ -237,6 +237,67 @@
     }
     .save-champ-btn:disabled { opacity: 0.38; cursor: not-allowed; }
 
+
+    /* ─── COUNTDOWN ─────────────────────────────────────────────── */
+    .match-countdown {
+      font-size: 10px; font-weight: 700; color: var(--gold);
+      letter-spacing: 0.3px; font-variant-numeric: tabular-nums;
+    }
+    .match-countdown.urgent { color: var(--danger); animation: pulse 1s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
+
+    /* ─── RACHA ──────────────────────────────────────────────────── */
+    .streak-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10px; font-weight: 700; padding: 2px 7px;
+      border-radius: 10px; background: rgba(244,196,48,.15);
+      color: var(--gold); border: 1px solid rgba(244,196,48,.3);
+      white-space: nowrap;
+    }
+    .streak-badge.fire { background: rgba(224,100,50,.18); color: #ff7043; border-color: rgba(224,100,50,.35); }
+
+    /* ─── STATS ──────────────────────────────────────────────────── */
+    .stats-match-card { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: var(--r); margin-bottom: 10px; overflow: hidden; }
+    .stats-match-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--gray-2); font-size: 11px; }
+    .stats-match-title { font-weight: 700; color: var(--white); }
+    .stats-match-result { font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif; font-size: 16px; color: var(--gold); }
+    .stats-body { padding: 10px 12px 12px; }
+    .stats-bars { display: flex; gap: 5px; margin-bottom: 8px; }
+    .stats-bar-block { flex: 1; }
+    .stats-bar-label { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; margin-bottom: 3px; text-align: center; }
+    .stats-bar-track { height: 6px; background: var(--gray-3); border-radius: 3px; overflow: hidden; margin-bottom: 3px; }
+    .stats-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+    .fill-home { background: var(--blue); }
+    .fill-draw { background: var(--gold); }
+    .fill-away { background: var(--danger); }
+    .stats-bar-pct { font-size: 10px; font-weight: 700; text-align: center; }
+    .fill-home-txt { color: var(--blue); } .fill-draw-txt { color: var(--gold); } .fill-away-txt { color: var(--danger); }
+    .stats-picks-grid { display: grid; grid-template-columns: 1fr auto auto auto; gap: 2px 6px; font-size: 10px; align-items: center; }
+    .stats-pick-name { color: var(--white); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stats-pick-ot   { font-weight: 700; text-align: center; }
+    .stats-pick-sc   { color: var(--muted); text-align: center; }
+    .stats-pick-pts  { font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif; font-size: 14px; color: var(--gold); text-align: right; }
+    .stats-pick-pts.zero { color: var(--gray-3); }
+    .stats-champ-section { margin-bottom: 16px; }
+    .stats-champ-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
+    .stats-champ-item { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: var(--rs); padding: 8px 6px; text-align: center; }
+    .stats-champ-flag { display: inline-block; font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif; font-size: 11px; background: var(--gray-3); color: var(--white); border-radius: 4px; padding: 2px 5px; margin-bottom: 4px; }
+    .stats-champ-name { font-size: 8px; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+    .stats-champ-count { font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif; font-size: 20px; color: var(--gold); line-height: 1; }
+    .stats-champ-lbl { font-size: 8px; color: var(--muted); }
+    .stats-global-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 7px; margin-bottom: 16px; }
+    .stats-global-card { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: var(--rs); padding: 12px 10px; text-align: center; }
+    .stats-global-val { font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif; font-size: 28px; color: var(--gold); line-height: 1; margin-bottom: 2px; }
+    .stats-global-lbl { font-size: 9px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; }
+    .stats-accordion { margin-bottom: 10px; border-radius: var(--r); overflow: hidden; border: 1px solid var(--gray-2); }
+    .stats-acc-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 13px; background: var(--gray-2); cursor: pointer; user-select: none; }
+    .stats-acc-phase { font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif; font-size: 15px; letter-spacing: 1.5px; color: var(--gold); }
+    .stats-acc-meta { font-size: 10px; color: var(--muted); }
+    .stats-acc-arrow { font-size: 11px; color: var(--muted); transition: transform .2s; display: inline-block; }
+    .stats-acc-arrow.open { transform: rotate(180deg); }
+    .stats-acc-body { display: none; padding: 10px; background: var(--green-deep); }
+    .stats-acc-body.open { display: block; }
+
     /* RANKING */
     .ranking-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin-bottom: 14px; }
     .rank-stat { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: var(--rs); padding: 10px 8px; text-align: center; }
@@ -595,6 +656,7 @@
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="switchTab('picks')"   id="tab-picks">MIS PICKS</button>
       <button class="nav-tab"        onclick="switchTab('ranking')"  id="tab-ranking">RANKING</button>
+      <button class="nav-tab"        onclick="switchTab('stats')"    id="tab-stats">ESTADÍSTICAS</button>
       <button class="nav-tab"        onclick="switchTab('admin')"    id="tab-admin" style="display:none">ADMIN</button>
     </div>
   </header>
@@ -617,6 +679,11 @@
       <div id="rankingList"    class="ranking-list"></div>
     </div>
 
+    <div id="screen-stats" class="screen">
+      <div class="section-label">ESTADÍSTICAS DEL GRUPO</div>
+      <div id="statsPanel"></div>
+    </div>
+
     <div id="screen-admin" class="screen">
       <div class="section-label">PANEL ORGANIZADOR</div>
       <div id="adminPanel"></div>
@@ -626,6 +693,7 @@
   <nav class="bottom-nav">
     <button class="bnav-btn active" onclick="switchTab('picks')"   id="bnav-picks"><span class="icon">🎯</span>MIS PICKS</button>
     <button class="bnav-btn"        onclick="switchTab('ranking')"  id="bnav-ranking"><span class="icon">🏅</span>RANKING</button>
+    <button class="bnav-btn"        onclick="switchTab('stats')"    id="bnav-stats"><span class="icon">📊</span>STATS</button>
     <button class="bnav-btn"        onclick="switchTab('admin')"    id="bnav-admin" style="display:none"><span class="icon">⚙️</span>ADMIN</button>
   </nav>
 </div>
@@ -889,6 +957,234 @@ async function doLogin() {
   }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   COUNTDOWN — formatea el tiempo hasta el partido
+═══════════════════════════════════════════════════════════════ */
+function fmtCountdown(match) {
+  const diff = (new Date(match.timeISO) - new Date()) / 1000; // segundos
+  if (diff <= 0 || match.done) return `🕐 ${fmtTime(match.timeISO)}`;
+  const h = Math.floor(diff / 3600);
+  const m = Math.floor((diff % 3600) / 60);
+  if (h > 48) return `🕐 ${fmtTime(match.timeISO)}`;        // más de 2 días → hora normal
+  if (h >= 1)  return `⏱ ${h}h ${m}m`;
+  return `⏱ ${m}m ${Math.floor(diff % 60)}s`;
+}
+
+// Tick global: actualiza todos los countdowns cada segundo
+let _cdTick = null;
+function startCountdownTick() {
+  if (_cdTick) return;
+  _cdTick = setInterval(() => {
+    DB.matches.forEach(m => {
+      const el = document.getElementById(`cd_${m.id}`);
+      if (!el) return;
+      const diff = (new Date(m.timeISO) - new Date()) / 1000;
+      el.textContent = fmtCountdown(m);
+      // Urgente: menos de 30 min para cerrar (LOCK_MINUTES + 15 extra)
+      el.classList.toggle("urgent", diff > 0 && diff < (CONFIG.LOCK_MINUTES + 15) * 60);
+    });
+  }, 1000);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RACHA — aciertos consecutivos de resultados (1X2)
+═══════════════════════════════════════════════════════════════ */
+function calcStreak(user) {
+  // Solo partidos finalizados, en orden cronológico
+  const played = DB.matches
+    .filter(m => m.done && m.result)
+    .sort((a,b) => new Date(a.timeISO) - new Date(b.timeISO));
+
+  let streak = 0;
+  for (let i = played.length - 1; i >= 0; i--) {
+    const m    = played[i];
+    const pick = DB.picks.find(p => p.user_id === user.id && p.match_id === m.id);
+    if (!pick?.ot) break;                                   // sin pick → corta la racha
+    const { homeScore:rh, awayScore:ra } = m.result;
+    const realOT = rh > ra ? "1" : rh === ra ? "X" : "2";
+    const ph = parseInt(pick.home_score), pa = parseInt(pick.away_score);
+    const pickOT = isNaN(ph)||isNaN(pa) ? null : ph>pa?"1":ph===pa?"X":"2";
+    if (pickOT === realOT) streak++;
+    else break;
+  }
+  return streak;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ESTADÍSTICAS DEL GRUPO
+═══════════════════════════════════════════════════════════════ */
+function renderStats() {
+  const phaseOrder  = ["16vos","8vos","Cuartos","Semis","Final","General"];
+  const phases      = [...new Set(DB.matches.map(m => m.phase || "General"))];
+  phases.sort((a,b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b));
+
+  const totalPicks  = DB.picks.filter(p => p.ot).length;
+  const totalUsers  = DB.users.length;
+  const playedCount = DB.matches.filter(m => m.done).length;
+  const avgPts      = totalUsers
+    ? (DB.users.reduce((s,u) => s + calcUserStats(u).pts, 0) / totalUsers).toFixed(1)
+    : 0;
+
+  // Campeones apostados
+  const champMap = {};
+  DB.users.forEach(u => { if (u.champion) champMap[u.champion] = (champMap[u.champion]||0) + 1; });
+  const champSorted = Object.entries(champMap).sort((a,b) => b[1]-a[1]).slice(0,8);
+
+  const champGrid = champSorted.length === 0
+    ? `<div style="font-size:12px;color:var(--muted)">Nadie ha elegido campeón aún.</div>`
+    : champSorted.map(([id, cnt]) => {
+        const t = CHAMPION_TEAMS.find(t => t.id === id);
+        return `<div class="stats-champ-item">
+          <span class="stats-champ-flag">${id}</span>
+          <div class="stats-champ-name">${t?.name||id}</div>
+          <div class="stats-champ-count">${cnt}</div>
+          <div class="stats-champ-lbl">${cnt===1?"voto":"votos"}</div>
+        </div>`;
+      }).join("");
+
+  // Acordeones por fase
+  const phaseAccordions = phases.map(phase => {
+    const pMatches  = DB.matches.filter(m => (m.phase||"General") === phase);
+    const doneCnt   = pMatches.filter(m => m.done).length;
+    const accId     = `sacc_${phase.replace(/[^a-z0-9]/gi,"")}`;
+    const startOpen = doneCnt > 0;
+
+    const matchCards = pMatches.map(m => {
+      const matchPicks = DB.picks.filter(p => p.match_id === m.id && p.ot);
+      const total = matchPicks.length;
+      const cntHome = matchPicks.filter(p => {
+        const ph=parseInt(p.home_score),pa=parseInt(p.away_score);
+        return !isNaN(ph)&&!isNaN(pa)&&ph>pa;
+      }).length;
+      const cntDraw = matchPicks.filter(p => {
+        const ph=parseInt(p.home_score),pa=parseInt(p.away_score);
+        return !isNaN(ph)&&!isNaN(pa)&&ph===pa;
+      }).length;
+      const cntAway = matchPicks.filter(p => {
+        const ph=parseInt(p.home_score),pa=parseInt(p.away_score);
+        return !isNaN(ph)&&!isNaN(pa)&&ph<pa;
+      }).length;
+
+      const pct = n => total > 0 ? Math.round(n/total*100) : 0;
+
+      // Barras 1X2
+      const bars = `
+        <div class="stats-bars">
+          <div class="stats-bar-block">
+            <div class="stats-bar-label">${m.homeFlag} LOCAL</div>
+            <div class="stats-bar-track"><div class="stats-bar-fill fill-home" style="width:${pct(cntHome)}%"></div></div>
+            <div class="stats-bar-pct fill-home-txt">${pct(cntHome)}%</div>
+          </div>
+          <div class="stats-bar-block">
+            <div class="stats-bar-label">EMPATE</div>
+            <div class="stats-bar-track"><div class="stats-bar-fill fill-draw" style="width:${pct(cntDraw)}%"></div></div>
+            <div class="stats-bar-pct fill-draw-txt">${pct(cntDraw)}%</div>
+          </div>
+          <div class="stats-bar-block">
+            <div class="stats-bar-label">${m.awayFlag} VISITA</div>
+            <div class="stats-bar-track"><div class="stats-bar-fill fill-away" style="width:${pct(cntAway)}%"></div></div>
+            <div class="stats-bar-pct fill-away-txt">${pct(cntAway)}%</div>
+          </div>
+        </div>`;
+
+      // Tabla de picks individuales — solo si el partido está cerrado
+      let picksTable = "";
+      if (isLocked(m)) {
+        const rows = DB.users.map(u => {
+          const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
+          const pts  = m.done ? calcPickPts(pick, m).total : null;
+          if (!pick?.ot) return `<span class="stats-pick-name">${u.name}</span><span class="stats-pick-ot" style="color:var(--muted)">–</span><span class="stats-pick-sc">–</span><span class="stats-pick-pts zero">–</span>`;
+          const ph=parseInt(pick.home_score),pa=parseInt(pick.away_score);
+          const pickOT = isNaN(ph)||isNaN(pa)?pick.ot:ph>pa?"1":ph===pa?"X":"2";
+          const otLabel= {"1":"LOC","X":"EMP","2":"VIS"}[pickOT];
+          const otColor= {"1":"var(--blue)","X":"var(--gold)","2":"var(--danger)"}[pickOT];
+          const sc = pick.home_score!==null?`${pick.home_score}-${pick.away_score}`:"–";
+          const adv = pickOT==="X"&&pick.advance ? (pick.advance==="home"?` →${m.homeFlag}`:` →${m.awayFlag}`) : "";
+          return `<span class="stats-pick-name">${u.name}</span>
+            <span class="stats-pick-ot" style="color:${otColor}">${otLabel}${adv}</span>
+            <span class="stats-pick-sc">${sc}</span>
+            <span class="stats-pick-pts ${pts===0?"zero":""}">${pts!==null?pts:"–"}</span>`;
+        }).join("");
+        picksTable = `
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--gray-2)">
+            <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:2px 6px;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid var(--gray-3)">
+              <span style="font-size:9px;color:var(--muted);font-weight:700">JUGADOR</span>
+              <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RES.</span>
+              <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARC.</span>
+              <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
+            </div>
+            <div class="stats-picks-grid">${rows}</div>
+          </div>`;
+      } else {
+        picksTable = `<div style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center">🔓 Los pronósticos se revelan cuando el partido cierra</div>`;
+      }
+
+      const resultStr = m.done && m.result ? `${m.result.homeScore} – ${m.result.awayScore}` : (isLocked(m)?"EN JUEGO":"PRÓXIMO");
+
+      return `
+        <div class="stats-match-card">
+          <div class="stats-match-header">
+            <span class="stats-match-title">${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag}</span>
+            <span class="stats-match-result">${resultStr}</span>
+          </div>
+          <div class="stats-body">
+            ${total>0 ? bars : `<div style="font-size:11px;color:var(--muted)">Sin pronósticos registrados</div>`}
+            <div style="font-size:10px;color:var(--muted);text-align:right;margin-top:2px">${total} pick${total!==1?"s":""} · ${m.day} ${fmtTime(m.timeISO)}</div>
+            ${picksTable}
+          </div>
+        </div>`;
+    }).join("");
+
+    return `
+      <div class="stats-accordion">
+        <div class="stats-acc-header" onclick="toggleStatsAccordion('${accId}')">
+          <div>
+            <span class="stats-acc-phase">${phase}</span>
+            <span class="stats-acc-meta" style="margin-left:8px">${doneCnt}/${pMatches.length} jugados</span>
+          </div>
+          <span class="stats-acc-arrow ${startOpen?"open":""}" id="sarr_${accId}">▼</span>
+        </div>
+        <div class="stats-acc-body ${startOpen?"open":""}" id="${accId}">${matchCards}</div>
+      </div>`;
+  }).join("");
+
+  document.getElementById("statsPanel").innerHTML = `
+    <div class="stats-global-grid">
+      <div class="stats-global-card">
+        <div class="stats-global-val">${totalUsers}</div>
+        <div class="stats-global-lbl">PARTICIPANTES</div>
+      </div>
+      <div class="stats-global-card">
+        <div class="stats-global-val">${totalPicks}</div>
+        <div class="stats-global-lbl">PICKS TOTALES</div>
+      </div>
+      <div class="stats-global-card">
+        <div class="stats-global-val">${playedCount}</div>
+        <div class="stats-global-lbl">PARTIDOS JUGADOS</div>
+      </div>
+      <div class="stats-global-card">
+        <div class="stats-global-val">${avgPts}</div>
+        <div class="stats-global-lbl">PROM. PTS GRUPO</div>
+      </div>
+    </div>
+    <div class="stats-champ-section">
+      <div class="section-label">CAMPEÓN MÁS APOSTADO</div>
+      <div class="stats-champ-grid">${champGrid}</div>
+    </div>
+    <div class="section-label">PICKS POR PARTIDO</div>
+    ${phaseAccordions}`;
+}
+
+function toggleStatsAccordion(id) {
+  const body  = document.getElementById(id);
+  const arrow = document.getElementById(`sarr_${id}`);
+  if (!body) return;
+  const open = body.classList.contains("open");
+  body.classList.toggle("open", !open);
+  if (arrow) arrow.classList.toggle("open", !open);
+}
+
 function bootApp() {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("appShell").style.display    = "block";
@@ -903,13 +1199,14 @@ function bootApp() {
   if (currentUser.is_admin) renderAdmin();
   // Refresco automático cada 60 s
   setInterval(async () => { await loadAll(); renderMatches(); renderRanking(); if(currentUser.is_admin) renderAdmin(); }, 60000);
+  startCountdownTick();
 }
 
 /* ═══════════════════════════════════════════════════════════════
    TABS
 ═══════════════════════════════════════════════════════════════ */
 function switchTab(id) {
-  ["picks","ranking","admin"].forEach(t => {
+  ["picks","ranking","stats","admin"].forEach(t => {
     document.getElementById(`screen-${t}`)?.classList.remove("active");
     document.getElementById(`tab-${t}`)?.classList.remove("active");
     document.getElementById(`bnav-${t}`)?.classList.remove("active");
@@ -917,6 +1214,7 @@ function switchTab(id) {
   document.getElementById(`screen-${id}`)?.classList.add("active");
   document.getElementById(`tab-${id}`)?.classList.add("active");
   document.getElementById(`bnav-${id}`)?.classList.add("active");
+  if (id === "stats") renderStats();
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1118,7 +1416,7 @@ function renderMatchCard(match) {
   return `
     <div class="match-card ${saved && !locked?"saved":""} ${locked?"locked":""}" id="card_${match.id}">
       <div class="match-card-header">
-        <span class="match-time">🕐 ${fmtTime(match.timeISO)}</span>
+        <span id="cd_${match.id}" class="match-time match-countdown">${fmtCountdown(match)}</span>
         <span class="match-status ${status.cls}">${status.label}</span>
       </div>
       <div class="match-teams">
@@ -1323,11 +1621,17 @@ function renderRanking() {
         </div>`;
     }).join("");
 
+    // Calcular racha del jugador
+    const streak = calcStreak(u);
+    const streakBadge = streak >= 2
+      ? `<span class="streak-badge ${streak>=4?"fire":""}">${streak>=4?"🔥":"⚡"} ${streak} seguidos</span>`
+      : "";
+
     return `
       <div class="ranking-row ${isMe?"me":""}" id="rrow_${u.id}" onclick="toggleDetail('${u.id}')">
         <div class="rank-pos ${i<3?"top":""}">${i+1}</div>
         <div class="rank-info">
-          <div class="rank-name">${u.name}${isMe?" 👈":""}</div>
+          <div class="rank-name">${u.name}${isMe?" 👈":""} ${streakBadge}</div>
           <div class="rank-sub">${ct ? ct.id+" "+ct.name : "Sin campeón"} · ${playedCount} jugados</div>
         </div>
         <div class="rank-pts-block"><div class="rank-pts">${u.pts}</div><div class="rank-pts-lbl">pts</div></div>
@@ -1502,512 +1806,4 @@ function renderAdmin() {
     </div>
     <div class="admin-section">
       <div class="admin-title">CAMPEÓN DEL TORNEO</div>
-      <div class="admin-match-card">
-        <div class="admin-row">
-          <span class="admin-label">GANADOR</span>
-          <select class="admin-select" id="adm_champ_winner">
-            <option value="">-- No definido --</option>
-            ${CHAMPION_TEAMS.map(t => `<option value="${t.id}" ${DB.championWinner===t.id?"selected":""}>${t.id} ${t.name}</option>`).join("")}
-          </select>
-        </div>
-        <div class="admin-footer">
-          <button class="admin-save-btn" onclick="adminSaveChampion()">💾 GUARDAR CAMPEÓN</button>
-        </div>
-      </div>
-    </div>
-    <button class="recalc-btn" onclick="recalcAll()">🔄 ACTUALIZAR TABLA DE POSICIONES</button>`;
-}
-
-async function adminSaveMatch(matchId) {
-  const match  = DB.matches.find(m => m.id === matchId);
-  const hs     = parseInt(document.getElementById(`adm_hs_${matchId}`).value);
-  const as_    = parseInt(document.getElementById(`adm_as_${matchId}`).value);
-  const winner = document.getElementById(`adm_w_${matchId}`).value;
-  const done   = document.getElementById(`adm_done_${matchId}`).value === "1";
-  const payload = { match_id: matchId, home_score: isNaN(hs)?null:hs, away_score: isNaN(as_)?null:as_, winner: winner||null, done };
-  try {
-    await supabase.upsert("match_results", payload);
-    if (!isNaN(hs) && !isNaN(as_)) match.result = { homeScore: hs, awayScore: as_ };
-    match.winner = winner || null;
-    match.done   = done;
-    showToast(`✅ ${match.homeFlag} vs ${match.awayFlag} guardado`, "success");
-    renderMatches(); renderRanking(); renderAdmin();
-  } catch(e) { showToast("Error al guardar", "error"); console.error(e); }
-}
-
-async function adminSaveChampion() {
-  const val = document.getElementById("adm_champ_winner").value || null;
-  try {
-    await supabase.upsert("settings", { key: "champion_winner", value: val });
-    DB.championWinner = val;
-    const t = CHAMPION_TEAMS.find(t => t.id === val);
-    showToast(t ? `✅ Campeón: ${t.id} ${t.name}` : "✅ Campeón eliminado", "success");
-    renderRanking();
-  } catch(e) { showToast("Error al guardar", "error"); console.error(e); }
-}
-
-async function recalcAll() {
-  showLoading("Actualizando...");
-  await loadAll();
-  hideLoading();
-  renderRanking();
-  showToast("✅ Tabla actualizada", "success");
-  switchTab("ranking");
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   MODAL PARTICIPANTE
-═══════════════════════════════════════════════════════════════ */
-// ID del usuario actualmente en el modal (para edición admin)
-let _modalUserId = null;
-
-function openParticipantModal(userId) {
-  _modalUserId = userId;
-  _renderModalContent(userId);
-  document.getElementById("participantModal").classList.add("open");
-}
-
-function _renderModalContent(userId) {
-  const user    = DB.users.find(u => u.id === userId);
-  if (!user) return;
-  const isAdmin = currentUser?.is_admin;
-  const stats   = calcUserStats(user);
-  const ct      = CHAMPION_TEAMS.find(t => t.id === user.champion);
-  document.getElementById("modalTitle").textContent = user.name + (isAdmin ? " ✏️" : "");
-
-  // ── Sección campeón ──────────────────────────────────────────
-  let champHtml = "";
-  if (isAdmin) {
-    // Admin: selector editable de campeón
-    const champGrid = CHAMPION_TEAMS.map(t => `
-      <button class="champ-edit-btn ${user.champion === t.id ? "selected" : ""}"
-        onclick="adminSetChampionForUser('${userId}','${t.id}',this)">
-        <span class="champ-edit-flag">${t.id}</span>
-        <span class="champ-edit-name">${t.name}</span>
-      </button>`).join("");
-    champHtml = `
-      <div class="modal-champ-edit-row">
-        <div class="modal-champ-edit-label">🏆 CAMPEÓN ELEGIDO</div>
-        <div class="champ-edit-grid">${champGrid}</div>
-        <button class="champ-edit-save-btn" onclick="adminSaveChampionForUser('${userId}')">
-          💾 GUARDAR CAMPEÓN DE ${user.name.toUpperCase()}
-        </button>
-      </div>`;
-  } else {
-    champHtml = `
-      <div class="modal-champ-row">
-        <span class="modal-champ-icon">🏆</span>
-        <div class="modal-champ-text">Campeón elegido: <b>${ct ? ct.id + " " + ct.name : "Sin elegir"}</b>
-          ${DB.championWinner ? (DB.championWinner === user.champion
-            ? " · <span style='color:var(--success)'>✅ +5 pts</span>"
-            : " · <span style='color:var(--danger)'>✗ 0 pts</span>") : ""}
-        </div>
-      </div>`;
-  }
-
-  // ── Filas de picks ────────────────────────────────────────────
-  let pickRows = "";
-  if (isAdmin) {
-    // Admin: formulario editable por partido
-    pickRows = `
-      <div class="modal-edit-header">
-        <span class="modal-edit-title">PICKS POR PARTIDO</span>
-        <span class="modal-edit-badge">⚙️ MODO ADMIN</span>
-      </div>` +
-      DB.matches.map(m => {
-        const pick    = DB.picks.find(p => p.user_id === user.id && p.match_id === m.id);
-        const p       = calcPickPts(pick, m);
-        const curHs   = pick?.home_score ?? "";
-        const curAs   = pick?.away_score ?? "";
-        const curAdv  = pick?.advance || null;
-        const ptsStr  = m.done ? p.total : (pick?.home_score !== null && pick?.home_score !== undefined ? "?" : "–");
-        const ptsZero = m.done && p.total === 0;
-        const uid_mid = `${userId}_${m.id}`.replace(/-/g,"_");
-
-        // OT derivado del marcador actual
-        const ph = parseInt(curHs), pa = parseInt(curAs);
-        const hasSc      = curHs !== "" && curAs !== "" && !isNaN(ph) && !isNaN(pa);
-        const derivedOT  = !hasSc ? null : ph > pa ? "1" : ph === pa ? "X" : "2";
-        const isDrawn    = derivedOT === "X";
-        const otLabel    = derivedOT === "1" ? `🏠 LOCAL gana ${m.homeFlag}`
-                         : derivedOT === "X" ? "🤝 EMPATE — elige clasificado"
-                         : derivedOT === "2" ? `✈️ VISITA gana ${m.awayFlag}`
-                         : "Ingresa el marcador";
-        const otClass    = { "1":"home","X":"draw","2":"away" }[derivedOT] || "empty";
-
-        const advanceRow = isDrawn ? `
-            <div class="advance-row">
-              <span class="advance-label">¿CLASIFICA?</span>
-              <button class="advance-btn ${curAdv==="home"?"sel":""}"
-                onclick="adminSetAdvance('${userId}','${m.id}','home','${uid_mid}')">
-                ${m.homeFlag} ${m.home}
-              </button>
-              <button class="advance-btn ${curAdv==="away"?"sel":""}"
-                onclick="adminSetAdvance('${userId}','${m.id}','away','${uid_mid}')">
-                ${m.awayFlag} ${m.away}
-              </button>
-            </div>` : "";
-
-        return `
-          <div class="modal-pick-edit-row" id="editrow_${uid_mid}">
-            <div class="modal-pick-edit-match">
-              <span>${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag}</span>
-              <span class="modal-pick-edit-pts ${ptsZero ? "zero" : ""}">${ptsStr !== "–" ? ptsStr + " pts" : "–"}</span>
-            </div>
-            <div class="ot-derived ${otClass}" style="margin-bottom:7px;font-size:11px">${otLabel}</div>
-            ${advanceRow}
-            <div class="edit-score-row">
-              <span class="edit-score-label">MARCADOR</span>
-              <div class="edit-score-inputs">
-                <input class="edit-score-input" type="number" min="0" max="20"
-                  id="ehs_${uid_mid}" value="${curHs}" placeholder="–"
-                  oninput="adminOnScoreInput('${userId}','${m.id}','${uid_mid}')" />
-                <span class="edit-score-sep">:</span>
-                <input class="edit-score-input" type="number" min="0" max="20"
-                  id="eas_${uid_mid}" value="${curAs}" placeholder="–"
-                  oninput="adminOnScoreInput('${userId}','${m.id}','${uid_mid}')" />
-              </div>
-              <button class="edit-save-btn"
-                onclick="adminSavePickForUser('${userId}','${m.id}','${uid_mid}')">💾</button>
-              <button class="edit-clear-btn"
-                onclick="adminClearPickForUser('${userId}','${m.id}','${uid_mid}')">✕</button>
-            </div>
-          </div>`;
-      }).join("");
-  } else {
-    // Vista normal de solo lectura
-    pickRows = DB.matches.map(m => {
-      const pick    = DB.picks.find(p => p.user_id === user.id && p.match_id === m.id);
-      const p       = calcPickPts(pick, m);
-      const otLabel = pick?.ot ? { "1":"LOCAL","X":"EMPATE","2":"VISITA" }[pick.ot] : "–";
-      const otColor = pick?.ot ? { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot] : "var(--muted)";
-      const sc      = pick?.home_score !== null && pick?.home_score !== undefined
-                      ? `${pick.home_score} - ${pick.away_score}` : "–";
-      const ptsStr  = m.done ? p.total : (pick?.ot ? "?" : "–");
-      return `<div class="modal-pick-row">
-        <div class="modal-pick-match"><b>${m.homeFlag} vs ${m.awayFlag}</b><br>${m.home} · ${m.away}</div>
-        <div class="modal-pick-ot" style="color:${otColor}">${otLabel}</div>
-        <div class="modal-pick-sc">${sc}</div>
-        <div class="modal-pick-pts ${p.total===0 && m.done ? "zero" : ""}">${ptsStr}</div>
-      </div>`;
-    }).join("");
-    pickRows = `
-      <div style="display:grid;grid-template-columns:1fr 54px 54px 28px;gap:4px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--gray-2)">
-        <span style="font-size:9px;color:var(--muted);font-weight:700">PARTIDO</span>
-        <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RESULTADO</span>
-        <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARCADOR</span>
-        <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
-      </div>` + pickRows;
-  }
-
-  document.getElementById("modalBody").innerHTML = `
-    ${champHtml}
-    ${pickRows}
-    <div class="modal-total-row">
-      <span class="modal-total-label">TOTAL ACUMULADO</span>
-      <span class="modal-total-pts">${stats.pts} <span style="font-size:14px;color:var(--muted)">pts</span></span>
-    </div>`;
-}
-
-/* ── Helpers de edición admin en modal ─────────────────────── */
-
-// Re-renderiza la fila de un partido en el modal admin al escribir el marcador
-function adminOnScoreInput(userId, matchId, uid_mid) {
-  const hsEl  = document.getElementById(`ehs_${uid_mid}`);
-  const asEl  = document.getElementById(`eas_${uid_mid}`);
-  const hs    = hsEl?.value ?? "";
-  const as_   = asEl?.value ?? "";
-  const ph    = parseInt(hs), pa = parseInt(as_);
-  const hasSc = hs !== "" && as_ !== "" && !isNaN(ph) && !isNaN(pa);
-
-  // Actualiza cache local del pick
-  let pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
-  if (!pick) {
-    pick = { user_id: userId, match_id: matchId, ot: null, home_score: null, away_score: null, advance: null };
-    DB.picks.push(pick);
-  }
-  pick.home_score = hasSc ? ph : null;
-  pick.away_score = hasSc ? pa : null;
-  // Si deja de ser empate, limpia el clasificado
-  if (hasSc && ph !== pa) pick.advance = null;
-
-  // Actualiza solo el badge OT y la fila de clasificado dentro de la tarjeta
-  const row = document.getElementById(`editrow_${uid_mid}`);
-  if (!row) return;
-
-  const match = DB.matches.find(m => m.id === matchId);
-  const derivedOT = !hasSc ? null : ph > pa ? "1" : ph === pa ? "X" : "2";
-  const otLabel   = derivedOT === "1" ? `🏠 LOCAL gana ${match.homeFlag}`
-                  : derivedOT === "X" ? "🤝 EMPATE — elige clasificado"
-                  : derivedOT === "2" ? `✈️ VISITA gana ${match.awayFlag}`
-                  : "Ingresa el marcador";
-  const otClass   = { "1":"home","X":"draw","2":"away" }[derivedOT] || "empty";
-
-  // Actualiza badge
-  const badge = row.querySelector(".ot-derived");
-  if (badge) { badge.className = `ot-derived ${otClass}`; badge.textContent = otLabel; }
-
-  // Muestra/oculta selector de clasificado
-  let advRow = row.querySelector(".advance-row");
-  if (derivedOT === "X") {
-    if (!advRow) {
-      advRow = document.createElement("div");
-      advRow.className = "advance-row";
-      advRow.innerHTML = `
-        <span class="advance-label">¿CLASIFICA?</span>
-        <button class="advance-btn ${pick.advance==="home"?"sel":""}"
-          onclick="adminSetAdvance('${userId}','${matchId}','home','${uid_mid}')">
-          ${match.homeFlag} ${match.home}
-        </button>
-        <button class="advance-btn ${pick.advance==="away"?"sel":""}"
-          onclick="adminSetAdvance('${userId}','${matchId}','away','${uid_mid}')">
-          ${match.awayFlag} ${match.away}
-        </button>`;
-      badge?.insertAdjacentElement("afterend", advRow);
-    }
-  } else {
-    advRow?.remove();
-  }
-}
-
-function adminSetAdvance(userId, matchId, value, uid_mid) {
-  let pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
-  if (!pick) return;
-  pick.advance = pick.advance === value ? null : value;
-  // Actualiza clases de los botones de clasificado en la fila
-  const row = document.getElementById(`editrow_${uid_mid}`);
-  if (!row) return;
-  row.querySelectorAll(".advance-btn").forEach((btn, i) => {
-    const v = i === 0 ? "home" : "away";
-    btn.className = "advance-btn" + (pick.advance === v ? " sel" : "");
-  });
-}
-
-async function adminSavePickForUser(userId, matchId, uid_mid) {
-  const hs  = document.getElementById(`ehs_${uid_mid}`)?.value ?? "";
-  const as_ = document.getElementById(`eas_${uid_mid}`)?.value ?? "";
-
-  if (hs === "" || as_ === "") { showToast("Ingresa el marcador completo", "error"); return; }
-  const ph = parseInt(hs), pa = parseInt(as_);
-  if (isNaN(ph) || isNaN(pa)) { showToast("Marcador inválido", "error"); return; }
-
-  const derivedOT = ph > pa ? "1" : ph === pa ? "X" : "2";
-
-  let pick = DB.picks.find(p => p.user_id === userId && p.match_id === matchId);
-  if (!pick) {
-    pick = { user_id: userId, match_id: matchId, ot: null, home_score: null, away_score: null, advance: null };
-    DB.picks.push(pick);
-  }
-
-  // Validar: empate requiere clasificado
-  if (derivedOT === "X" && !pick.advance) {
-    showToast("Elige qué equipo clasifica en el empate", "error"); return;
-  }
-
-  const payload = {
-    user_id:    userId,
-    match_id:   matchId,
-    ot:         derivedOT,
-    home_score: ph,
-    away_score: pa,
-    advance:    derivedOT === "X" ? pick.advance : null,
-  };
-
-  try {
-    await supabase.upsert("picks", payload);
-    pick.ot = derivedOT; pick.home_score = ph; pick.away_score = pa;
-    pick.advance = payload.advance;
-    delete pick._draft_ot;
-    showToast("✅ Pick guardado", "success");
-    _renderModalContent(userId);
-    renderRanking();
-    renderAdmin();
-  } catch(e) {
-    showToast("Error al guardar", "error"); console.error(e);
-  }
-}
-
-async function adminClearPickForUser(userId, matchId, uid_mid) {
-  if (!confirm("¿Eliminar el pronóstico de este partido?")) return;
-  try {
-    await fetch(
-      `${CONFIG.SUPABASE_URL}/rest/v1/picks?user_id=eq.${userId}&match_id=eq.${matchId}`,
-      { method: "DELETE", headers: { ...SB_HEADERS(), "Prefer": "" } }
-    );
-    const idx = DB.picks.findIndex(p => p.user_id === userId && p.match_id === matchId);
-    if (idx !== -1) DB.picks.splice(idx, 1);
-    showToast("✅ Pronóstico eliminado", "success");
-    _renderModalContent(userId);
-    renderRanking();
-    renderAdmin();
-  } catch(e) {
-    showToast("Error al eliminar", "error"); console.error(e);
-  }
-}
-
-function adminSetChampionForUser(userId, teamId, btn) {
-  // Solo marca visualmente; se guarda con el botón guardar
-  const user = DB.users.find(u => u.id === userId);
-  if (!user) return;
-  user._draft_champion = user._draft_champion === teamId ? null : teamId;
-  // Refresca clases en la grilla
-  btn.closest(".champ-edit-grid").querySelectorAll(".champ-edit-btn").forEach(b => b.classList.remove("selected"));
-  if (user._draft_champion) btn.classList.add("selected");
-}
-
-async function adminSaveChampionForUser(userId) {
-  const user = DB.users.find(u => u.id === userId);
-  if (!user) return;
-  const champion = user._draft_champion !== undefined ? user._draft_champion : user.champion;
-  try {
-    await supabase.patch("users", `?id=eq.${userId}`, { champion });
-    user.champion = champion;
-    delete user._draft_champion;
-    showToast("✅ Campeón actualizado", "success");
-    _renderModalContent(userId);
-    renderRanking();
-    renderAdmin();
-  } catch(e) {
-    showToast("Error al guardar", "error"); console.error(e);
-  }
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   ELIMINAR JUGADOR
-═══════════════════════════════════════════════════════════════ */
-function confirmDeleteUser(userId) {
-  const card = document.getElementById(`pcard_${userId}`);
-  if (!card) return;
-
-  // Si ya está en modo confirmación, cancela
-  if (card.classList.contains("confirm-delete")) {
-    card.classList.remove("confirm-delete");
-    card.querySelector(".confirm-delete-bar")?.remove();
-    return;
-  }
-
-  // Proteger al admin actual
-  if (userId === currentUser.id) {
-    showToast("No puedes eliminarte a ti mismo", "error");
-    return;
-  }
-
-  const user = DB.users.find(u => u.id === userId);
-  card.classList.add("confirm-delete");
-
-  // Insertar barra de confirmación al final de la tarjeta
-  const bar = document.createElement("div");
-  bar.className = "confirm-delete-bar";
-  bar.innerHTML = `
-    <button class="confirm-no-btn"  onclick="event.stopPropagation(); cancelDeleteUser('${userId}')">CANCELAR</button>
-    <button class="confirm-yes-btn" onclick="event.stopPropagation(); deleteUser('${userId}')">🗑 ELIMINAR</button>`;
-  card.appendChild(bar);
-}
-
-function cancelDeleteUser(userId) {
-  const card = document.getElementById(`pcard_${userId}`);
-  if (!card) return;
-  card.classList.remove("confirm-delete");
-  card.querySelector(".confirm-delete-bar")?.remove();
-}
-
-async function deleteUser(userId) {
-  const user = DB.users.find(u => u.id === userId);
-  if (!user) return;
-
-  showLoading(`Eliminando a ${user.name}...`);
-  try {
-    // Supabase: eliminar picks del usuario (ON DELETE CASCADE lo haría,
-    // pero lo hacemos explícito por seguridad)
-    await fetch(
-      `${CONFIG.SUPABASE_URL}/rest/v1/picks?user_id=eq.${userId}`,
-      { method: "DELETE", headers: { ...SB_HEADERS() } }
-    );
-    // Eliminar usuario
-    await fetch(
-      `${CONFIG.SUPABASE_URL}/rest/v1/users?id=eq.${userId}`,
-      { method: "DELETE", headers: { ...SB_HEADERS() } }
-    );
-
-    // Actualizar cache local
-    DB.picks  = DB.picks.filter(p => p.user_id !== userId);
-    DB.users  = DB.users.filter(u => u.id !== userId);
-
-    hideLoading();
-    showToast(`✅ ${user.name} eliminado`, "success");
-    renderAdmin();
-    renderRanking();
-  } catch(e) {
-    hideLoading();
-    showToast("Error al eliminar", "error");
-    console.error(e);
-  }
-}
-
-function closeParticipantModal(event) {
-  if (event && event.target !== document.getElementById("participantModal")) return;
-  // Limpia drafts al cerrar
-  DB.picks.forEach(p => delete p._draft_ot);
-  DB.users.forEach(u => delete u._draft_champion);
-  _modalUserId = null;
-  document.getElementById("participantModal").classList.remove("open");
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   UTILIDADES
-═══════════════════════════════════════════════════════════════ */
-function showLoading(msg = "Cargando...") {
-  document.getElementById("loadingText").textContent = msg;
-  document.getElementById("loadingOverlay").classList.remove("hidden");
-}
-function hideLoading() { document.getElementById("loadingOverlay").classList.add("hidden"); }
-
-let toastTimer;
-function showToast(msg, type = "success") {
-  const t = document.getElementById("toast");
-  t.textContent = msg; t.className = `toast ${type} visible`;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove("visible"), 2800);
-}
-
-function showUserMenu() {
-  if (confirm(`Sesión activa: ${currentUser.name}\n\n¿Cerrar sesión?`)) {
-    sessionStorage.removeItem("qm26_uid");
-    location.reload();
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   INICIO
-═══════════════════════════════════════════════════════════════ */
-(async function init() {
-  // Verifica config de Supabase
-  if (CONFIG.SUPABASE_URL.includes("TU_PROYECTO") || CONFIG.SUPABASE_ANON === "TU_ANON_KEY") {
-    document.getElementById("loginScreen").querySelector(".login-card").insertAdjacentHTML("afterbegin",
-      `<div class="config-banner"><b>⚠️ Configuración pendiente</b>Reemplaza <code>SUPABASE_URL</code> y <code>SUPABASE_ANON</code> en el bloque CONFIG del archivo HTML. Consulta el README para los pasos.</div>`);
-    return;
-  }
-  try {
-    showLoading("Conectando...");
-    await loadAll();
-    hideLoading();
-    // Intenta reanudar sesión
-    const uid = sessionStorage.getItem("qm26_uid");
-    if (uid) {
-      const user = DB.users.find(u => u.id === uid);
-      if (user) { currentUser = user; bootApp(); return; }
-    }
-    // Muestra login
-    document.getElementById("loginScreen").style.display = "flex";
-  } catch(e) {
-    hideLoading();
-    document.getElementById("loginScreen").style.display = "flex";
-    document.getElementById("loginScreen").querySelector(".login-card").insertAdjacentHTML("afterbegin",
-      `<div class="config-banner"><b>⚠️ Error de conexión</b>No se pudo conectar con Supabase. Verifica que la URL y la clave sean correctas.</div>`);
-    console.error(e);
-  }
-})();
-</script>
-</body>
-</html>
+      <div class="admin-ma
