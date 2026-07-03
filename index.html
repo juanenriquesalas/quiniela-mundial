@@ -294,6 +294,81 @@
       font-size: 9px; color: var(--muted); font-weight: 700; letter-spacing: 0.5px;
     }
 
+
+    /* ─── CAMBIO DE POSICIÓN ─────────────────────────────────── */
+    .rank-change-toast {
+      position: fixed; top: 80px; left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: var(--gray-1); border-radius: var(--r);
+      padding: 14px 20px; z-index: 998; opacity: 0;
+      transition: all 0.35s; pointer-events: none;
+      border: 2px solid var(--gray-3); text-align: center;
+      min-width: 220px; box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    }
+    .rank-change-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .rank-change-icon  { font-size: 28px; display: block; margin-bottom: 4px; }
+    .rank-change-text  { font-size: 13px; font-weight: 700; color: var(--white); }
+    .rank-change-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .rank-change-toast.up   { border-color: var(--success); }
+    .rank-change-toast.down { border-color: var(--danger); }
+    .rank-change-toast.same { border-color: var(--gold); }
+
+    /* ─── PERFIL PROPIO EN RANKING ───────────────────────────── */
+    .my-profile-btn {
+      width: 100%; background: var(--gray-2); border: 1px solid var(--gray-3);
+      border-radius: var(--rs); padding: 10px 14px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+      transition: border-color 0.15s; text-align: left;
+    }
+    .my-profile-btn:active { border-color: var(--gold); }
+    .my-profile-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-field), var(--green-mid));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 18px; color: var(--gold); flex-shrink: 0;
+    }
+    .my-profile-info { flex: 1; min-width: 0; }
+    .my-profile-name { font-size: 14px; font-weight: 700; color: var(--white); }
+    .my-profile-sub  { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .my-profile-pts  {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 24px; color: var(--gold); line-height: 1; flex-shrink: 0;
+    }
+
+    /* ─── MARCADOR POPULAR ───────────────────────────────────── */
+    .popular-score-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(244,196,48,.12); border: 1px solid rgba(244,196,48,.25);
+      border-radius: 8px; padding: 3px 9px; font-size: 10px;
+      color: var(--gold); font-weight: 700; margin-top: 4px;
+    }
+
+    /* ─── ADMIN: AGREGAR PARTIDO ─────────────────────────────── */
+    .add-match-form {
+      background: var(--gray-1); border: 1px solid var(--gray-2);
+      border-radius: var(--r); padding: 14px; margin-bottom: 10px;
+    }
+    .add-match-form-title {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 14px; color: var(--gold); letter-spacing: 1px; margin-bottom: 12px;
+    }
+    .add-match-input {
+      width: 100%; background: var(--gray-2); border: 1.5px solid var(--gray-3);
+      border-radius: var(--rs); padding: 10px 12px; color: var(--white);
+      font-size: 13px; margin-bottom: 8px;
+    }
+    .add-match-input:focus { outline: none; border-color: var(--gold); }
+    .add-match-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .add-match-row .add-match-input { margin-bottom: 0; }
+    .add-match-btn {
+      width: 100%; background: var(--green-mid); border: none;
+      border-radius: var(--rs); padding: 11px; color: var(--white);
+      font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 4px;
+      transition: background 0.15s;
+    }
+    .add-match-btn:active { background: var(--success); }
+
     /* ─── COUNTDOWN ─────────────────────────────────────────────── */
     .match-countdown {
       font-size: 10px; font-weight: 700; color: var(--gold);
@@ -766,6 +841,13 @@
   </div>
 </div>
 
+<!-- Notificación de cambio de posición -->
+<div class="rank-change-toast" id="rankChangeToast">
+  <span class="rank-change-icon" id="rankChangeIcon"></span>
+  <div class="rank-change-text" id="rankChangeText"></div>
+  <div class="rank-change-sub"  id="rankChangeSub"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -877,17 +959,20 @@ let DB = {
 ═══════════════════════════════════════════════════════════════ */
 async function loadAll() {
   // No muestra loading aquí — el llamador decide cuándo mostrarlo
-  const [users, matchResults, picks, settings] = await Promise.all([
+  const [users, matchResults, picks, settings, extraMatches] = await Promise.all([
     supabase.get("users", "?order=created_at"),
     supabase.get("match_results", "?select=*"),
     supabase.get("picks", "?select=*"),
     supabase.get("settings", "?select=*"),
+    supabase.get("extra_matches", "?select=*").catch(() => []),  // tabla opcional
   ]);
 
   DB.users = users;
 
   const resultMap = Object.fromEntries(matchResults.map(r => [r.match_id, r]));
-  DB.matches = MATCHES.map(m => {
+
+  // Fixture base (hardcoded)
+  const baseMatches = MATCHES.map(m => {
     const r = resultMap[m.id];
     return {
       ...m,
@@ -896,6 +981,29 @@ async function loadAll() {
       done:   r?.done   || false,
     };
   });
+
+  // Partidos extra creados desde el admin
+  const extraConverted = (extraMatches || []).map(e => {
+    const r = resultMap[e.match_id];
+    return {
+      id:       e.match_id,
+      phase:    e.phase,
+      day:      e.day,
+      timeISO:  e.time_iso,
+      home:     e.home,      homeFlag: e.home_flag,
+      away:     e.away,      awayFlag: e.away_flag,
+      result:   r ? { homeScore: r.home_score, awayScore: r.away_score } : null,
+      winner:   r?.winner || null,
+      done:     r?.done   || false,
+    };
+  });
+
+  // Merge: base + extra (sin duplicados por id)
+  const extraIds = new Set(extraConverted.map(m => m.id));
+  DB.matches = [
+    ...baseMatches.filter(m => !extraIds.has(m.id)),
+    ...extraConverted,
+  ].sort((a,b) => new Date(a.timeISO) - new Date(b.timeISO));
 
   DB.picks = picks;
 
@@ -971,7 +1079,12 @@ function calcUserStats(user) {
 function calcRanking() {
   return DB.users
     .map(u => ({ ...u, ...calcUserStats(u) }))
-    .sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name));
+    .sort((a, b) =>
+      b.pts     - a.pts     ||          // 1º mayor puntaje
+      b.exact   - a.exact   ||          // 2º más marcadores exactos (cada uno vale 3)
+      b.ot      - a.ot      ||          // 3º más resultados 1X2 correctos
+      a.name.localeCompare(b.name)      // 4º alfabético como último recurso
+    );
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1136,12 +1249,28 @@ function renderStats() {
         : locked ? "EN JUEGO" : "PRÓXIMO";
       const resultPending = !m.done;
 
+      // Marcador más popular (solo si cerrado)
+      let popularScore = "";
+      if (locked && total > 0) {
+        const scoreMap = {};
+        matchPicks.forEach(p => {
+          if (p.home_score!==null && p.away_score!==null) {
+            const key = `${p.home_score}-${p.away_score}`;
+            scoreMap[key] = (scoreMap[key]||0) + 1;
+          }
+        });
+        const topScore = Object.entries(scoreMap).sort((a,b)=>b[1]-a[1])[0];
+        if (topScore && topScore[1] > 1)
+          popularScore = `<span class="popular-score-badge">🎯 Más apostado: ${topScore[0].replace("-"," – ")} (${topScore[1]})</span>`;
+      }
+
       // Chips de distribución visible en el header
       const distChips = total > 0
         ? `<span class="stats-cnt-chip cnt-home">🏠 ${pct(cntHome)}%</span>
            <span class="stats-cnt-chip cnt-draw">🤝 ${pct(cntDraw)}%</span>
            <span class="stats-cnt-chip cnt-away">✈️ ${pct(cntAway)}%</span>
-           <span class="stats-cnt-chip cnt-none">${total} picks</span>`
+           <span class="stats-cnt-chip cnt-none">${total} picks</span>
+           ${popularScore}`
         : `<span class="stats-cnt-chip cnt-none">Sin picks</span>`;
 
       // Barras de distribución (en el body)
@@ -1654,6 +1783,14 @@ function renderRanking() {
   const myStats     = ranking.find(u => u.id === currentUser.id) || { pts:0 };
   const myPos       = ranking.findIndex(u => u.id === currentUser.id) + 1;
 
+  // ── Notificación de cambio de posición ──────────────────────
+  const prevPos = parseInt(sessionStorage.getItem("qm26_prev_pos") || "0");
+  if (prevPos && myPos && prevPos !== myPos && playedCount > 0) {
+    const moved = prevPos - myPos;  // positivo = subió
+    showRankChange(moved, prevPos, myPos);
+  }
+  if (myPos) sessionStorage.setItem("qm26_prev_pos", myPos);
+
   document.getElementById("rankingSummary").innerHTML = `
     <div class="rank-stat"><div class="rank-stat-val">${myStats.pts}</div><div class="rank-stat-label">MIS PUNTOS</div></div>
     <div class="rank-stat"><div class="rank-stat-val">${myPos || "–"}</div><div class="rank-stat-label">MI POSICIÓN</div></div>
@@ -1676,7 +1813,22 @@ function renderRanking() {
     return;
   }
 
-  document.getElementById("rankingList").innerHTML = ranking.map((u, i) => {
+  // Botón de perfil propio al tope
+  const myRank     = ranking.find(u => u.id === currentUser.id);
+  const myRankPos  = ranking.findIndex(u => u.id === currentUser.id) + 1;
+  const myStreak   = myRank ? calcStreak(myRank) : 0;
+  const myCt       = myRank ? CHAMPION_TEAMS.find(t => t.id === myRank.champion) : null;
+  const profileBtn = myRank ? `
+    <button class="my-profile-btn" onclick="openMyProfile()">
+      <div class="my-profile-avatar">${currentUser.name[0].toUpperCase()}</div>
+      <div class="my-profile-info">
+        <div class="my-profile-name">${currentUser.name} · #${myRankPos}</div>
+        <div class="my-profile-sub">${myCt ? myCt.id+" "+myCt.name : "Sin campeón"} ${myStreak>=2 ? "· "+(myStreak>=4?"🔥":"⚡")+myStreak+" seguidos" : ""}</div>
+      </div>
+      <div class="my-profile-pts">${myRank.pts}<span style="font-size:12px;color:var(--muted)"> pts</span></div>
+    </button>` : "";
+
+  document.getElementById("rankingList").innerHTML = profileBtn + ranking.map((u, i) => {
     const ct  = CHAMPION_TEAMS.find(t => t.id === u.champion);
     const isMe = u.id === currentUser.id;
     // Agrupar partidos por fase para el detalle expandible
@@ -1922,6 +2074,29 @@ function renderAdmin() {
         <div class="admin-footer">
           <button class="admin-save-btn" onclick="adminSaveChampion()">💾 GUARDAR CAMPEÓN</button>
         </div>
+      </div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-title">AGREGAR PARTIDO</div>
+      <div class="add-match-form">
+        <div class="add-match-form-title">Nuevo partido</div>
+        <div class="add-match-row">
+          <input class="add-match-input" id="nm_home" placeholder="Equipo local (ej: España)" />
+          <input class="add-match-input" id="nm_home_flag" placeholder="FIFA (ej: ESP)" style="max-width:90px" />
+        </div>
+        <div class="add-match-row">
+          <input class="add-match-input" id="nm_away" placeholder="Equipo visita (ej: Croacia)" />
+          <input class="add-match-input" id="nm_away_flag" placeholder="FIFA (ej: CRO)" style="max-width:90px" />
+        </div>
+        <select class="add-match-input" id="nm_phase">
+          <option value="8vos">8vos de Final</option>
+          <option value="Cuartos">Cuartos de Final</option>
+          <option value="Semis">Semifinales</option>
+          <option value="Final">Final</option>
+        </select>
+        <input class="add-match-input" id="nm_day" placeholder="Día (ej: Sáb 04 Jul)" />
+        <input class="add-match-input" id="nm_time" placeholder="Hora Chile UTC-4 (ej: 2026-07-04T13:00:00-04:00)" />
+        <button class="add-match-btn" onclick="adminAddMatch()">➕ AGREGAR PARTIDO</button>
       </div>
     </div>
     <button class="recalc-btn" onclick="recalcAll()">🔄 ACTUALIZAR TABLA DE POSICIONES</button>`;
@@ -2350,6 +2525,101 @@ async function deleteUser(userId) {
   } catch(e) {
     hideLoading();
     showToast("Error al eliminar", "error");
+    console.error(e);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   NOTIFICACIÓN DE CAMBIO DE POSICIÓN
+═══════════════════════════════════════════════════════════════ */
+let _rankChangeTimer = null;
+function showRankChange(moved, prevPos, newPos) {
+  const toast = document.getElementById("rankChangeToast");
+  const icon  = document.getElementById("rankChangeIcon");
+  const text  = document.getElementById("rankChangeText");
+  const sub   = document.getElementById("rankChangeSub");
+  if (!toast) return;
+
+  clearTimeout(_rankChangeTimer);
+  if (moved > 0) {
+    toast.className = "rank-change-toast up";
+    icon.textContent = "📈";
+    text.textContent = `¡Subiste ${moved} lugar${moved>1?"es":""}!`;
+    sub.textContent  = `Posición ${prevPos} → ${newPos}`;
+  } else if (moved < 0) {
+    toast.className = "rank-change-toast down";
+    icon.textContent = "📉";
+    text.textContent = `Bajaste ${Math.abs(moved)} lugar${Math.abs(moved)>1?"es":""}`;
+    sub.textContent  = `Posición ${prevPos} → ${newPos}`;
+  } else {
+    return;
+  }
+  toast.classList.add("visible");
+  _rankChangeTimer = setTimeout(() => toast.classList.remove("visible"), 4000);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PERFIL PROPIO — abre modal con estadísticas personales
+═══════════════════════════════════════════════════════════════ */
+function openMyProfile() {
+  openParticipantModal(currentUser.id);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AGREGAR PARTIDO DESDE ADMIN
+═══════════════════════════════════════════════════════════════ */
+async function adminAddMatch() {
+  const home      = document.getElementById("nm_home")?.value.trim();
+  const homeFlag  = document.getElementById("nm_home_flag")?.value.trim().toUpperCase();
+  const away      = document.getElementById("nm_away")?.value.trim();
+  const awayFlag  = document.getElementById("nm_away_flag")?.value.trim().toUpperCase();
+  const phase     = document.getElementById("nm_phase")?.value;
+  const day       = document.getElementById("nm_day")?.value.trim();
+  const timeISO   = document.getElementById("nm_time")?.value.trim();
+
+  if (!home || !homeFlag || !away || !awayFlag || !day || !timeISO) {
+    showToast("Completa todos los campos", "error"); return;
+  }
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/.test(timeISO)) {
+    showToast("Formato de hora incorrecto. Usa: 2026-07-04T13:00:00-04:00", "error"); return;
+  }
+
+  // Generar ID único para el partido
+  const existingIds = DB.matches.map(m => m.id);
+  let num = DB.matches.length + 1;
+  let newId = `m${String(num).padStart(2,"0")}`;
+  while (existingIds.includes(newId)) { num++; newId = `m${String(num).padStart(2,"0")}`; }
+
+  const newMatch = { id: newId, phase, day, timeISO, home, homeFlag, away, awayFlag };
+
+  // Guardar en Supabase tabla extra_matches
+  try {
+    await supabase.upsert("extra_matches", {
+      match_id:   newId,
+      phase, day,
+      time_iso:   timeISO,
+      home,       home_flag: homeFlag,
+      away,       away_flag: awayFlag,
+    });
+
+    // Agregar al array local
+    DB.matches.push({
+      ...newMatch,
+      result: null, winner: null, done: false
+    });
+
+    showToast(`✅ Partido agregado: ${homeFlag} vs ${awayFlag}`, "success");
+
+    // Limpiar formulario
+    ["nm_home","nm_home_flag","nm_away","nm_away_flag","nm_day","nm_time"].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = "";
+    });
+
+    renderAdmin();
+    renderMatches();
+  } catch(e) {
+    showToast("Error al guardar en Supabase", "error");
     console.error(e);
   }
 }
