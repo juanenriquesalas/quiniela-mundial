@@ -2080,6 +2080,8 @@ function renderAdmin() {
       <div class="admin-title">AGREGAR PARTIDO</div>
       <div class="add-match-form">
         <div class="add-match-form-title">Nuevo partido</div>
+
+        <!-- Equipos -->
         <div class="add-match-row">
           <input class="add-match-input" id="nm_home" placeholder="Equipo local (ej: España)" />
           <input class="add-match-input" id="nm_home_flag" placeholder="FIFA (ej: ESP)" style="max-width:90px" />
@@ -2088,14 +2090,50 @@ function renderAdmin() {
           <input class="add-match-input" id="nm_away" placeholder="Equipo visita (ej: Croacia)" />
           <input class="add-match-input" id="nm_away_flag" placeholder="FIFA (ej: CRO)" style="max-width:90px" />
         </div>
-        <select class="add-match-input" id="nm_phase">
+
+        <!-- Fase -->
+        <select class="add-match-input" id="nm_phase" onchange="nmUpdateDay()">
           <option value="8vos">8vos de Final</option>
           <option value="Cuartos">Cuartos de Final</option>
           <option value="Semis">Semifinales</option>
           <option value="Final">Final</option>
         </select>
-        <input class="add-match-input" id="nm_day" placeholder="Día (ej: Sáb 04 Jul)" />
-        <input class="add-match-input" id="nm_time" placeholder="Hora Chile UTC-4 (ej: 2026-07-04T13:00:00-04:00)" />
+
+        <!-- Fecha: día + mes + año con selects -->
+        <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;margin-bottom:5px">FECHA (HORA CHILE UTC-4)</div>
+        <div class="add-match-row" style="margin-bottom:8px">
+          <select class="add-match-input" id="nm_d" style="max-width:72px" onchange="nmUpdatePreview()">
+            ${Array.from({length:31},(_,i)=>i+1).map(d=>`<option value="${String(d).padStart(2,'0')}">${String(d).padStart(2,'0')}</option>`).join('')}
+          </select>
+          <select class="add-match-input" id="nm_m" onchange="nmUpdatePreview()">
+            <option value="07">Julio</option>
+            <option value="08">Agosto</option>
+            <option value="06">Junio</option>
+          </select>
+          <select class="add-match-input" id="nm_y" style="max-width:90px" onchange="nmUpdatePreview()">
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
+
+        <!-- Hora y minuto -->
+        <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;margin-bottom:5px">HORA DE INICIO (CHILE)</div>
+        <div class="add-match-row" style="margin-bottom:12px">
+          <select class="add-match-input" id="nm_hh" onchange="nmUpdatePreview()">
+            ${Array.from({length:24},(_,i)=>i).map(h=>`<option value="${String(h).padStart(2,'0')}">${String(h).padStart(2,'0')}</option>`).join('')}
+          </select>
+          <span style="color:var(--muted);font-size:20px;font-family:'Bebas Neue',Arial,sans-serif;padding:0 4px;line-height:2.2">:</span>
+          <select class="add-match-input" id="nm_mm" onchange="nmUpdatePreview()">
+            <option value="00">00</option>
+            <option value="30">30</option>
+            <option value="15">15</option>
+            <option value="45">45</option>
+          </select>
+        </div>
+
+        <!-- Preview del timeISO generado -->
+        <div id="nm_preview" style="font-size:10px;color:var(--muted);margin-bottom:10px;padding:7px 10px;background:var(--gray-2);border-radius:6px"></div>
+
         <button class="add-match-btn" onclick="adminAddMatch()">➕ AGREGAR PARTIDO</button>
       </div>
     </div>
@@ -2569,52 +2607,83 @@ function openMyProfile() {
 /* ═══════════════════════════════════════════════════════════════
    AGREGAR PARTIDO DESDE ADMIN
 ═══════════════════════════════════════════════════════════════ */
+// Genera el label de día legible: "Sáb 04 Jul"
+function nmBuildDayLabel(d, m, y) {
+  const date = new Date(`${y}-${m}-${d}T12:00:00`);
+  const dias  = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+  const meses = ["","Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+  return `${dias[date.getDay()]} ${d} ${meses[parseInt(m)]}`;
+}
+
+// Genera el timeISO completo con offset Chile UTC-4
+function nmBuildISO(d, m, y, hh, mm) {
+  return `${y}-${m}-${d}T${hh}:${mm}:00-04:00`;
+}
+
+// Actualiza el preview en tiempo real
+function nmUpdatePreview() {
+  const d  = document.getElementById("nm_d")?.value;
+  const m  = document.getElementById("nm_m")?.value;
+  const y  = document.getElementById("nm_y")?.value;
+  const hh = document.getElementById("nm_hh")?.value;
+  const mm = document.getElementById("nm_mm")?.value;
+  if (!d || !m || !y || !hh || !mm) return;
+  const label = nmBuildDayLabel(d, m, y);
+  const iso   = nmBuildISO(d, m, y, hh, mm);
+  const prev  = document.getElementById("nm_preview");
+  if (prev) prev.innerHTML = `<b style="color:var(--white)">${label} · ${hh}:${mm}</b> &nbsp;<span style="color:var(--gray-3)">${iso}</span>`;
+}
+
+// Llama al preview cuando cambia la fase (no requerido pero útil)
+function nmUpdateDay() { nmUpdatePreview(); }
+
 async function adminAddMatch() {
   const home      = document.getElementById("nm_home")?.value.trim();
   const homeFlag  = document.getElementById("nm_home_flag")?.value.trim().toUpperCase();
   const away      = document.getElementById("nm_away")?.value.trim();
   const awayFlag  = document.getElementById("nm_away_flag")?.value.trim().toUpperCase();
   const phase     = document.getElementById("nm_phase")?.value;
-  const day       = document.getElementById("nm_day")?.value.trim();
-  const timeISO   = document.getElementById("nm_time")?.value.trim();
+  const d         = document.getElementById("nm_d")?.value;
+  const m         = document.getElementById("nm_m")?.value;
+  const y         = document.getElementById("nm_y")?.value;
+  const hh        = document.getElementById("nm_hh")?.value;
+  const mm        = document.getElementById("nm_mm")?.value;
 
-  if (!home || !homeFlag || !away || !awayFlag || !day || !timeISO) {
-    showToast("Completa todos los campos", "error"); return;
-  }
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/.test(timeISO)) {
-    showToast("Formato de hora incorrecto. Usa: 2026-07-04T13:00:00-04:00", "error"); return;
+  if (!home || !homeFlag || !away || !awayFlag) {
+    showToast("Completa los nombres y códigos FIFA", "error"); return;
   }
 
-  // Generar ID único para el partido
-  const existingIds = DB.matches.map(m => m.id);
+  const day     = nmBuildDayLabel(d, m, y);
+  const timeISO = nmBuildISO(d, m, y, hh, mm);
+
+  // Generar ID único
+  const existingIds = DB.matches.map(mx => mx.id);
   let num = DB.matches.length + 1;
   let newId = `m${String(num).padStart(2,"0")}`;
   while (existingIds.includes(newId)) { num++; newId = `m${String(num).padStart(2,"0")}`; }
 
   const newMatch = { id: newId, phase, day, timeISO, home, homeFlag, away, awayFlag };
 
-  // Guardar en Supabase tabla extra_matches
   try {
     await supabase.upsert("extra_matches", {
-      match_id:   newId,
+      match_id:  newId,
       phase, day,
-      time_iso:   timeISO,
-      home,       home_flag: homeFlag,
-      away,       away_flag: awayFlag,
+      time_iso:  timeISO,
+      home,      home_flag: homeFlag,
+      away,      away_flag: awayFlag,
     });
 
-    // Agregar al array local
-    DB.matches.push({
-      ...newMatch,
-      result: null, winner: null, done: false
-    });
+    DB.matches.push({ ...newMatch, result: null, winner: null, done: false });
+    DB.matches.sort((a,b) => new Date(a.timeISO) - new Date(b.timeISO));
 
-    showToast(`✅ Partido agregado: ${homeFlag} vs ${awayFlag}`, "success");
+    showToast(`✅ ${homeFlag} vs ${awayFlag} · ${day} ${hh}:${mm}`, "success");
 
-    // Limpiar formulario
-    ["nm_home","nm_home_flag","nm_away","nm_away_flag","nm_day","nm_time"].forEach(id => {
+    // Limpiar campos de texto
+    ["nm_home","nm_home_flag","nm_away","nm_away_flag"].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = "";
     });
+    const prev = document.getElementById("nm_preview");
+    if (prev) prev.innerHTML = "";
 
     renderAdmin();
     renderMatches();
