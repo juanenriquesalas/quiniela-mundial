@@ -1046,16 +1046,17 @@ function calcPickPts(pick, match) {
   const otOk    = pickOT === realOT;
   const exactOk = ph === rh && pa === ra;
 
-  // Clasificado: si el marcador fue empate, se usa pick.advance; si no, el OT lo define
+  // Clasificado: independiente del 1X2.
+  // Si apostó empate → usa pick.advance (seleccionado explícitamente)
+  // Si apostó triunfo → el clasificado implícito es el equipo ganador en su marcador
   let advanceOk = false;
-  if (pickOT === "X") {
-    // Empate apostado: el clasificado debe coincidir con match.winner
-    const realWinner = match.winner; // 'home' | 'away'
-    advanceOk = realWinner && pick.advance === realWinner;
-  } else {
-    // No empate: el clasificado es el equipo que el marcador indica ganador
-    const pickWinner = ph > pa ? "home" : "away";
-    advanceOk = otOk && pickWinner === match.winner;
+  if (match.winner) {
+    if (pickOT === "X") {
+      advanceOk = pick.advance === match.winner;
+    } else {
+      const pickWinner = ph > pa ? "home" : "away";
+      advanceOk = pickWinner === match.winner;
+    }
   }
 
   const pts_ot      = otOk      ? 1 : 0;
