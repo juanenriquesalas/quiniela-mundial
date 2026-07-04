@@ -1188,6 +1188,10 @@ async function loadAll() {
   const editsSetting = settings.find(s => s.key === "pick_edits");
   DB.pickEdits = editsSetting?.value ? JSON.parse(editsSetting.value) : [];
 
+  // Nombres baneados (eliminados por el admin)
+  const bannedSetting = settings.find(s => s.key === "banned_names");
+  DB.bannedNames = bannedSetting?.value ? JSON.parse(bannedSetting.value) : [];
+
   // Torneos
   const tournamentsSetting = settings.find(s => s.key === "tournaments");
   DB.tournaments = tournamentsSetting?.value ? JSON.parse(tournamentsSetting.value) : [];
@@ -1299,6 +1303,14 @@ async function doLogin() {
     DB.users = users;
     if (btn) { btn.disabled = false; btn.textContent = "ENTRAR A LA QUINIELA →"; }
 
+    // Verificar lista negra (nombres eliminados por admin)
+    const banned = (DB.bannedNames || []).map(n => n.toLowerCase());
+    if (banned.includes(name.toLowerCase())) {
+      if (btn) { btn.disabled = false; btn.textContent = "ENTRAR A LA QUINIELA →"; }
+      showToast("Este nombre fue removido del grupo. Contacta al organizador.", "error");
+      return;
+    }
+
     // Búsqueda exacta (case-insensitive)
     const existing = DB.users.find(u => u.name.toLowerCase() === name.toLowerCase());
 
@@ -1308,15 +1320,13 @@ async function doLogin() {
       return;
     }
 
-    // No existe: buscar nombres similares
+    // No existe: buscar nombres similares (excluyendo baneados)
     const suggestions = fuzzyMatchUsers(name, DB.users);
 
     if (suggestions.length > 0) {
-      // Mostrar modal de confirmación
       _loginPending = { name, code, isAdmin };
       showNameConfirmModal(name, suggestions);
     } else {
-      // No hay similares: preguntar si quiere crear cuenta nueva
       _loginPending = { name, code, isAdmin };
       showNameConfirmModal(name, []);
     }
@@ -1399,6 +1409,14 @@ async function loginAsSuggested(userId) {
 async function loginConfirmNew() {
   document.getElementById("nameConfirmModal").classList.remove("open");
   const { name, isAdmin } = _loginPending;
+
+  // Segunda verificación: el nombre no debe estar baneado
+  const banned = (DB.bannedNames || []).map(n => n.toLowerCase());
+  if (banned.includes(name.toLowerCase())) {
+    showToast("Este nombre fue removido del grupo. Contacta al organizador.", "error");
+    return;
+  }
+
   showLoading("Creando cuenta...");
   try {
     const result  = await supabase.upsert("users", { name, is_admin: isAdmin });
@@ -2644,6 +2662,16 @@ function renderAdmin() {
     <div class="admin-section">
       <div class="admin-title">PARTICIPANTES (${DB.users.length})</div>
       <div class="participants-grid">${participantCards}</div>
+      ${DB.bannedNames?.length ? `
+        <div style="margin-top:10px;padding:10px 12px;background:var(--gray-2);border-radius:var(--rs)">
+          <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:6px">ACCESO BLOQUEADO</div>
+          ${DB.bannedNames.map(n => `
+            <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--gray-3)">
+              <span style="flex:1;font-size:12px;color:var(--danger)">🚫 ${n}</span>
+              <button class="admin-save-btn" style="padding:4px 10px;font-size:10px;background:var(--gray-3)"
+                onclick="unbanUser('${n}')">Desbloquear</button>
+            </div>`).join('')}
+        </div>` : ''}
     </div>
     <div class="admin-section">
       <div class="admin-title">RESULTADOS DE PARTIDOS</div>
@@ -3131,6 +3159,14 @@ function cancelDeleteUser(userId) {
   card.querySelector(".confirm-delete-bar")?.remove();
 }
 
+
+async function unbanUser(name) {
+  DB.bannedNames = (DB.bannedNames || []).filter(n => n.toLowerCase() !== name.toLowerCase());
+  await supabase.upsert("settings", { key:"banned_names", value: JSON.stringify(DB.bannedNames) });
+  showToast(`✅ ${name} puede volver a registrarse`, "success");
+  renderAdmin();
+}
+
 async function deleteUser(userId) {
   const user = DB.users.find(u => u.id === userId);
   if (!user) return;
@@ -3148,6 +3184,15 @@ async function deleteUser(userId) {
       `${CONFIG.SUPABASE_URL}/rest/v1/users?id=eq.${userId}`,
       { method: "DELETE", headers: { ...SB_HEADERS() } }
     );
+
+    // Guardar nombre en lista negra para evitar que se recree
+    const bannedRaw  = await supabase.get("settings", "?key=eq.banned_names").catch(()=>[]);
+    const bannedList = bannedRaw?.[0]?.value ? JSON.parse(bannedRaw[0].value) : [];
+    if (!bannedList.map(n=>n.toLowerCase()).includes(user.name.toLowerCase())) {
+      bannedList.push(user.name);
+      await supabase.upsert("settings", { key:"banned_names", value: JSON.stringify(bannedList) });
+    }
+    DB.bannedNames = bannedList;
 
     // Actualizar cache local
     DB.picks  = DB.picks.filter(p => p.user_id !== userId);
