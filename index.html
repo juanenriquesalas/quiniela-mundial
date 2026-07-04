@@ -369,6 +369,152 @@
     }
     .add-match-btn:active { background: var(--success); }
 
+
+    /* ─── LOGIN: MODAL CONFIRMACIÓN DE NOMBRE ───────────────────── */
+    .name-confirm-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.78); z-index: 600;
+      align-items: flex-end; justify-content: center;
+    }
+    .name-confirm-overlay.open { display: flex; }
+    .name-confirm-sheet {
+      background: var(--gray-1); border-radius: 18px 18px 0 0;
+      width: 100%; max-width: 420px; padding: 0 0 36px;
+      animation: slideUp .22s ease;
+    }
+    .name-confirm-handle {
+      width: 36px; height: 4px; background: var(--gray-3);
+      border-radius: 2px; margin: 12px auto 16px;
+    }
+    .name-confirm-body { padding: 0 20px; }
+    .name-confirm-icon { font-size: 32px; text-align: center; display: block; margin-bottom: 8px; }
+    .name-confirm-title {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 20px; color: var(--gold); letter-spacing: 1px;
+      text-align: center; margin-bottom: 6px;
+    }
+    .name-confirm-desc { font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 16px; line-height: 1.5; }
+    .name-confirm-typed {
+      background: var(--gray-2); border: 1.5px solid var(--gray-3);
+      border-radius: var(--rs); padding: 10px 14px;
+      font-size: 14px; color: var(--white); font-weight: 600;
+      text-align: center; margin-bottom: 14px;
+    }
+    .name-confirm-label { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; margin-bottom: 7px; }
+    .name-suggest-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .name-suggest-btn {
+      background: var(--gray-2); border: 1.5px solid var(--gray-3);
+      border-radius: var(--rs); padding: 11px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; transition: border-color 0.15s;
+    }
+    .name-suggest-btn:active { border-color: var(--gold); }
+    .name-suggest-name { font-size: 14px; font-weight: 700; color: var(--white); }
+    .name-suggest-score {
+      font-size: 10px; color: var(--muted);
+      background: var(--gray-3); border-radius: 8px; padding: 2px 7px;
+    }
+    .name-suggest-score.high { background: rgba(76,175,135,.2); color: var(--success); }
+    .name-confirm-divider {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 12px; font-size: 10px; color: var(--muted); font-weight: 700;
+    }
+    .name-confirm-divider::before,
+    .name-confirm-divider::after { content:""; flex:1; height:1px; background:var(--gray-2); }
+    .name-create-btn {
+      width: 100%; background: transparent; border: 1.5px solid var(--gray-3);
+      border-radius: var(--rs); padding: 11px;
+      font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer;
+      transition: all 0.15s; margin-bottom: 8px;
+    }
+    .name-create-btn:active { border-color: var(--danger); color: var(--danger); }
+    .name-cancel-btn {
+      width: 100%; background: transparent; border: none;
+      padding: 8px; font-size: 12px; color: var(--muted); cursor: pointer;
+    }
+
+
+    /* ─── MODO ESPECTADOR ───────────────────────────────────── */
+    .spectator-banner {
+      background: rgba(244,196,48,.08); border: 1px solid rgba(244,196,48,.25);
+      border-radius: var(--rs); padding: 8px 12px; margin-bottom: 12px;
+      font-size: 11px; color: var(--gold); display: flex;
+      align-items: center; gap: 8px;
+    }
+    .spectator-join-btn {
+      margin-left: auto; background: var(--gold); border: none;
+      border-radius: 6px; padding: 5px 10px; font-size: 10px;
+      font-weight: 700; color: var(--green-deep); cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* ─── EXPORTAR RANKING (imagen) ─────────────────────────── */
+    .export-btn {
+      width: 100%; background: var(--gray-2); border: 1px solid var(--gray-3);
+      border-radius: var(--rs); padding: 11px; font-size: 13px;
+      font-weight: 700; color: var(--white); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: 7px; margin-bottom: 12px; transition: border-color 0.15s;
+    }
+    .export-btn:active { border-color: var(--gold); color: var(--gold); }
+
+    /* Canvas oculto para exportar */
+    #exportCanvas { display: none; }
+
+    /* ─── HISTORIAL DE EDICIONES ADMIN ──────────────────────── */
+    .pick-edit-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 9px; font-weight: 700; padding: 1px 6px;
+      border-radius: 8px; background: rgba(244,196,48,.12);
+      color: var(--gold-dim); border: 1px solid rgba(244,196,48,.2);
+      margin-left: 4px; white-space: nowrap;
+    }
+    .edit-log-row {
+      font-size: 10px; color: var(--muted); padding: 4px 0;
+      border-bottom: 1px solid var(--gray-2); display: flex;
+      align-items: center; gap: 6px;
+    }
+    .edit-log-row:last-child { border-bottom: none; }
+    .edit-log-section {
+      margin-top: 8px; padding-top: 8px;
+      border-top: 1px solid var(--gray-2);
+    }
+    .edit-log-title {
+      font-size: 9px; font-weight: 700; color: var(--muted);
+      letter-spacing: 1px; margin-bottom: 5px;
+    }
+
+    /* ─── SELECTOR DE TORNEO ─────────────────────────────────── */
+    .tournament-selector {
+      background: var(--gray-2); border-radius: var(--rs);
+      padding: 10px 14px; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .tournament-select {
+      flex: 1; background: var(--gray-1); border: 1.5px solid var(--gray-3);
+      border-radius: 6px; color: var(--white); font-size: 13px;
+      font-weight: 600; padding: 8px 10px;
+    }
+    .tournament-select:focus { outline: none; border-color: var(--gold); }
+    .tournament-label {
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      letter-spacing: 0.5px; white-space: nowrap;
+    }
+    .tournament-badge {
+      font-size: 9px; font-weight: 700; padding: 2px 8px;
+      border-radius: 10px; background: rgba(76,175,135,.18);
+      color: var(--success); white-space: nowrap;
+    }
+    .tournament-badge.archived {
+      background: rgba(160,160,180,.13); color: var(--muted);
+    }
+    /* Admin: crear/archivar torneo */
+    .tournament-admin-card {
+      background: var(--gray-1); border: 1px solid var(--gray-2);
+      border-radius: var(--r); padding: 14px; margin-bottom: 8px;
+    }
+    .tournament-form-row { display: flex; gap: 7px; margin-bottom: 8px; }
+
     /* ─── COUNTDOWN ─────────────────────────────────────────────── */
     .match-countdown {
       font-size: 10px; font-weight: 700; color: var(--gold);
@@ -770,6 +916,8 @@
       <label class="login-label">CÓDIGO DEL GRUPO</label>
       <input id="loginCode" class="login-input" type="text" placeholder="Pídelo al organizador" maxlength="20" autocomplete="off" />
       <button class="login-btn" onclick="doLogin()">ENTRAR A LA QUINIELA →</button>
+      <button class="login-btn" style="margin-top:8px;background:var(--gray-2);color:var(--muted);border:1px solid var(--gray-3)"
+        onclick="doSpectator()">👁 Ver como espectador</button>
     </div>
   </div>
 </div>
@@ -804,9 +952,13 @@
     </div>
 
     <div id="screen-ranking" class="screen">
+      <div id="tournamentSelectorRanking"></div>
       <div class="section-label">TABLA DE POSICIONES</div>
       <div id="rankingSummary" class="ranking-summary"></div>
       <div id="podiumRow"      class="podium-row"></div>
+      <button class="export-btn" onclick="exportRankingImage()">
+        📸 Compartir ranking por WhatsApp
+      </button>
       <div id="rankingList"    class="ranking-list"></div>
     </div>
 
@@ -838,6 +990,28 @@
       <button class="modal-close" onclick="closeParticipantModal()">✕</button>
     </div>
     <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Modal confirmación de nombre en login -->
+<canvas id="exportCanvas" width="600" height="900"></canvas>
+
+<div class="name-confirm-overlay" id="nameConfirmModal">
+  <div class="name-confirm-sheet">
+    <div class="name-confirm-handle"></div>
+    <div class="name-confirm-body">
+      <span class="name-confirm-icon">🤔</span>
+      <div class="name-confirm-title">¿Eres tú?</div>
+      <div class="name-confirm-desc" id="nameConfirmDesc"></div>
+      <div class="name-confirm-typed" id="nameConfirmTyped"></div>
+      <div class="name-confirm-label" id="nameSuggestLabel"></div>
+      <div class="name-suggest-list" id="nameSuggestList"></div>
+      <div class="name-confirm-divider">O</div>
+      <button class="name-create-btn" id="nameCreateBtn" onclick="loginConfirmNew()">
+        ➕ Crear cuenta nueva con este nombre
+      </button>
+      <button class="name-cancel-btn" onclick="loginCancelConfirm()">← Volver y corregir mi nombre</button>
+    </div>
   </div>
 </div>
 
@@ -1009,6 +1183,18 @@ async function loadAll() {
 
   const champSetting = settings.find(s => s.key === "champion_winner");
   DB.championWinner  = champSetting?.value || null;
+
+  // Historial de ediciones de picks
+  const editsSetting = settings.find(s => s.key === "pick_edits");
+  DB.pickEdits = editsSetting?.value ? JSON.parse(editsSetting.value) : [];
+
+  // Torneos
+  const tournamentsSetting = settings.find(s => s.key === "tournaments");
+  DB.tournaments = tournamentsSetting?.value ? JSON.parse(tournamentsSetting.value) : [];
+  if (!DB.tournaments.length) {
+    DB.tournaments = [{ id:"t1", name:"Mundial 2026", status:"active", created_at: Date.now() }];
+  }
+  DB.activeTournament = DB.tournaments.find(t => t.status === "active")?.id || "t1";
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1091,6 +1277,9 @@ function calcRanking() {
 /* ═══════════════════════════════════════════════════════════════
    AUTH
 ═══════════════════════════════════════════════════════════════ */
+// Estado temporal del flujo de login
+let _loginPending = { name: null, code: null, isAdmin: false };
+
 async function doLogin() {
   const name = document.getElementById("loginName").value.trim();
   const code = document.getElementById("loginCode").value.trim().toLowerCase();
@@ -1105,32 +1294,32 @@ async function doLogin() {
   if (btn) { btn.disabled = true; btn.textContent = "Conectando..."; }
 
   try {
-    // Recarga usuarios frescos antes de buscar
+    // Carga usuarios frescos
     const users = await supabase.get("users", "?order=created_at");
     DB.users = users;
+    if (btn) { btn.disabled = false; btn.textContent = "ENTRAR A LA QUINIELA →"; }
 
+    // Búsqueda exacta (case-insensitive)
     const existing = DB.users.find(u => u.name.toLowerCase() === name.toLowerCase());
-    if (!existing) {
-      const result = await supabase.upsert("users", { name, is_admin: isAdmin });
-      const created = Array.isArray(result) ? result[0] : result;
-      if (!created?.id) throw new Error("No se pudo crear el usuario");
-      DB.users.push(created);
-      currentUser = created;
-    } else {
-      currentUser = { ...existing };
-      if (isAdmin && !existing.is_admin) {
-        await supabase.patch("users", `?id=eq.${existing.id}`, { is_admin: true });
-        currentUser.is_admin = true;
-      }
+
+    if (existing) {
+      // Coincidencia exacta: entrar directo
+      await loginProceed(existing, isAdmin);
+      return;
     }
 
-    sessionStorage.setItem("qm26_uid", currentUser.id);
+    // No existe: buscar nombres similares
+    const suggestions = fuzzyMatchUsers(name, DB.users);
 
-    // Carga el resto de datos antes de mostrar la app
-    showLoading("Cargando datos...");
-    await loadAll();
-    hideLoading();
-    bootApp();
+    if (suggestions.length > 0) {
+      // Mostrar modal de confirmación
+      _loginPending = { name, code, isAdmin };
+      showNameConfirmModal(name, suggestions);
+    } else {
+      // No hay similares: preguntar si quiere crear cuenta nueva
+      _loginPending = { name, code, isAdmin };
+      showNameConfirmModal(name, []);
+    }
 
   } catch(e) {
     hideLoading();
@@ -1138,6 +1327,110 @@ async function doLogin() {
     showToast("Error al conectar. Intenta de nuevo.", "error");
     console.error("doLogin error:", e);
   }
+}
+
+/* ── Similitud de nombres (distancia Levenshtein normalizada) ─────────────── */
+function levenshtein(a, b) {
+  a = a.toLowerCase(); b = b.toLowerCase();
+  const m = a.length, n = b.length;
+  const dp = Array.from({length: m+1}, (_,i) => Array.from({length: n+1}, (_,j) => i===0?j:j===0?i:0));
+  for (let i=1;i<=m;i++) for (let j=1;j<=n;j++)
+    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function fuzzyMatchUsers(typed, users) {
+  return users
+    .map(u => {
+      const dist    = levenshtein(typed, u.name);
+      const maxLen  = Math.max(typed.length, u.name.length);
+      const score   = 1 - dist / maxLen;         // 0–1, mayor = más similar
+      const startsWithMatch = u.name.toLowerCase().startsWith(typed.toLowerCase().slice(0,3));
+      const containsMatch   = u.name.toLowerCase().includes(typed.toLowerCase()) ||
+                              typed.toLowerCase().includes(u.name.toLowerCase().slice(0,4));
+      return { user: u, score, boost: startsWithMatch || containsMatch };
+    })
+    .filter(r => r.score >= 0.45 || r.boost)     // umbral de similitud
+    .sort((a,b) => (b.score + (b.boost?.5:0)) - (a.score + (a.boost?.5:0)))
+    .slice(0, 4)                                  // máximo 4 sugerencias
+    .map(r => ({ ...r.user, score: r.score }));
+}
+
+/* ── Modal de confirmación de nombre ──────────────────────────────────────── */
+function showNameConfirmModal(typed, suggestions) {
+  document.getElementById("nameConfirmTyped").textContent = `"${typed}"`;
+
+  const hasSuggestions = suggestions.length > 0;
+  document.getElementById("nameConfirmDesc").textContent = hasSuggestions
+    ? "Este nombre no está registrado. ¿Quisiste decir alguno de estos?"
+    : "Este nombre no está en el grupo. ¿Quieres crear una cuenta nueva?";
+
+  document.getElementById("nameSuggestLabel").textContent = hasSuggestions
+    ? "PARTICIPANTES EXISTENTES" : "";
+
+  const list = document.getElementById("nameSuggestList");
+  list.innerHTML = suggestions.map(u => {
+    const pct   = Math.round(u.score * 100);
+    const isHigh = pct >= 75;
+    return `
+      <button class="name-suggest-btn" onclick="loginAsSuggested('${u.id}')">
+        <span class="name-suggest-name">${u.name}</span>
+        <span class="name-suggest-score ${isHigh?"high":""}">
+          ${isHigh ? "✓ Muy similar" : `${pct}% similar`}
+        </span>
+      </button>`;
+  }).join("");
+
+  document.getElementById("nameCreateBtn").textContent =
+    `➕ Crear cuenta nueva como "${typed}"`;
+
+  document.getElementById("nameConfirmModal").classList.add("open");
+}
+
+// Usuario elige un nombre sugerido
+async function loginAsSuggested(userId) {
+  document.getElementById("nameConfirmModal").classList.remove("open");
+  const user = DB.users.find(u => u.id === userId);
+  if (!user) return;
+  await loginProceed(user, _loginPending.isAdmin);
+}
+
+// Usuario confirma crear cuenta nueva
+async function loginConfirmNew() {
+  document.getElementById("nameConfirmModal").classList.remove("open");
+  const { name, isAdmin } = _loginPending;
+  showLoading("Creando cuenta...");
+  try {
+    const result  = await supabase.upsert("users", { name, is_admin: isAdmin });
+    const created = Array.isArray(result) ? result[0] : result;
+    if (!created?.id) throw new Error("No se pudo crear el usuario");
+    DB.users.push(created);
+    await loginProceed(created, isAdmin);
+  } catch(e) {
+    hideLoading();
+    showToast("Error al crear la cuenta", "error");
+    console.error(e);
+  }
+}
+
+// Usuario cancela y vuelve al login
+function loginCancelConfirm() {
+  document.getElementById("nameConfirmModal").classList.remove("open");
+  _loginPending = { name: null, code: null, isAdmin: false };
+}
+
+// Flujo final: autenticar y entrar
+async function loginProceed(user, isAdmin) {
+  currentUser = { ...user };
+  if (isAdmin && !user.is_admin) {
+    await supabase.patch("users", `?id=eq.${user.id}`, { is_admin: true });
+    currentUser.is_admin = true;
+  }
+  sessionStorage.setItem("qm26_uid", currentUser.id);
+  showLoading("Cargando datos...");
+  await loadAll();
+  hideLoading();
+  bootApp();
 }
 
 
@@ -1412,14 +1705,304 @@ function toggleMatchStatsAcc(id) {
   if (arrow) arrow.classList.toggle("open", !open);
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   PUNTO 1 — MODO ESPECTADOR
+═══════════════════════════════════════════════════════════════ */
+async function doSpectator() {
+  const name = document.getElementById("loginName").value.trim() || "Espectador";
+  showLoading("Cargando datos...");
+  try {
+    await loadAll();
+    hideLoading();
+    currentUser = { id: null, name, is_admin: false, is_spectator: true, champion: null };
+    bootApp();
+  } catch(e) {
+    hideLoading();
+    showToast("Error al conectar", "error");
+    console.error(e);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PUNTO 3 — EXPORTAR RANKING COMO IMAGEN (Canvas API)
+═══════════════════════════════════════════════════════════════ */
+function exportRankingImage() {
+  const canvas  = document.getElementById("exportCanvas");
+  const ctx     = canvas.getContext("2d");
+  const ranking = calcRanking();
+  const top     = ranking.slice(0, Math.min(10, ranking.length));
+  const W = 600, ROW = 64, PAD = 32;
+  const H = PAD + 120 + top.length * ROW + PAD + 60;
+  canvas.width = W; canvas.height = H;
+
+  // Fondo
+  ctx.fillStyle = "#0a1628";
+  ctx.fillRect(0, 0, W, H);
+
+  // Franja dorada superior
+  ctx.fillStyle = "#f4c430";
+  ctx.fillRect(0, 0, W, 6);
+
+  // Logo / título
+  ctx.fillStyle = "#f4c430";
+  ctx.font = "bold 36px 'Arial Narrow', Arial, sans-serif";
+  ctx.letterSpacing = "4px";
+  ctx.textAlign = "center";
+  ctx.fillText("⚽ QUINIELA MUNDIAL 2026", W/2, PAD + 44);
+
+  ctx.fillStyle = "#8888aa";
+  ctx.font = "14px Arial, sans-serif";
+  ctx.fillText(`Ranking · ${new Date().toLocaleDateString("es-CL",{day:"2-digit",month:"long"})}`, W/2, PAD + 70);
+
+  ctx.fillStyle = "#2a2a3e";
+  ctx.fillRect(PAD, PAD + 84, W - PAD*2, 2);
+
+  // Filas
+  const medals = ["🥇","🥈","🥉"];
+  top.forEach((u, i) => {
+    const y = PAD + 120 + i * ROW;
+    const isMe = u.id === currentUser?.id;
+
+    // Fondo fila propia
+    if (isMe) {
+      ctx.fillStyle = "rgba(244,196,48,0.08)";
+      ctx.fillRect(PAD, y - 4, W - PAD*2, ROW - 6);
+    }
+
+    // Posición / medalla
+    ctx.fillStyle = i < 3 ? "#f4c430" : "#3d3d55";
+    ctx.font = "bold 20px 'Arial Narrow', Arial, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText(i < 3 ? medals[i] : `${i+1}`, PAD, y + 30);
+
+    // Nombre
+    ctx.fillStyle = isMe ? "#f4c430" : "#f5f5f0";
+    ctx.font = `${isMe?"bold ":""}18px Arial, sans-serif`;
+    ctx.fillText(u.name, PAD + 48, y + 30);
+
+    // Campeón
+    const ct = CHAMPION_TEAMS.find(t => t.id === u.champion);
+    if (ct) {
+      ctx.fillStyle = "#8888aa";
+      ctx.font = "12px Arial, sans-serif";
+      ctx.fillText(`🏆 ${ct.id}`, PAD + 48, y + 50);
+    }
+
+    // Puntos
+    ctx.fillStyle = "#f4c430";
+    ctx.font = "bold 28px 'Arial Narrow', Arial, sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(`${u.pts}`, W - PAD - 36, y + 32);
+    ctx.fillStyle = "#8888aa";
+    ctx.font = "11px Arial, sans-serif";
+    ctx.fillText("pts", W - PAD, y + 32);
+
+    // Separador
+    ctx.strokeStyle = "#2a2a3e";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(PAD, y + ROW - 8);
+    ctx.lineTo(W - PAD, y + ROW - 8);
+    ctx.stroke();
+  });
+
+  // Footer
+  ctx.fillStyle = "#3d3d55";
+  ctx.font = "11px Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("Haz tus picks en la Quiniela Mundial 2026", W/2, H - PAD + 4);
+  ctx.fillStyle = "#f4c430";
+  ctx.fillRect(0, H - 6, W, 6);
+
+  // Descargar
+  const link = document.createElement("a");
+  link.download = `ranking-quiniela-${Date.now()}.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+  showToast("✅ Imagen descargada — ¡compártela en WhatsApp!", "success");
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PUNTO 4 — HISTORIAL DE EDICIONES DE PICKS
+═══════════════════════════════════════════════════════════════ */
+// Clave en settings: "pick_edits" → JSON array de { ts, admin, userId, matchId, ot, hs, as }
+async function logPickEdit(userId, matchId, payload) {
+  try {
+    const key  = "pick_edits";
+    const raw  = await supabase.get("settings", `?key=eq.${key}`);
+    const prev = raw?.[0]?.value ? JSON.parse(raw[0].value) : [];
+    const entry = {
+      ts:      Date.now(),
+      admin:   currentUser.name,
+      userId,
+      matchId,
+      ot:      payload.ot,
+      hs:      payload.home_score,
+      as:      payload.away_score,
+      advance: payload.advance,
+    };
+    const updated = [...prev.slice(-99), entry];  // máx 100 entradas
+    await supabase.upsert("settings", { key, value: JSON.stringify(updated) });
+    // Actualizar cache local
+    if (!DB.pickEdits) DB.pickEdits = [];
+    DB.pickEdits.push(entry);
+  } catch(e) {
+    console.warn("No se pudo registrar la edición:", e);
+  }
+}
+
+// Renderiza el historial de ediciones en el modal de participante (solo admin)
+function renderEditLog(userId) {
+  if (!DB.pickEdits?.length) return "";
+  const logs = DB.pickEdits
+    .filter(e => e.userId === userId)
+    .sort((a,b) => b.ts - a.ts)
+    .slice(0, 10);
+  if (!logs.length) return "";
+  const rows = logs.map(e => {
+    const m    = DB.matches.find(m => m.id === e.matchId);
+    const time = new Date(e.ts).toLocaleString("es-CL",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+    const otL  = {"1":"LOCAL","X":"EMPATE","2":"VISITA"}[e.ot] || e.ot;
+    const sc   = e.hs !== null ? `${e.hs}-${e.as}` : "–";
+    return `<div class="edit-log-row">
+      <span style="color:var(--gold)">✏️</span>
+      <span>${m ? m.homeFlag+" vs "+m.awayFlag : e.matchId}</span>
+      <span style="font-weight:700;color:var(--white)">${otL} ${sc}</span>
+      <span style="margin-left:auto">${time}</span>
+    </div>`;
+  }).join("");
+  return `<div class="edit-log-section">
+    <div class="edit-log-title">EDICIONES DEL ADMIN</div>
+    ${rows}
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PUNTO 5 — GESTOR DE TORNEOS
+═══════════════════════════════════════════════════════════════ */
+// DB.tournaments: [{ id, name, status:"active"|"archived", created_at }]
+// DB.activeTournament: id del torneo activo
+
+async function loadTournaments() {
+  try {
+    const raw = await supabase.get("settings", "?key=eq.tournaments");
+    DB.tournaments = raw?.[0]?.value ? JSON.parse(raw[0].value) : [];
+    // Si no hay ninguno, crear el torneo actual por defecto
+    if (!DB.tournaments.length) {
+      DB.tournaments = [{ id:"t1", name:"Mundial 2026", status:"active", created_at: Date.now() }];
+      await supabase.upsert("settings", { key:"tournaments", value: JSON.stringify(DB.tournaments) });
+    }
+    DB.activeTournament = DB.tournaments.find(t => t.status === "active")?.id || "t1";
+  } catch(e) {
+    DB.tournaments = [{ id:"t1", name:"Mundial 2026", status:"active", created_at: Date.now() }];
+    DB.activeTournament = "t1";
+  }
+}
+
+async function saveTournaments() {
+  await supabase.upsert("settings", { key:"tournaments", value: JSON.stringify(DB.tournaments) });
+}
+
+function renderTournamentSelector() {
+  if (!DB.tournaments?.length) return "";
+  const options = DB.tournaments.map(t =>
+    `<option value="${t.id}" ${t.id===DB.activeTournament?"selected":""}>${t.name} ${t.status==="archived"?"(archivado)":""}</option>`
+  ).join("");
+  const active = DB.tournaments.find(t => t.id === DB.activeTournament);
+  return `
+    <div class="tournament-selector">
+      <span class="tournament-label">TORNEO</span>
+      <select class="tournament-select" onchange="switchTournament(this.value)">
+        ${options}
+      </select>
+      <span class="tournament-badge ${active?.status==="archived"?"archived":""}">
+        ${active?.status==="active" ? "🟢 ACTIVO" : "📦 ARCHIVADO"}
+      </span>
+    </div>`;
+}
+
+function switchTournament(id) {
+  // Por ahora solo cambia la vista visual (futuras versiones filtran picks por torneo)
+  DB.activeTournament = id;
+  showToast(`Torneo: ${DB.tournaments.find(t=>t.id===id)?.name}`, "success");
+  renderRanking();
+  renderStats();
+}
+
+function renderTournamentAdmin() {
+  if (!DB.tournaments) return "";
+  const list = DB.tournaments.map(t => `
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gray-2)">
+      <span style="flex:1;font-size:13px;font-weight:600;color:var(--white)">${t.name}</span>
+      <span class="tournament-badge ${t.status==="archived"?"archived":""}">${t.status==="active"?"🟢 ACTIVO":"📦 ARCHIVADO"}</span>
+      ${t.status==="active"
+        ? `<button class="admin-save-btn" style="padding:5px 10px;font-size:10px" onclick="archiveTournament('${t.id}')">Archivar</button>`
+        : `<button class="admin-save-btn" style="padding:5px 10px;font-size:10px" onclick="activateTournament('${t.id}')">Activar</button>`}
+    </div>`).join("");
+
+  return `
+    <div class="tournament-admin-card">
+      <div class="admin-picks-title" style="margin-bottom:8px">TORNEOS</div>
+      ${list}
+      <div style="margin-top:12px">
+        <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;margin-bottom:6px">CREAR NUEVO TORNEO</div>
+        <div class="tournament-form-row">
+          <input class="add-match-input" id="new_tournament_name" placeholder='Ej: Copa América 2027' style="margin-bottom:0" />
+          <button class="add-match-btn" style="white-space:nowrap;padding:0 14px" onclick="createTournament()">➕ CREAR</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function createTournament() {
+  const name = document.getElementById("new_tournament_name")?.value.trim();
+  if (!name) { showToast("Ingresa un nombre para el torneo", "error"); return; }
+  const newT = { id: `t${Date.now()}`, name, status:"active", created_at: Date.now() };
+  // Archivar el activo actual
+  DB.tournaments.forEach(t => { if (t.status==="active") t.status="archived"; });
+  DB.tournaments.push(newT);
+  DB.activeTournament = newT.id;
+  await saveTournaments();
+  showToast(`✅ Torneo "${name}" creado y activado`, "success");
+  renderAdmin();
+}
+
+async function archiveTournament(id) {
+  if (!confirm("¿Archivar este torneo? El ranking y los picks quedarán en modo solo lectura.")) return;
+  DB.tournaments.find(t=>t.id===id).status = "archived";
+  await saveTournaments();
+  showToast("✅ Torneo archivado", "success");
+  renderAdmin();
+}
+
+async function activateTournament(id) {
+  DB.tournaments.forEach(t => { if (t.status==="active") t.status="archived"; });
+  DB.tournaments.find(t=>t.id===id).status = "active";
+  DB.activeTournament = id;
+  await saveTournaments();
+  showToast(`✅ Torneo activado`, "success");
+  renderAdmin();
+}
+
 function bootApp() {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("appShell").style.display    = "block";
-  document.getElementById("headerUsername").textContent = currentUser.name;
+  document.getElementById("headerUsername").textContent = currentUser.is_spectator
+    ? `👁 ${currentUser.name}` : currentUser.name;
+
   if (currentUser.is_admin) {
     document.getElementById("tab-admin").style.display  = "block";
     document.getElementById("bnav-admin").style.display = "flex";
   }
+
+  // Ocultar tab MIS PICKS si es espectador
+  if (currentUser.is_spectator) {
+    document.getElementById("tab-picks").style.display  = "none";
+    document.getElementById("bnav-picks").style.display = "none";
+    switchTab("ranking");
+  }
+
   renderChampion();
   renderMatches();
   renderRanking();
@@ -1779,6 +2362,10 @@ async function savePick(matchId, silent = false) {
    RANKING
 ═══════════════════════════════════════════════════════════════ */
 function renderRanking() {
+  // Selector de torneo (encima del ranking)
+  const selectorEl = document.getElementById("tournamentSelectorRanking");
+  if (selectorEl) selectorEl.innerHTML = renderTournamentSelector();
+
   const ranking     = calcRanking();
   const playedCount = DB.matches.filter(m => m.done).length;
   const myStats     = ranking.find(u => u.id === currentUser.id) || { pts:0 };
@@ -2138,6 +2725,10 @@ function renderAdmin() {
         <button class="add-match-btn" onclick="adminAddMatch()">➕ AGREGAR PARTIDO</button>
       </div>
     </div>
+    <div class="admin-section">
+      <div class="admin-title">GESTIÓN DE TORNEOS</div>
+      ${renderTournamentAdmin()}
+    </div>
     <button class="recalc-btn" onclick="recalcAll()">🔄 ACTUALIZAR TABLA DE POSICIONES</button>`;
 }
 
@@ -2329,7 +2920,8 @@ function _renderModalContent(userId) {
     <div class="modal-total-row">
       <span class="modal-total-label">TOTAL ACUMULADO</span>
       <span class="modal-total-pts">${stats.pts} <span style="font-size:14px;color:var(--muted)">pts</span></span>
-    </div>`;
+    </div>
+    ${isAdmin ? renderEditLog(userId) : ""}`;
 }
 
 /* ── Helpers de edición admin en modal ─────────────────────── */
@@ -2441,6 +3033,10 @@ async function adminSavePickForUser(userId, matchId, uid_mid) {
     pick.ot = derivedOT; pick.home_score = ph; pick.away_score = pa;
     pick.advance = payload.advance;
     delete pick._draft_ot;
+
+    // Registrar edición en el historial
+    await logPickEdit(userId, matchId, payload);
+
     showToast("✅ Pick guardado", "success");
     _renderModalContent(userId);
     renderRanking();
