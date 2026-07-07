@@ -515,6 +515,115 @@
     }
     .tournament-form-row { display: flex; gap: 7px; margin-bottom: 8px; }
 
+
+    /* ─── TEMA CLARO ─────────────────────────────────────────── */
+    body.light-mode {
+      --green-deep:  #f0f4f8;
+      --green-field: #1a472a;
+      --green-mid:   #2d6a4f;
+      --gold:        #b8860b;
+      --gold-dim:    #9a7209;
+      --white:       #1a1a2e;
+      --gray-1:      #ffffff;
+      --gray-2:      #e8edf2;
+      --gray-3:      #c8d0da;
+      --muted:       #6b7a8d;
+      --danger:      #c0392b;
+      --success:     #27ae60;
+      --blue:        #2471a3;
+    }
+    body.light-mode .app-header {
+      background: linear-gradient(135deg, #1a472a 0%, #0d2137 100%);
+    }
+    body.light-mode .picks-acc-body,
+    body.light-mode .stats-acc-body,
+    body.light-mode .admin-accordion-body { background: #e8edf2; }
+    body.light-mode .login-wrap {
+      background: linear-gradient(180deg, var(--green-field) 0%, #1a2a3a 40%);
+    }
+    body.light-mode .bottom-nav { background: #ffffff; border-color: #c8d0da; }
+    body.light-mode .loading-overlay { background: rgba(240,244,248,.92); }
+    body.light-mode .spinner { border-color: #c8d0da; border-top-color: var(--gold); }
+    .theme-toggle {
+      background: none; border: 1px solid var(--gray-3);
+      border-radius: 20px; padding: 4px 10px;
+      font-size: 14px; cursor: pointer; color: var(--muted);
+      transition: all 0.2s; line-height: 1;
+    }
+    .theme-toggle:active { border-color: var(--gold); }
+
+    /* ─── RANKING POR FASE ───────────────────────────────────── */
+    .phase-ranking-section { margin-bottom: 16px; }
+    .phase-rank-accordion {
+      background: var(--gray-1); border: 1px solid var(--gray-2);
+      border-radius: var(--r); margin-bottom: 8px; overflow: hidden;
+    }
+    .phase-rank-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px; cursor: pointer; user-select: none;
+      background: var(--gray-2); transition: background 0.15s;
+    }
+    .phase-rank-header:active { background: var(--gray-3); }
+    .phase-rank-title {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 16px; letter-spacing: 1.5px; color: var(--gold);
+    }
+    .phase-rank-meta { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .phase-rank-arrow { font-size: 11px; color: var(--muted); transition: transform .2s; display: inline-block; }
+    .phase-rank-arrow.open { transform: rotate(180deg); }
+    .phase-rank-body { display: none; padding: 12px 14px 14px; }
+    .phase-rank-body.open { display: block; }
+    .phase-podium { display: flex; gap: 6px; margin-bottom: 10px; }
+    .phase-podium-card {
+      flex: 1; border-radius: var(--rs); padding: 10px 6px;
+      text-align: center; border: 1px solid var(--gray-2);
+      background: var(--gray-2);
+    }
+    .phase-podium-card.pp1 { border-color: #ffd700; background: rgba(255,215,0,.07); }
+    .phase-podium-card.pp2 { border-color: #c0c0c0; background: rgba(192,192,192,.05); }
+    .phase-podium-card.pp3 { border-color: #cd7f32; background: rgba(205,127,50,.05); }
+    .phase-podium-medal { font-size: 20px; display: block; margin-bottom: 3px; }
+    .phase-podium-name {
+      font-size: 11px; font-weight: 700; color: var(--white);
+      line-height: 1.2; margin-bottom: 3px; word-break: break-word;
+    }
+    .phase-podium-pts {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 22px; color: var(--gold); line-height: 1;
+    }
+    .phase-podium-lbl { font-size: 9px; color: var(--muted); }
+    .phase-rank-list { display: flex; flex-direction: column; gap: 4px; }
+    .phase-rank-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; background: var(--gray-2);
+      border-radius: var(--rs); font-size: 12px;
+    }
+    .phase-rank-pos {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 16px; color: var(--muted); width: 20px; text-align: center;
+    }
+    .phase-rank-name { flex: 1; font-weight: 600; color: var(--white); }
+    .phase-rank-breakdown { font-size: 10px; color: var(--muted); }
+    .phase-rank-pts {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 18px; color: var(--gold);
+    }
+
+    /* ─── RACHA NEGATIVA ─────────────────────────────────────── */
+    .streak-badge.cold {
+      background: rgba(160,160,180,.13); color: var(--muted);
+      border-color: rgba(160,160,180,.25);
+    }
+
+    /* ─── ALERTA ÚLTIMO MOMENTO ──────────────────────────────── */
+    .last-chance-banner {
+      background: rgba(224,82,82,.12); border: 1px solid rgba(224,82,82,.35);
+      border-radius: var(--rs); padding: 7px 10px; margin-bottom: 7px;
+      font-size: 11px; font-weight: 700; color: var(--danger);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .last-chance-cd { font-variant-numeric: tabular-nums; }
+
     /* ─── COUNTDOWN ─────────────────────────────────────────────── */
     .match-countdown {
       font-size: 10px; font-weight: 700; color: var(--gold);
@@ -927,9 +1036,12 @@
   <header class="app-header">
     <div class="header-top">
       <div class="logo">⚽ QUINIELA <span>2026</span></div>
-      <div class="user-badge" onclick="showUserMenu()">
-        <div class="dot"></div>
-        <span id="headerUsername">–</span>
+      <div style="display:flex;align-items:center;gap:7px">
+        <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+        <div class="user-badge" onclick="showUserMenu()">
+          <div class="dot"></div>
+          <span id="headerUsername">–</span>
+        </div>
       </div>
     </div>
     <div class="nav-tabs">
@@ -1475,8 +1587,15 @@ function startCountdownTick() {
       if (!el) return;
       const diff = (new Date(m.timeISO) - new Date()) / 1000;
       el.textContent = fmtCountdown(m);
-      // Urgente: menos de 30 min para cerrar (LOCK_MINUTES + 15 extra)
       el.classList.toggle("urgent", diff > 0 && diff < (CONFIG.LOCK_MINUTES + 15) * 60);
+
+      // Actualizar contador de último momento si existe
+      const lcEl = document.getElementById(`lc_${m.id}`);
+      if (lcEl) {
+        const mins = (new Date(m.timeISO) - new Date()) / 60000;
+        if (mins > 0 && mins <= 30) lcEl.textContent = `${Math.ceil(mins)}m`;
+        else if (mins <= 0) { const banner = lcEl.closest(".last-chance-banner"); if(banner) banner.remove(); }
+      }
     });
   }, 1000);
 }
@@ -1508,6 +1627,110 @@ function calcStreak(user) {
 /* ═══════════════════════════════════════════════════════════════
    ESTADÍSTICAS DEL GRUPO
 ═══════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════
+   RANKING POR FASE
+═══════════════════════════════════════════════════════════════ */
+function calcPhaseRanking(phase) {
+  // Solo partidos de esa fase que ya estén finalizados
+  const phaseMatches = DB.matches.filter(m => (m.phase||"General") === phase && m.done);
+  if (!phaseMatches.length) return [];
+
+  return DB.users.map(u => {
+    let pts = 0, exact = 0, ot = 0, advance = 0;
+    phaseMatches.forEach(m => {
+      const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
+      const p    = calcPickPts(pick, m);
+      pts     += p.total;
+      exact   += p.exact;
+      ot      += p.ot;
+      advance += p.advance;
+    });
+    return { ...u, pts, exact, ot, advance, played: phaseMatches.length };
+  })
+  .sort((a,b) => b.pts - a.pts || b.exact - a.exact || b.ot - a.ot || a.name.localeCompare(b.name));
+}
+
+function renderPhaseRankings() {
+  const phaseOrder = ["16vos","8vos","Cuartos","Semis","Final","General"];
+  const phases = [...new Set(DB.matches.map(m => m.phase||"General"))];
+  phases.sort((a,b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b));
+
+  const medals = ["🥇","🥈","🥉"];
+  const ppCls  = ["pp1","pp2","pp3"];
+
+  const accordions = phases.map(phase => {
+    const ranking     = calcPhaseRanking(phase);
+    const phaseMatches = DB.matches.filter(m => (m.phase||"General") === phase);
+    const doneCnt     = phaseMatches.filter(m => m.done).length;
+    const accId       = `pracc_${phase.replace(/[^a-z0-9]/gi,"")}`;
+
+    if (!doneCnt) return `
+      <div class="phase-rank-accordion">
+        <div class="phase-rank-header" onclick="togglePhaseRankAcc('${accId}')">
+          <div>
+            <div class="phase-rank-title">${phase}</div>
+            <div class="phase-rank-meta">Sin partidos finalizados aún</div>
+          </div>
+          <span class="phase-rank-arrow" id="parr2_${accId}">▼</span>
+        </div>
+        <div class="phase-rank-body" id="${accId}">
+          <div class="empty" style="padding:20px"><div class="empty-icon">⏳</div>Esperando resultados</div>
+        </div>
+      </div>`;
+
+    // Podio top 3
+    const top3 = ranking.slice(0, Math.min(3, ranking.length));
+    const podium = `
+      <div class="phase-podium">
+        ${top3.map((u,i) => `
+          <div class="phase-podium-card ${ppCls[i]}">
+            <span class="phase-podium-medal">${medals[i]}</span>
+            <div class="phase-podium-name">${u.name}</div>
+            <div class="phase-podium-pts">${u.pts}</div>
+            <div class="phase-podium-lbl">pts</div>
+          </div>`).join("")}
+      </div>`;
+
+    // Lista completa
+    const list = ranking.map((u,i) => `
+      <div class="phase-rank-row">
+        <span class="phase-rank-pos">${i+1}</span>
+        <span class="phase-rank-name">${u.name}${u.id===currentUser?.id?" 👈":""}</span>
+        <span class="phase-rank-breakdown">${Math.floor(u.exact/3)}✓ ${u.ot}↗ ${u.advance}→</span>
+        <span class="phase-rank-pts">${u.pts}</span>
+      </div>`).join("");
+
+    const myRank = ranking.findIndex(u => u.id === currentUser?.id) + 1;
+
+    return `
+      <div class="phase-rank-accordion">
+        <div class="phase-rank-header" onclick="togglePhaseRankAcc('${accId}')">
+          <div>
+            <div class="phase-rank-title">${phase}</div>
+            <div class="phase-rank-meta">${doneCnt}/${phaseMatches.length} partidos · tu posición: #${myRank||"–"}</div>
+          </div>
+          <span class="phase-rank-arrow" id="parr2_${accId}">▼</span>
+        </div>
+        <div class="phase-rank-body" id="${accId}">
+          ${podium}
+          <div class="phase-rank-list">${list}</div>
+        </div>
+      </div>`;
+  }).join("");
+
+  return accordions;
+}
+
+function togglePhaseRankAcc(id) {
+  const body  = document.getElementById(id);
+  const arrow = document.getElementById(`parr2_${id}`);
+  if (!body) return;
+  const open = body.classList.contains("open");
+  body.classList.toggle("open", !open);
+  if (arrow) arrow.classList.toggle("open", !open);
+}
+
 function renderStats() {
   const phaseOrder  = ["16vos","8vos","Cuartos","Semis","Final","General"];
   const phases      = [...new Set(DB.matches.map(m => m.phase || "General"))];
@@ -1701,6 +1924,8 @@ function renderStats() {
       <div class="section-label">CAMPEÓN MÁS APOSTADO</div>
       <div class="stats-champ-grid">${champGrid}</div>
     </div>
+    <div class="section-label">RANKING POR FASE</div>
+    <div class="phase-ranking-section">${renderPhaseRankings()}</div>
     <div class="section-label">PICKS POR PARTIDO</div>
     ${phaseAccordions}`;
 }
@@ -2003,7 +2228,117 @@ async function activateTournament(id) {
   renderAdmin();
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   TEMA CLARO / OSCURO
+═══════════════════════════════════════════════════════════════ */
+function toggleTheme() {
+  const isLight = document.body.classList.toggle("light-mode");
+  sessionStorage.setItem("qm26_theme", isLight ? "light" : "dark");
+  const btn = document.getElementById("themeToggleBtn");
+  if (btn) btn.textContent = isLight ? "☀️" : "🌙";
+}
+
+function applyTheme() {
+  const saved = sessionStorage.getItem("qm26_theme");
+  if (saved === "light") {
+    document.body.classList.add("light-mode");
+    const btn = document.getElementById("themeToggleBtn");
+    if (btn) btn.textContent = "☀️";
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RESUMEN DE JORNADA PARA WHATSAPP
+═══════════════════════════════════════════════════════════════ */
+function generateDaySummary() {
+  const ranking   = calcRanking();
+  const today     = new Date().toLocaleDateString("es-CL", { weekday:"long", day:"numeric", month:"long" });
+  const played    = DB.matches.filter(m => m.done);
+  const pending   = DB.matches.filter(m => !m.done && !isLocked(m)).length;
+
+  // Resultados del día (partidos finalizados recientemente — últimas 24h)
+  const recentMs  = played.filter(m => Date.now() - new Date(m.timeISO).getTime() < 86400000 * 2);
+
+  let text = `⚽ *QUINIELA MUNDIAL 2026*
+`;
+  text += `📅 ${today.charAt(0).toUpperCase() + today.slice(1)}
+
+`;
+
+  if (recentMs.length) {
+    text += `*🏟 RESULTADOS RECIENTES*
+`;
+    recentMs.forEach(m => {
+      if (m.result) text += `${m.homeFlag} ${m.home} ${m.result.homeScore}-${m.result.awayScore} ${m.away} ${m.awayFlag}
+`;
+    });
+    text += "
+";
+  }
+
+  text += `*🏅 TOP 5 RANKING*
+`;
+  ranking.slice(0,5).forEach((u,i) => {
+    const medals = ["🥇","🥈","🥉","4️⃣","5️⃣"];
+    text += `${medals[i]} ${u.name} — ${u.pts} pts
+`;
+  });
+  text += "
+";
+
+  if (pending > 0) {
+    text += `⏰ Quedan *${pending} partido${pending>1?"s":""}* abiertos para apostar.
+`;
+  }
+
+  text += `
+📲 Haz tus picks en la Quiniela`;
+
+  // Copiar al portapapeles
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => showToast("✅ Resumen copiado — pégalo en WhatsApp", "success"))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand("copy");
+  document.body.removeChild(ta);
+  showToast("✅ Resumen copiado — pégalo en WhatsApp", "success");
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RACHA NEGATIVA — partidos consecutivos sin puntuar
+═══════════════════════════════════════════════════════════════ */
+function calcColdStreak(user) {
+  const played = DB.matches
+    .filter(m => m.done && m.result)
+    .sort((a,b) => new Date(a.timeISO) - new Date(b.timeISO));
+
+  let streak = 0;
+  for (let i = played.length - 1; i >= 0; i--) {
+    const m    = played[i];
+    const pick = DB.picks.find(p => p.user_id === user.id && p.match_id === m.id);
+    const pts  = calcPickPts(pick, m).total;
+    if (pts === 0) streak++;
+    else break;
+  }
+  return streak;
+}
+
 function bootApp() {
+  applyTheme();
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("appShell").style.display    = "block";
   document.getElementById("headerUsername").textContent = currentUser.is_spectator
@@ -2200,6 +2535,14 @@ function renderMatchCard(match) {
     }
     predArea = `<div class="locked-msg"><span class="lock-icon">🔒</span>${match.done ? "Partido finalizado" : "Pronósticos cerrados"}</div>${badgeHtml}`;
   } else {
+    // Alerta de último momento: menos de 30 min para cerrar y sin pick
+    const diffMin = (new Date(match.timeISO) - new Date()) / 60000;
+    const hasPick = !!pick?.ot;
+    const lastChanceBanner = (!hasPick && diffMin > 0 && diffMin <= 30)
+      ? `<div class="last-chance-banner">
+           ⚠️ ¡Menos de <span class="last-chance-cd" id="lc_${match.id}">${Math.ceil(diffMin)}m</span> para cerrar!
+         </div>` : "";
+
     // OT derivado del marcador ingresado
     const hs = pick?.home_score, as_ = pick?.away_score;
     const hasScore = hs !== null && hs !== undefined && hs !== "" && as_ !== null && as_ !== undefined && as_ !== "";
@@ -2231,6 +2574,7 @@ function renderMatchCard(match) {
 
     predArea = `
       <div class="prediction-area">
+        ${lastChanceBanner}
         <div class="ot-derived ${otClass}">${otLabel}</div>
         ${advanceRow}
         <div class="score-row">
@@ -2484,11 +2828,14 @@ function renderRanking() {
         </div>`;
     }).join("");
 
-    // Calcular racha del jugador
-    const streak = calcStreak(u);
+    // Calcular racha positiva y negativa
+    const streak     = calcStreak(u);
+    const coldStreak = calcColdStreak(u);
     const streakBadge = streak >= 2
       ? `<span class="streak-badge ${streak>=4?"fire":""}">${streak>=4?"🔥":"⚡"} ${streak} seguidos</span>`
-      : "";
+      : coldStreak >= 3
+        ? `<span class="streak-badge cold">💤 ${coldStreak} sin puntuar</span>`
+        : "";
 
     return `
       <div class="ranking-row ${isMe?"me":""}" id="rrow_${u.id}" onclick="toggleDetail('${u.id}')">
@@ -2757,7 +3104,10 @@ function renderAdmin() {
       <div class="admin-title">GESTIÓN DE TORNEOS</div>
       ${renderTournamentAdmin()}
     </div>
-    <button class="recalc-btn" onclick="recalcAll()">🔄 ACTUALIZAR TABLA DE POSICIONES</button>`;
+    <button class="recalc-btn" onclick="recalcAll()">🔄 ACTUALIZAR TABLA DE POSICIONES</button>
+    <button class="recalc-btn" style="margin-top:8px;background:var(--green-mid)" onclick="generateDaySummary()">
+      📋 COPIAR RESUMEN DE JORNADA
+    </button>`;
 }
 
 async function adminSaveMatch(matchId) {
