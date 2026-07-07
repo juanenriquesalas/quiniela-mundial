@@ -258,6 +258,80 @@
     .detail-pick-pts { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 15px; color: var(--gold); width: 24px; text-align: right; }
     .detail-pick-pts.zero { color: var(--gray-3); }
 
+
+    /* ─── STATS: PICKS POR PARTIDO ──────────────────────────────── */
+    .stats-match-section { margin-bottom: 8px; border-radius: var(--r); overflow: hidden; border: 1px solid var(--gray-2); }
+    .stats-match-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 12px; background: var(--gray-2); cursor: pointer; user-select: none;
+      gap: 8px;
+    }
+    .stats-match-header:active { background: var(--gray-3); }
+    .stats-match-title-block { flex: 1; min-width: 0; }
+    .stats-match-name { font-size: 12px; font-weight: 700; color: var(--white); }
+    .stats-match-sub  { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .stats-match-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .stats-result-box {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 16px; color: var(--gold); background: var(--gray-1);
+      border-radius: 6px; padding: 2px 10px; white-space: nowrap;
+    }
+    .stats-result-box.pending { font-size: 10px; color: var(--muted); padding: 4px 10px; }
+    .stats-match-arrow { font-size: 11px; color: var(--muted); transition: transform .2s; display: inline-block; }
+    .stats-match-arrow.open { transform: rotate(180deg); }
+    /* Chips de distribución en header */
+    .stats-dist-chips { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+    .sdchip { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .sdchip-home { background: rgba(74,158,255,.15);  color: var(--blue); }
+    .sdchip-draw { background: rgba(244,196,48,.15);  color: var(--gold); }
+    .sdchip-away { background: rgba(224,82,82,.15);   color: var(--danger); }
+    .sdchip-none { background: rgba(160,160,180,.12); color: var(--muted); }
+    .sdchip-pop  { background: rgba(76,175,135,.15);  color: var(--success); }
+    /* Cuerpo acordeón partido */
+    .stats-match-body { display: none; border-top: 1px solid var(--gray-2); background: var(--gray-1); }
+    .stats-match-body.open { display: block; }
+    /* Barras */
+    .stats-bars-wrap { padding: 10px 12px 8px; }
+    .stats-bar-row { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
+    .stats-bar-lbl { font-size: 10px; color: var(--muted); font-weight: 700; width: 60px; text-align: right; flex-shrink: 0; }
+    .stats-bar-track { flex: 1; height: 8px; background: var(--gray-2); border-radius: 4px; overflow: hidden; }
+    .stats-bar-fill { height: 100%; border-radius: 4px; transition: width .4s; }
+    .fill-home { background: var(--blue); }
+    .fill-draw { background: var(--gold); }
+    .fill-away { background: var(--danger); }
+    .stats-bar-val { font-size: 10px; font-weight: 700; width: 36px; flex-shrink: 0; }
+    .stats-bar-val.home { color: var(--blue); }
+    .stats-bar-val.draw { color: var(--gold); }
+    .stats-bar-val.away { color: var(--danger); }
+    /* Popular score */
+    .stats-popular { font-size: 10px; color: var(--muted); padding: 0 12px 8px; }
+    .stats-popular b { color: var(--success); }
+    /* Tabla picks individuales */
+    .stats-picks-table { border-top: 1px solid var(--gray-2); }
+    .stats-picks-head {
+      display: grid; grid-template-columns: 1fr 54px 54px 28px;
+      padding: 5px 12px; font-size: 9px; font-weight: 700;
+      color: var(--muted); letter-spacing: 0.5px; border-bottom: 1px solid var(--gray-2);
+    }
+    .stats-pick-row {
+      display: grid; grid-template-columns: 1fr 54px 54px 28px;
+      padding: 5px 12px; font-size: 11px; border-bottom: 1px solid var(--gray-2);
+      align-items: center;
+    }
+    .stats-pick-row:last-child { border-bottom: none; }
+    .stats-pick-name { font-weight: 600; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stats-pick-ot   { font-weight: 700; text-align: center; }
+    .stats-pick-sc   { color: var(--muted); text-align: center; font-size: 10px; }
+    .stats-pick-pts  { font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif; font-size: 15px; color: var(--gold); text-align: right; }
+    .stats-pick-pts.zero { color: var(--gray-3); }
+    .stats-locked-msg { padding: 10px 12px; font-size: 10px; color: var(--muted); text-align: center; }
+
+    /* ─── RANKING: GRÁFICO DE EVOLUCIÓN ─────────────────────────── */
+    .evo-chart-wrap { margin-top: 10px; padding: 10px 0 4px; border-top: 1px solid var(--gray-2); }
+    .evo-chart-title { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; margin-bottom: 8px; }
+    .evo-svg { width: 100%; overflow: visible; display: block; }
+    .evo-tooltip { font-size: 9px; fill: var(--muted); }
+
     /* STREAK */
     .streak-badge {
       display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 700;
@@ -1021,6 +1095,91 @@ async function savePick(matchId,silent=false){
   }catch(e){if(!silent)showToast("Error al guardar","error");console.error(e);}
 }
 
+
+/* ── GRÁFICO SVG DE EVOLUCIÓN DE PUNTOS ─────────────────────────────────── */
+function generateEvoChart(user) {
+  // Partidos finalizados en orden cronológico
+  const played = DB.matches
+    .filter(m => m.done && m.result)
+    .sort((a,b) => new Date(a.timeISO) - new Date(b.timeISO));
+  if (played.length === 0) return "";
+
+  // Calcular puntos acumulados partido a partido
+  let cumPts = 0;
+  const data = played.map(m => {
+    const pick = DB.picks.find(p => p.user_id === user.id && p.match_id === m.id);
+    cumPts += calcPickPts(pick, m).total;
+    return { m, pts: cumPts };
+  });
+
+  // Agregar campeón al final si aplica
+  const champPts = DB.championWinner && user.champion === DB.championWinner ? 5 : 0;
+  if (champPts > 0) {
+    data[data.length - 1] = { ...data[data.length - 1], pts: data[data.length - 1].pts + champPts };
+  }
+
+  const W = 280, H = 80, PAD = { t:10, r:10, b:20, l:28 };
+  const chartW = W - PAD.l - PAD.r;
+  const chartH = H - PAD.t - PAD.b;
+
+  const maxPts = Math.max(...data.map(d => d.pts), 1);
+  const xStep = data.length > 1 ? chartW / (data.length - 1) : chartW;
+
+  const toX = i => PAD.l + (data.length > 1 ? i * xStep : chartW / 2);
+  const toY = v => PAD.t + chartH - (v / maxPts) * chartH;
+
+  // Línea
+  const points = data.map((d,i) => `${toX(i).toFixed(1)},${toY(d.pts).toFixed(1)}`).join(" ");
+  // Área bajo la curva
+  const areaPoints = [
+    `${toX(0).toFixed(1)},${(PAD.t+chartH).toFixed(1)}`,
+    ...data.map((d,i) => `${toX(i).toFixed(1)},${toY(d.pts).toFixed(1)}`),
+    `${toX(data.length-1).toFixed(1)},${(PAD.t+chartH).toFixed(1)}`
+  ].join(" ");
+
+  // Etiquetas eje Y
+  const yLabels = [0, Math.round(maxPts/2), maxPts].map(v => `
+    <text x="${PAD.l - 4}" y="${toY(v) + 3}" text-anchor="end" font-size="8" fill="#8888aa">${v}</text>
+    <line x1="${PAD.l}" y1="${toY(v)}" x2="${W - PAD.r}" y2="${toY(v)}" stroke="#2a2a3e" stroke-width="1" stroke-dasharray="3,3"/>`
+  ).join("");
+
+  // Puntos en la línea y etiquetas
+  const dots = data.map((d,i) => {
+    const x = toX(i).toFixed(1), y = toY(d.pts).toFixed(1);
+    const isLast = i === data.length - 1;
+    const labelX = i === 0 ? PAD.l : i === data.length - 1 ? toX(i) - 2 : toX(i);
+    const anchor  = i === 0 ? "start" : i === data.length - 1 ? "end" : "middle";
+    const showLabel = i === 0 || isLast || (data.length <= 8);
+    return `
+      <circle cx="${x}" cy="${y}" r="3" fill="#f4c430" stroke="#0a1628" stroke-width="1.5"/>
+      ${showLabel ? `<text x="${labelX}" y="${parseFloat(y)-6}" text-anchor="${anchor}" font-size="8" fill="#f4c430" font-weight="bold">${d.pts}</text>` : ""}`;
+  }).join("");
+
+  // Eje X: etiquetas de partido abreviado
+  const xLabels = data.map((d,i) => {
+    if(data.length > 8 && i % 2 !== 0 && i !== data.length - 1) return "";
+    const label = d.m.homeFlag + d.m.awayFlag;
+    return `<text x="${toX(i).toFixed(1)}" y="${H - 4}" text-anchor="middle" font-size="7" fill="#8888aa">${label}</text>`;
+  }).join("");
+
+  return `
+    <div class="evo-chart-wrap">
+      <div class="evo-chart-title">EVOLUCIÓN DE PUNTOS</div>
+      <svg class="evo-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+        <!-- Grid y etiquetas Y -->
+        ${yLabels}
+        <!-- Área -->
+        <polygon points="${areaPoints}" fill="rgba(244,196,48,0.07)"/>
+        <!-- Línea -->
+        <polyline points="${points}" fill="none" stroke="#f4c430" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <!-- Puntos -->
+        ${dots}
+        <!-- Etiquetas X -->
+        ${xLabels}
+      </svg>
+    </div>`;
+}
+
 /* ── RANKING ─────────────────────────────────────────────────────────────── */
 function renderRanking(){
   const ranking=calcRanking();
@@ -1072,7 +1231,8 @@ function renderRanking(){
           <div class="detail-cell"><div class="detail-val">${Math.floor(u.exact/3)}</div><div class="detail-lbl">Exactos</div></div>
           <div class="detail-cell"><div class="detail-val">${u.champ}</div><div class="detail-lbl">Campeón</div></div>
         </div>
-        <div class="detail-picks-title">PICKS POR PARTIDO</div>${pickRows}
+        ${generateEvoChart(u)}
+        <div class="detail-picks-title" style="margin-top:10px">PICKS POR PARTIDO</div>${pickRows}
       </div>`;
   }).join("");
 }
@@ -1162,6 +1322,151 @@ function renderStats(){
   // Resumen de jornada
   const summaryBtn=`<button class="summary-btn" onclick="copyDaySummary()">📋 Copiar resumen para WhatsApp</button>`;
 
+  // ── PICKS POR PARTIDO (acordeón por fase → partido) ──────────────
+  const matchPhases=[...new Set(DB.matches.map(m=>m.phase||"General"))];
+  matchPhases.sort((a,b)=>PHASE_ORDER.indexOf(a)-PHASE_ORDER.indexOf(b));
+
+  const matchStatsHtml=matchPhases.map(phase=>{
+    const pMatches=DB.matches.filter(m=>(m.phase||"General")===phase);
+    const phAccId=`msp_${phase.replace(/[^a-z0-9]/gi,"")}`;
+    const doneCnt=pMatches.filter(m=>m.done).length;
+
+    const matchAccordions=pMatches.map(m=>{
+      const mAccId=`ms_${m.id}`;
+      const mPicks=DB.picks.filter(p=>p.match_id===m.id&&p.ot);
+      const total=mPicks.length;
+      const locked=isLocked(m);
+
+      // Conteo por resultado
+      const cnt1=mPicks.filter(p=>{const ph=parseInt(p.home_score),pa=parseInt(p.away_score);return!isNaN(ph)&&!isNaN(pa)&&ph>pa;}).length;
+      const cntX=mPicks.filter(p=>{const ph=parseInt(p.home_score),pa=parseInt(p.away_score);return!isNaN(ph)&&!isNaN(pa)&&ph===pa;}).length;
+      const cnt2=mPicks.filter(p=>{const ph=parseInt(p.home_score),pa=parseInt(p.away_score);return!isNaN(ph)&&!isNaN(pa)&&ph<pa;}).length;
+      const pct=n=>total>0?Math.round(n/total*100):0;
+
+      // Marcador más popular (solo si partido cerrado y hay marcadores)
+      let popularHtml="";
+      if(locked&&total>0){
+        const scoreMap={};
+        mPicks.forEach(p=>{
+          if(p.home_score!==null&&p.away_score!==null){
+            const k=`${p.home_score}-${p.away_score}`;
+            scoreMap[k]=(scoreMap[k]||0)+1;
+          }
+        });
+        const top=Object.entries(scoreMap).sort((a,b)=>b[1]-a[1])[0];
+        if(top&&top[1]>1){
+          popularHtml=`<div class="stats-popular">🎯 Marcador más apostado: <b>${top[0].replace("-"," – ")} (${top[1]} votos)</b></div>`;
+        }
+      }
+
+      // Chips de distribución
+      const chips=total>0?`
+        <span class="sdchip sdchip-home">🏠 ${pct(cnt1)}%</span>
+        <span class="sdchip sdchip-draw">🤝 ${pct(cntX)}%</span>
+        <span class="sdchip sdchip-away">✈️ ${pct(cnt2)}%</span>
+        <span class="sdchip sdchip-none">${total} pick${total!==1?"s":""}</span>
+        ${popularHtml.includes("Marcador")?`<span class="sdchip sdchip-pop">🎯 marcador popular</span>`:""}
+      `:`<span class="sdchip sdchip-none">Sin picks</span>`;
+
+      // Resultado / estado
+      const resultStr=m.done&&m.result?`${m.result.homeScore} – ${m.result.awayScore}`:(locked?"EN JUEGO":"PRÓXIMO");
+      const resultPending=!m.done;
+
+      // Barras
+      const barsHtml=total>0?`
+        <div class="stats-bars-wrap">
+          <div class="stats-bar-row">
+            <span class="stats-bar-lbl">${m.homeFlag} LOCAL</span>
+            <div class="stats-bar-track"><div class="stats-bar-fill fill-home" style="width:${pct(cnt1)}%"></div></div>
+            <span class="stats-bar-val home">${cnt1} · ${pct(cnt1)}%</span>
+          </div>
+          <div class="stats-bar-row">
+            <span class="stats-bar-lbl">EMPATE</span>
+            <div class="stats-bar-track"><div class="stats-bar-fill fill-draw" style="width:${pct(cntX)}%"></div></div>
+            <span class="stats-bar-val draw">${cntX} · ${pct(cntX)}%</span>
+          </div>
+          <div class="stats-bar-row">
+            <span class="stats-bar-lbl">${m.awayFlag} VISITA</span>
+            <div class="stats-bar-track"><div class="stats-bar-fill fill-away" style="width:${pct(cnt2)}%"></div></div>
+            <span class="stats-bar-val away">${cnt2} · ${pct(cnt2)}%</span>
+          </div>
+        </div>
+        ${popularHtml}`
+      :`<div class="stats-locked-msg">Sin pronósticos registrados</div>`;
+
+      // Picks individuales (solo si cerrado)
+      let picksHtml="";
+      if(locked){
+        const sortedUsers=[...DB.users].sort((a,b)=>{
+          if(!m.done)return 0;
+          return calcPickPts(DB.picks.find(p=>p.user_id===b.id&&p.match_id===m.id),m).total
+               - calcPickPts(DB.picks.find(p=>p.user_id===a.id&&p.match_id===m.id),m).total;
+        });
+        const rows=sortedUsers.map(u=>{
+          const pick=DB.picks.find(p=>p.user_id===u.id&&p.match_id===m.id);
+          const pts=m.done?calcPickPts(pick,m).total:null;
+          if(!pick?.ot)return`<div class="stats-pick-row">
+            <span class="stats-pick-name" style="color:var(--muted)">${u.name}</span>
+            <span class="stats-pick-ot" style="color:var(--muted)">–</span>
+            <span class="stats-pick-sc">–</span>
+            <span class="stats-pick-pts zero">–</span></div>`;
+          const ph=parseInt(pick.home_score),pa=parseInt(pick.away_score);
+          const pickOT=isNaN(ph)||isNaN(pa)?pick.ot:ph>pa?"1":ph===pa?"X":"2";
+          const otLabel={"1":"LOCAL","X":"EMPATE","2":"VISITA"}[pickOT]||pickOT;
+          const otColor={"1":"var(--blue)","X":"var(--gold)","2":"var(--danger)"}[pickOT]||"var(--muted)";
+          const sc=pick.home_score!==null?`${pick.home_score} – ${pick.away_score}`:"–";
+          const adv=pickOT==="X"&&pick.advance?` → ${pick.advance==="home"?m.homeFlag:m.awayFlag}`:"";
+          const ptsStr=pts!==null?pts:"?";
+          return`<div class="stats-pick-row">
+            <span class="stats-pick-name">${u.name}</span>
+            <span class="stats-pick-ot" style="color:${otColor};font-size:10px">${otLabel}${adv}</span>
+            <span class="stats-pick-sc">${sc}</span>
+            <span class="stats-pick-pts ${pts===0?"zero":""}">${ptsStr}</span></div>`;
+        }).join("");
+        picksHtml=`<div class="stats-picks-table">
+          <div class="stats-picks-head">
+            <span>JUGADOR</span><span style="text-align:center">RESULTADO</span>
+            <span style="text-align:center">MARCADOR</span><span style="text-align:right">PTS</span>
+          </div>${rows}</div>`;
+      } else {
+        picksHtml=`<div class="stats-locked-msg">🔓 Los picks se revelan cuando cierra el partido</div>`;
+      }
+
+      return`<div class="stats-match-section">
+        <div class="stats-match-header" onclick="toggleMatchStats('${mAccId}')">
+          <div class="stats-match-title-block">
+            <div class="stats-match-name">${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag}</div>
+            <div class="stats-match-sub">${m.day} · ${fmtTime(m.timeISO)}</div>
+            <div class="stats-dist-chips">${chips}</div>
+          </div>
+          <div class="stats-match-right">
+            <span class="stats-result-box ${resultPending?"pending":""}">${resultStr}</span>
+            <span class="stats-match-arrow" id="marr_${mAccId}">▼</span>
+          </div>
+        </div>
+        <div class="stats-match-body" id="${mAccId}">
+          ${barsHtml}
+          ${picksHtml}
+        </div>
+      </div>`;
+    }).join("");
+
+    // Acordeón de fase conteniendo los partidos
+    const open=doneCnt>0;
+    return`<div style="margin-bottom:10px;border:1px solid var(--gray-2);border-radius:var(--r);overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:var(--gray-2);cursor:pointer;user-select:none" onclick="toggleMatchStatsPhase('${phAccId}')">
+        <div>
+          <span style="font-family:'Bebas Neue','Arial Narrow',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;color:var(--gold)">${phase}</span>
+          <span style="font-size:10px;color:var(--muted);margin-left:8px">${doneCnt}/${pMatches.length} jugados</span>
+        </div>
+        <span style="font-size:11px;color:var(--muted);transition:transform .2s;display:inline-block" id="pharr2_${phAccId}">▼</span>
+      </div>
+      <div style="display:${open?"block":"none"};padding:8px" id="${phAccId}">
+        ${matchAccordions}
+      </div>
+    </div>`;
+  }).join("");
+
   document.getElementById("statsPanel").innerHTML=`
     <div class="stats-global-grid">
       <div class="stats-global-card"><div class="stats-global-val">${totalUsers}</div><div class="stats-global-lbl">PARTICIPANTES</div></div>
@@ -1173,7 +1478,25 @@ function renderStats(){
     <div class="section-label">CAMPEÓN MÁS APOSTADO</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:18px">${champGrid}</div>
     <div class="section-label">RANKING POR FASE</div>
-    ${phaseRankingSections||`<div class="empty"><div class="empty-icon">⏳</div>Aún no hay partidos finalizados.</div>`}`;
+    ${phaseRankingSections||`<div class="empty"><div class="empty-icon">⏳</div>Aún no hay partidos finalizados.</div>`}
+    <div class="section-label" style="margin-top:18px">PICKS POR PARTIDO</div>
+    ${matchStatsHtml}`;
+}
+
+function toggleMatchStats(id){
+  const body=document.getElementById(id),arrow=document.getElementById(`marr_${id}`);
+  if(!body)return;
+  const open=body.classList.contains("open");
+  body.classList.toggle("open",!open);
+  if(arrow)arrow.classList.toggle("open",!open);
+}
+
+function toggleMatchStatsPhase(id){
+  const body=document.getElementById(id),arrow=document.getElementById(`pharr2_${id}`);
+  if(!body)return;
+  const open=body.style.display!=="none";
+  body.style.display=open?"none":"block";
+  if(arrow)arrow.style.transform=open?"":"rotate(180deg)";
 }
 
 function togglePhaseRank(id){
