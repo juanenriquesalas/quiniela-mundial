@@ -32,11 +32,32 @@
       --r:           12px;
       --rs:          8px;
     }
+    /* LIGHT MODE */
+    body.light {
+      --green-deep:  #f0f4f8;
+      --green-field: #1a472a;
+      --green-mid:   #2d6a4f;
+      --gold:        #c9a227;
+      --gold-dim:    #a88320;
+      --white:       #1a1a2e;
+      --gray-1:      #ffffff;
+      --gray-2:      #e8edf2;
+      --gray-3:      #ccd5de;
+      --muted:       #6677aa;
+      --danger:      #c0392b;
+      --success:     #27ae60;
+      --blue:        #2980b9;
+    }
+    body.light .app-header { background: linear-gradient(135deg, #1a472a 0%, #0d2a14 100%); }
+    body.light .login-wrap  { background: linear-gradient(180deg, #1a472a 0%, #f0f4f8 40%); }
+    body.light .login-logo, body.light .logo { color: var(--gold); }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--green-deep); color: var(--white);
       min-height: 100vh; overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
     }
     input, select, button, textarea { font-family: inherit; }
     ::-webkit-scrollbar { width: 4px; }
@@ -51,6 +72,14 @@
     .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .logo { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--gold); line-height: 1; }
     .logo span { color: var(--white); }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .theme-toggle {
+      background: var(--gray-2); border: 1px solid var(--gray-3); border-radius: 50%;
+      width: 30px; height: 30px; cursor: pointer; font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.18s; flex-shrink: 0;
+    }
+    .theme-toggle:active { transform: scale(0.9); }
     .user-badge {
       background: var(--gray-2); border: 1px solid var(--gray-3); border-radius: 20px;
       padding: 5px 12px; font-size: 13px; font-weight: 600; color: var(--white);
@@ -229,6 +258,66 @@
     .detail-pick-pts { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 15px; color: var(--gold); width: 24px; text-align: right; }
     .detail-pick-pts.zero { color: var(--gray-3); }
 
+    /* STREAK */
+    .streak-badge {
+      display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 10px; background: rgba(244,196,48,.15);
+      color: var(--gold); border: 1px solid rgba(244,196,48,.3); white-space: nowrap;
+    }
+    .streak-badge.neg { background: rgba(160,160,180,.12); color: var(--muted); border-color: rgba(160,160,180,.2); }
+    .streak-badge.fire { background: rgba(224,100,50,.18); color: #ff7043; border-color: rgba(224,100,50,.35); }
+
+    /* STATS */
+    .stats-global-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 7px; margin-bottom: 16px; }
+    .stats-global-card { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: var(--rs); padding: 12px 10px; text-align: center; }
+    .stats-global-val { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 28px; color: var(--gold); line-height: 1; margin-bottom: 2px; }
+    .stats-global-lbl { font-size: 9px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; }
+
+    /* PHASE RANKING in STATS */
+    .phase-rank-section { margin-bottom: 18px; }
+    .phase-rank-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 12px; background: var(--gray-2); border-radius: var(--r) var(--r) 0 0;
+      cursor: pointer; user-select: none;
+    }
+    .phase-rank-title { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 15px; letter-spacing: 1.5px; color: var(--gold); }
+    .phase-rank-meta { font-size: 10px; color: var(--muted); }
+    .phase-rank-arrow { font-size: 11px; color: var(--muted); transition: transform .2s; }
+    .phase-rank-arrow.open { transform: rotate(180deg); }
+    .phase-rank-body { display: none; background: var(--gray-1); border: 1px solid var(--gray-2); border-top: none; border-radius: 0 0 var(--r) var(--r); padding: 10px 12px 12px; }
+    .phase-rank-body.open { display: block; }
+    .phase-podium { display: flex; gap: 6px; margin-bottom: 10px; }
+    .phase-podium-card {
+      flex: 1; background: var(--gray-2); border-radius: var(--rs); padding: 10px 6px; text-align: center;
+      border: 1px solid var(--gray-3);
+    }
+    .phase-podium-card.pp1 { border-color: #ffd700; }
+    .phase-podium-card.pp2 { border-color: #c0c0c0; }
+    .phase-podium-card.pp3 { border-color: #cd7f32; }
+    .phase-podium-medal { font-size: 18px; display: block; margin-bottom: 3px; }
+    .phase-podium-name { font-size: 11px; font-weight: 700; color: var(--white); word-break: break-word; margin-bottom: 3px; line-height: 1.2; }
+    .phase-podium-pts { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 22px; color: var(--gold); line-height: 1; }
+    .phase-podium-lbl { font-size: 8px; color: var(--muted); }
+    .phase-full-list { border-top: 1px solid var(--gray-2); padding-top: 8px; }
+    .phase-rank-row {
+      display: flex; align-items: center; gap: 8px; padding: 5px 0;
+      border-bottom: 1px solid var(--gray-2); font-size: 12px;
+    }
+    .phase-rank-row:last-child { border-bottom: none; }
+    .phase-rank-pos { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 16px; color: var(--gray-3); width: 18px; text-align: center; flex-shrink: 0; }
+    .phase-rank-pos.top { color: var(--gold); }
+    .phase-rank-name { flex: 1; font-weight: 600; color: var(--white); }
+    .phase-rank-pts { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 18px; color: var(--gold); }
+
+    /* RESUMEN JORNADA */
+    .summary-btn {
+      width: 100%; background: var(--gray-2); border: 1px solid var(--gray-3);
+      border-radius: var(--rs); padding: 11px; font-size: 13px; font-weight: 700;
+      color: var(--white); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 7px; margin-bottom: 14px; transition: border-color 0.15s;
+    }
+    .summary-btn:active { border-color: var(--gold); color: var(--gold); }
+
     /* ADMIN */
     .admin-section { margin-bottom: 20px; }
     .admin-title { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 16px; color: var(--gold); letter-spacing: 2px; margin-bottom: 10px; }
@@ -342,8 +431,6 @@
     .login-btn:active { opacity: 0.82; }
     .empty { text-align: center; padding: 38px 20px; color: var(--muted); font-size: 13px; }
     .empty .empty-icon { font-size: 38px; margin-bottom: 9px; }
-
-    /* SUPABASE CONFIG BANNER */
     .config-banner { background: rgba(224,82,82,.12); border: 1px solid var(--danger); border-radius: var(--rs); padding: 12px 14px; margin-bottom: 14px; font-size: 12px; color: var(--danger); line-height: 1.5; }
     .config-banner b { display: block; margin-bottom: 4px; font-size: 13px; }
     .config-banner code { background: rgba(0,0,0,.3); border-radius: 4px; padding: 1px 5px; font-size: 11px; color: var(--white); }
@@ -351,13 +438,11 @@
 </head>
 <body>
 
-<!-- LOADING -->
 <div class="loading-overlay hidden" id="loadingOverlay">
   <div class="spinner"></div>
   <div class="loading-text" id="loadingText">Cargando...</div>
 </div>
 
-<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-wrap">
     <div class="login-logo">⚽ QUINIELA 2026</div>
@@ -372,20 +457,23 @@
   </div>
 </div>
 
-<!-- APP -->
 <div id="appShell" style="display:none">
   <header class="app-header">
     <div class="header-top">
       <div class="logo">⚽ QUINIELA <span>2026</span></div>
-      <div class="user-badge" onclick="showUserMenu()">
-        <div class="dot"></div>
-        <span id="headerUsername">–</span>
+      <div class="header-right">
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+        <div class="user-badge" onclick="showUserMenu()">
+          <div class="dot"></div>
+          <span id="headerUsername">–</span>
+        </div>
       </div>
     </div>
     <div class="nav-tabs">
-      <button class="nav-tab active" onclick="switchTab('picks')"   id="tab-picks">MIS PICKS</button>
-      <button class="nav-tab"        onclick="switchTab('ranking')"  id="tab-ranking">RANKING</button>
-      <button class="nav-tab"        onclick="switchTab('admin')"    id="tab-admin" style="display:none">ADMIN</button>
+      <button class="nav-tab active" onclick="switchTab('picks')"  id="tab-picks">MIS PICKS</button>
+      <button class="nav-tab"        onclick="switchTab('ranking')" id="tab-ranking">RANKING</button>
+      <button class="nav-tab"        onclick="switchTab('stats')"   id="tab-stats">ESTADÍSTICAS</button>
+      <button class="nav-tab"        onclick="switchTab('admin')"   id="tab-admin" style="display:none">ADMIN</button>
     </div>
   </header>
 
@@ -407,6 +495,11 @@
       <div id="rankingList"    class="ranking-list"></div>
     </div>
 
+    <div id="screen-stats" class="screen">
+      <div class="section-label">ESTADÍSTICAS DEL GRUPO</div>
+      <div id="statsPanel"></div>
+    </div>
+
     <div id="screen-admin" class="screen">
       <div class="section-label">PANEL ORGANIZADOR</div>
       <div id="adminPanel"></div>
@@ -414,13 +507,13 @@
   </main>
 
   <nav class="bottom-nav">
-    <button class="bnav-btn active" onclick="switchTab('picks')"   id="bnav-picks"><span class="icon">🎯</span>MIS PICKS</button>
-    <button class="bnav-btn"        onclick="switchTab('ranking')"  id="bnav-ranking"><span class="icon">🏅</span>RANKING</button>
-    <button class="bnav-btn"        onclick="switchTab('admin')"    id="bnav-admin" style="display:none"><span class="icon">⚙️</span>ADMIN</button>
+    <button class="bnav-btn active" onclick="switchTab('picks')"  id="bnav-picks"><span class="icon">🎯</span>MIS PICKS</button>
+    <button class="bnav-btn"        onclick="switchTab('ranking')" id="bnav-ranking"><span class="icon">🏅</span>RANKING</button>
+    <button class="bnav-btn"        onclick="switchTab('stats')"   id="bnav-stats"><span class="icon">📊</span>STATS</button>
+    <button class="bnav-btn"        onclick="switchTab('admin')"   id="bnav-admin" style="display:none"><span class="icon">⚙️</span>ADMIN</button>
   </nav>
 </div>
 
-<!-- MODAL PARTICIPANTE -->
 <div class="modal-overlay" id="participantModal" onclick="closeParticipantModal(event)">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
@@ -435,43 +528,36 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════
-   ⚙️  CONFIGURACIÓN — edita estas 4 líneas antes de subir
-   ─────────────────────────────────────────────────────────────
-   Pasos para obtener SUPABASE_URL y SUPABASE_ANON_KEY:
-   1. Crea cuenta gratuita en supabase.com
-   2. Crea un nuevo proyecto
-   3. Ve a Settings → API → copia Project URL y anon/public key
-   4. Ejecuta el SQL del archivo schema.sql en el editor de Supabase
-═══════════════════════════════════════════════════════════════ */
 const CONFIG = {
   GROUP_CODE:      "quinielamundial",
   ADMIN_CODE:      "hombrepalido",
-  SUPABASE_URL:    "https://TU_PROYECTO.supabase.co",       // ← REEMPLAZA
-  SUPABASE_ANON:   "TU_ANON_KEY",                           // ← REEMPLAZA
+  SUPABASE_URL:    "https://kiiaaczyagnmyiednacw.supabase.co",
+  SUPABASE_ANON:   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpaWFhY3p5YWdubXlpZWRuYWN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NTUyODMsImV4cCI6MjA5ODIzMTI4M30.lS6-MZu4EVNWYCu63BIxYP5SalR5A4JYIHlBshtLRd8",
   LOCK_MINUTES:    15,
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   FIXTURE
-═══════════════════════════════════════════════════════════════ */
+/* ── FIXTURE ─────────────────────────────────────────────────────────────── */
 const MATCHES = [
-  { id:"m01", day:"Dom 28 Jun", timeISO:"2026-06-28T15:00:00-04:00", home:"Sudáfrica",      homeFlag:"RSA", away:"Canadá",      awayFlag:"CAN" },
-  { id:"m02", day:"Lun 29 Jun", timeISO:"2026-06-29T13:00:00-04:00", home:"Brasil",          homeFlag:"BRA", away:"Japón",       awayFlag:"JPN" },
-  { id:"m03", day:"Lun 29 Jun", timeISO:"2026-06-29T16:30:00-04:00", home:"Alemania",        homeFlag:"GER", away:"Paraguay",    awayFlag:"PAR" },
-  { id:"m04", day:"Lun 29 Jun", timeISO:"2026-06-29T21:00:00-04:00", home:"Países Bajos",    homeFlag:"NED", away:"Marruecos",   awayFlag:"MAR" },
-  { id:"m05", day:"Mar 30 Jun", timeISO:"2026-06-30T13:00:00-04:00", home:"Costa de Marfil", homeFlag:"CIV", away:"Noruega",     awayFlag:"NOR" },
-  { id:"m06", day:"Mar 30 Jun", timeISO:"2026-06-30T17:00:00-04:00", home:"Francia",          homeFlag:"FRA", away:"Suecia",      awayFlag:"SWE" },
-  { id:"m07", day:"Mar 30 Jun", timeISO:"2026-06-30T21:00:00-04:00", home:"México",           homeFlag:"MEX", away:"Ecuador",     awayFlag:"ECU" },
-  { id:"m08", day:"Mié 01 Jul", timeISO:"2026-07-01T12:00:00-04:00", home:"Inglaterra",       homeFlag:"ENG", away:"RD Congo",   awayFlag:"COD" },
-  { id:"m09", day:"Mié 01 Jul", timeISO:"2026-07-01T16:00:00-04:00", home:"Bélgica",          homeFlag:"BEL", away:"Senegal",     awayFlag:"SEN" },
-  { id:"m10", day:"Mié 01 Jul", timeISO:"2026-07-01T20:00:00-04:00", home:"EE.UU.",           homeFlag:"USA", away:"Bosnia H.",   awayFlag:"BIH" },
-  { id:"m11", day:"Jue 02 Jul", timeISO:"2026-07-02T15:00:00-04:00", home:"España",           homeFlag:"ESP", away:"Austria",     awayFlag:"AUT" },
-  { id:"m12", day:"Jue 02 Jul", timeISO:"2026-07-02T19:00:00-04:00", home:"Portugal",         homeFlag:"POR", away:"Croacia",     awayFlag:"CRO" },
-  { id:"m13", day:"Jue 02 Jul", timeISO:"2026-07-02T23:00:00-04:00", home:"Suiza",            homeFlag:"SUI", away:"Argelia",     awayFlag:"ALG" },
-  { id:"m14", day:"Vie 03 Jul", timeISO:"2026-07-03T14:00:00-04:00", home:"Australia",        homeFlag:"AUS", away:"Egipto",      awayFlag:"EGY" },
-  { id:"m15", day:"Vie 03 Jul", timeISO:"2026-07-03T18:00:00-04:00", home:"Argentina",        homeFlag:"ARG", away:"Cabo Verde",  awayFlag:"CPV" },
-  { id:"m16", day:"Vie 03 Jul", timeISO:"2026-07-03T21:30:00-04:00", home:"Colombia",         homeFlag:"COL", away:"Ghana",       awayFlag:"GHA" },
+  { id:"m01", phase:"16vos", day:"Dom 28 Jun", timeISO:"2026-06-28T15:00:00-04:00", home:"Sudáfrica",      homeFlag:"RSA", away:"Canadá",      awayFlag:"CAN" },
+  { id:"m02", phase:"16vos", day:"Lun 29 Jun", timeISO:"2026-06-29T13:00:00-04:00", home:"Brasil",          homeFlag:"BRA", away:"Japón",       awayFlag:"JPN" },
+  { id:"m03", phase:"16vos", day:"Lun 29 Jun", timeISO:"2026-06-29T16:30:00-04:00", home:"Alemania",        homeFlag:"GER", away:"Paraguay",    awayFlag:"PAR" },
+  { id:"m04", phase:"16vos", day:"Lun 29 Jun", timeISO:"2026-06-29T21:00:00-04:00", home:"Países Bajos",    homeFlag:"NED", away:"Marruecos",   awayFlag:"MAR" },
+  { id:"m05", phase:"16vos", day:"Mar 30 Jun", timeISO:"2026-06-30T13:00:00-04:00", home:"Costa de Marfil", homeFlag:"CIV", away:"Noruega",     awayFlag:"NOR" },
+  { id:"m06", phase:"16vos", day:"Mar 30 Jun", timeISO:"2026-06-30T17:00:00-04:00", home:"Francia",          homeFlag:"FRA", away:"Suecia",      awayFlag:"SWE" },
+  { id:"m07", phase:"16vos", day:"Mar 30 Jun", timeISO:"2026-06-30T21:00:00-04:00", home:"México",           homeFlag:"MEX", away:"Ecuador",     awayFlag:"ECU" },
+  { id:"m08", phase:"16vos", day:"Mié 01 Jul", timeISO:"2026-07-01T12:00:00-04:00", home:"Inglaterra",       homeFlag:"ENG", away:"RD Congo",   awayFlag:"COD" },
+  { id:"m09", phase:"16vos", day:"Mié 01 Jul", timeISO:"2026-07-01T16:00:00-04:00", home:"Bélgica",          homeFlag:"BEL", away:"Senegal",     awayFlag:"SEN" },
+  { id:"m10", phase:"16vos", day:"Mié 01 Jul", timeISO:"2026-07-01T20:00:00-04:00", home:"EE.UU.",           homeFlag:"USA", away:"Bosnia H.",   awayFlag:"BIH" },
+  { id:"m11", phase:"16vos", day:"Jue 02 Jul", timeISO:"2026-07-02T15:00:00-04:00", home:"España",           homeFlag:"ESP", away:"Austria",     awayFlag:"AUT" },
+  { id:"m12", phase:"16vos", day:"Jue 02 Jul", timeISO:"2026-07-02T19:00:00-04:00", home:"Portugal",         homeFlag:"POR", away:"Croacia",     awayFlag:"CRO" },
+  { id:"m13", phase:"16vos", day:"Jue 02 Jul", timeISO:"2026-07-02T23:00:00-04:00", home:"Suiza",            homeFlag:"SUI", away:"Argelia",     awayFlag:"ALG" },
+  { id:"m14", phase:"16vos", day:"Vie 03 Jul", timeISO:"2026-07-03T14:00:00-04:00", home:"Australia",        homeFlag:"AUS", away:"Egipto",      awayFlag:"EGY" },
+  { id:"m15", phase:"16vos", day:"Vie 03 Jul", timeISO:"2026-07-03T18:00:00-04:00", home:"Argentina",        homeFlag:"ARG", away:"Cabo Verde",  awayFlag:"CPV" },
+  { id:"m16", phase:"16vos", day:"Vie 03 Jul", timeISO:"2026-07-03T21:30:00-04:00", home:"Colombia",         homeFlag:"COL", away:"Ghana",       awayFlag:"GHA" },
+  { id:"m17", phase:"8vos",  day:"Sáb 04 Jul", timeISO:"2026-07-04T13:00:00-04:00", home:"Canadá",           homeFlag:"CAN", away:"Marruecos",   awayFlag:"MAR" },
+  { id:"m18", phase:"8vos",  day:"Sáb 04 Jul", timeISO:"2026-07-04T17:00:00-04:00", home:"Paraguay",         homeFlag:"PAR", away:"Francia",      awayFlag:"FRA" },
+  { id:"m19", phase:"8vos",  day:"Dom 05 Jul", timeISO:"2026-07-05T16:00:00-04:00", home:"Brasil",           homeFlag:"BRA", away:"Noruega",      awayFlag:"NOR" },
+  { id:"m20", phase:"8vos",  day:"Dom 05 Jul", timeISO:"2026-07-05T20:00:00-04:00", home:"México",           homeFlag:"MEX", away:"Inglaterra",   awayFlag:"ENG" },
 ];
 
 const CHAMPION_TEAMS = [
@@ -483,26 +569,25 @@ const CHAMPION_TEAMS = [
   { id:"JPN", name:"Japón"   },
 ];
 
-/* ═══════════════════════════════════════════════════════════════
-   SUPABASE API
-═══════════════════════════════════════════════════════════════ */
+const PHASE_ORDER = ["16vos","8vos","Cuartos","Semis","Final","General"];
+
+/* ── SUPABASE ────────────────────────────────────────────────────────────── */
 const SB_HEADERS = () => ({
   "Content-Type":  "application/json",
   "apikey":        CONFIG.SUPABASE_ANON,
   "Authorization": `Bearer ${CONFIG.SUPABASE_ANON}`,
   "Prefer":        "return=representation",
 });
-
 const supabase = {
-  async get(table, query = "") {
+  async get(table, query="") {
     const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/${table}${query}`, { headers: SB_HEADERS() });
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   },
   async upsert(table, data) {
     const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/${table}`, {
-      method: "POST",
-      headers: { ...SB_HEADERS(), "Prefer": "resolution=merge-duplicates,return=representation" },
+      method:"POST",
+      headers: { ...SB_HEADERS(), "Prefer":"resolution=merge-duplicates,return=representation" },
       body: JSON.stringify(data),
     });
     if (!r.ok) throw new Error(await r.text());
@@ -510,169 +595,264 @@ const supabase = {
   },
   async patch(table, query, data) {
     const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/${table}${query}`, {
-      method: "PATCH",
-      headers: SB_HEADERS(),
-      body: JSON.stringify(data),
+      method:"PATCH", headers: SB_HEADERS(), body: JSON.stringify(data),
     });
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   },
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   ESTADO GLOBAL  (cache en memoria, fuente de verdad = Supabase)
-═══════════════════════════════════════════════════════════════ */
-let currentUser  = null;
-let DB = {
-  users:          [],   // [{ id, name, is_admin, champion }]
-  matches:        [],   // MATCHES enriquecidos con result/done desde Supabase
-  picks:          [],   // [{ user_id, match_id, ot, home_score, away_score }]
-  championWinner: null,
-};
+/* ── ESTADO GLOBAL ───────────────────────────────────────────────────────── */
+let currentUser = null;
+let DB = { users:[], matches:[], picks:[], championWinner:null, bannedNames:[] };
 
-/* ═══════════════════════════════════════════════════════════════
-   CARGA INICIAL DESDE SUPABASE
-═══════════════════════════════════════════════════════════════ */
+/* ── CARGA DE DATOS ──────────────────────────────────────────────────────── */
 async function loadAll() {
-  showLoading("Sincronizando datos...");
-  const [users, matchResults, picks, settings] = await Promise.all([
-    supabase.get("users", "?order=created_at"),
-    supabase.get("match_results", "?select=*"),
-    supabase.get("picks", "?select=*"),
-    supabase.get("settings", "?select=*"),
+  const [users, matchResults, picks, settings, extraMatches] = await Promise.all([
+    supabase.get("users","?order=created_at"),
+    supabase.get("match_results","?select=*"),
+    supabase.get("picks","?select=*"),
+    supabase.get("settings","?select=*"),
+    supabase.get("extra_matches","?select=*").catch(()=>[]),
   ]);
 
   DB.users = users;
+  const resultMap = Object.fromEntries(matchResults.map(r=>[r.match_id,r]));
 
-  // Mezcla fixture local con resultados de la base de datos
-  const resultMap = Object.fromEntries(matchResults.map(r => [r.match_id, r]));
-  DB.matches = MATCHES.map(m => {
+  const baseMatches = MATCHES.map(m => {
     const r = resultMap[m.id];
-    return {
-      ...m,
-      result: r ? { homeScore: r.home_score, awayScore: r.away_score } : null,
-      winner: r?.winner || null,
-      done:   r?.done   || false,
-    };
+    return { ...m, result: r?{homeScore:r.home_score,awayScore:r.away_score}:null, winner:r?.winner||null, done:r?.done||false };
   });
+  const extraConverted = (extraMatches||[]).map(e => {
+    const r = resultMap[e.match_id];
+    return { id:e.match_id, phase:e.phase, day:e.day, timeISO:e.time_iso, home:e.home, homeFlag:e.home_flag, away:e.away, awayFlag:e.away_flag,
+             result:r?{homeScore:r.home_score,awayScore:r.away_score}:null, winner:r?.winner||null, done:r?.done||false };
+  });
+  const extraIds = new Set(extraConverted.map(m=>m.id));
+  DB.matches = [...baseMatches.filter(m=>!extraIds.has(m.id)), ...extraConverted]
+    .sort((a,b)=>new Date(a.timeISO)-new Date(b.timeISO));
 
   DB.picks = picks;
-
-  const champSetting = settings.find(s => s.key === "champion_winner");
-  DB.championWinner  = champSetting?.value || null;
-
-  hideLoading();
+  const cs = settings.find(s=>s.key==="champion_winner");
+  DB.championWinner = cs?.value||null;
+  const bs = settings.find(s=>s.key==="banned_names");
+  DB.bannedNames = bs?.value ? JSON.parse(bs.value) : [];
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   TIEMPO
-═══════════════════════════════════════════════════════════════ */
-function isLocked(match)  { return (new Date(match.timeISO) - new Date()) / 60000 <= CONFIG.LOCK_MINUTES; }
-function isStarted(match) { return (new Date(match.timeISO) - new Date()) / 60000 <= 0; }
-
-function getStatus(match) {
-  if (match.done)         return { label:"FINALIZADO",  cls:"status-done" };
-  if (isLocked(match))    return { label:"CERRADO 🔒",  cls:"status-locked" };
-  const diff = (new Date(match.timeISO) - new Date()) / 60000;
-  if (diff <= 60)         return { label:"¡PRONTO!",    cls:"status-soon" };
-  return                         { label:"ABIERTO ✓",   cls:"status-open" };
+/* ── TIEMPO ──────────────────────────────────────────────────────────────── */
+function isLocked(m)  { return (new Date(m.timeISO)-new Date())/60000 <= CONFIG.LOCK_MINUTES; }
+function isStarted(m) { return (new Date(m.timeISO)-new Date())/60000 <= 0; }
+function getStatus(m) {
+  if (m.done)       return { label:"FINALIZADO", cls:"status-done" };
+  if (isLocked(m))  return { label:"CERRADO 🔒", cls:"status-locked" };
+  const diff = (new Date(m.timeISO)-new Date())/60000;
+  if (diff<=60)     return { label:"¡PRONTO!",   cls:"status-soon" };
+  return                   { label:"ABIERTO ✓",  cls:"status-open" };
 }
-
 function fmtTime(iso) {
-  return new Date(iso).toLocaleTimeString("es-CL", { hour:"2-digit", minute:"2-digit", timeZone:"America/Santiago" });
+  return new Date(iso).toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit",timeZone:"America/Santiago"});
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   PUNTUACIÓN
-═══════════════════════════════════════════════════════════════ */
+/* ── PUNTUACIÓN ──────────────────────────────────────────────────────────── */
 function calcPickPts(pick, match) {
-  if (!match.done || !match.result || !pick?.ot) return { ot:0, exact:0, advance:0, total:0 };
-  const { homeScore:rh, awayScore:ra } = match.result;
-  const realOT  = rh > ra ? "1" : rh === ra ? "X" : "2";
-  const otOk    = pick.ot === realOT;
-  const exactOk = pick.home_score !== null && pick.away_score !== null
-                  && parseInt(pick.home_score) === rh && parseInt(pick.away_score) === ra;
-  const pts_ot      = otOk    ? 1 : 0;
-  const pts_exact   = exactOk ? 3 : 0;
-  const pts_advance = otOk    ? 1 : 0;
-  return { ot: pts_ot, exact: pts_exact, advance: pts_advance, total: pts_ot + pts_exact + pts_advance };
+  if (!match.done||!match.result||!pick?.ot) return {ot:0,exact:0,advance:0,total:0};
+  const {homeScore:rh,awayScore:ra} = match.result;
+  const realOT = rh>ra?"1":rh===ra?"X":"2";
+  const otOk   = pick.ot===realOT;
+  const ph=parseInt(pick.home_score), pa=parseInt(pick.away_score);
+  const exactOk = !isNaN(ph)&&!isNaN(pa)&&ph===rh&&pa===ra;
+  // Clasificado: independiente del 1X2
+  let advanceOk = false;
+  if (match.winner) {
+    if (pick.ot==="X") advanceOk = pick.advance===match.winner;
+    else { const pw=ph>pa?"home":"away"; advanceOk = pw===match.winner; }
+  }
+  const pts_ot=otOk?1:0, pts_exact=exactOk?3:0, pts_adv=advanceOk?1:0;
+  return {ot:pts_ot,exact:pts_exact,advance:pts_adv,total:pts_ot+pts_exact+pts_adv};
 }
 
 function calcUserStats(user) {
-  let totPts = 0, totOT = 0, totExact = 0, totAdvance = 0, totChamp = 0;
-  DB.matches.forEach(m => {
-    if (!m.done) return;
-    const pick = DB.picks.find(p => p.user_id === user.id && p.match_id === m.id);
-    const p    = calcPickPts(pick, m);
-    totOT += p.ot; totExact += p.exact; totAdvance += p.advance; totPts += p.total;
+  let pts=0,ot=0,exact=0,advance=0,champ=0;
+  DB.matches.forEach(m=>{
+    if(!m.done)return;
+    const pick=DB.picks.find(p=>p.user_id===user.id&&p.match_id===m.id);
+    const p=calcPickPts(pick,m);
+    ot+=p.ot; exact+=p.exact; advance+=p.advance; pts+=p.total;
   });
-  if (DB.championWinner && user.champion === DB.championWinner) { totChamp = 5; totPts += 5; }
-  return { pts: totPts, ot: totOT, exact: totExact, advance: totAdvance, champ: totChamp };
+  if(DB.championWinner&&user.champion===DB.championWinner){champ=5;pts+=5;}
+  return {pts,ot,exact,advance,champ};
+}
+
+// Puntos de un usuario en una fase específica
+function calcUserPhaseStats(user, phase) {
+  let pts=0,ot=0,exact=0,advance=0;
+  DB.matches.filter(m=>(m.phase||"General")===phase&&m.done).forEach(m=>{
+    const pick=DB.picks.find(p=>p.user_id===user.id&&p.match_id===m.id);
+    const p=calcPickPts(pick,m);
+    ot+=p.ot; exact+=p.exact; advance+=p.advance; pts+=p.total;
+  });
+  return {pts,ot,exact,advance};
 }
 
 function calcRanking() {
-  return DB.users
-    .map(u => ({ ...u, ...calcUserStats(u) }))
-    .sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name));
+  return DB.users.map(u=>({...u,...calcUserStats(u)}))
+    .sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.ot-a.ot||a.name.localeCompare(b.name));
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   AUTH
-═══════════════════════════════════════════════════════════════ */
+// Racha positiva y negativa
+function calcStreaks(user) {
+  const played = DB.matches.filter(m=>m.done&&m.result)
+    .sort((a,b)=>new Date(a.timeISO)-new Date(b.timeISO));
+  let pos=0, neg=0;
+  for (let i=played.length-1;i>=0;i--) {
+    const m=played[i];
+    const pick=DB.picks.find(p=>p.user_id===user.id&&p.match_id===m.id);
+    if(!pick?.ot){neg++;if(pos>0)break;continue;}
+    const p=calcPickPts(pick,m);
+    if(p.total>0){pos++;if(neg>0)break;}
+    else{neg++;if(pos>0)break;}
+    if(pos>0&&neg>0)break;
+  }
+  return {pos,neg};
+}
+
+/* ── AUTH ────────────────────────────────────────────────────────────────── */
+let _loginPending = {name:null,code:null,isAdmin:false};
+
 async function doLogin() {
   const name = document.getElementById("loginName").value.trim();
   const code = document.getElementById("loginCode").value.trim().toLowerCase();
-  if (!name) { showToast("Ingresa tu nombre", "error"); return; }
-  if (code !== CONFIG.GROUP_CODE.toLowerCase() && code !== CONFIG.ADMIN_CODE.toLowerCase()) {
-    showToast("Código incorrecto", "error"); return;
+  if (!name) { showToast("Ingresa tu nombre","error"); return; }
+  if (code!==CONFIG.GROUP_CODE.toLowerCase()&&code!==CONFIG.ADMIN_CODE.toLowerCase()) {
+    showToast("Código incorrecto","error"); return;
   }
-  const isAdmin = code === CONFIG.ADMIN_CODE.toLowerCase();
-  showLoading("Registrando sesión...");
+  const isAdmin = code===CONFIG.ADMIN_CODE.toLowerCase();
+  const btn = document.querySelector(".login-btn");
+  if (btn){btn.disabled=true;btn.textContent="Conectando...";}
   try {
-    // Upsert usuario (crea si no existe, actualiza is_admin si corresponde)
-    const existing = DB.users.find(u => u.name.toLowerCase() === name.toLowerCase());
-    if (!existing) {
-      const [created] = await supabase.upsert("users", { name, is_admin: isAdmin });
-      DB.users.push(created);
-      currentUser = created;
-    } else {
-      currentUser = existing;
-      if (isAdmin && !existing.is_admin) {
-        await supabase.patch("users", `?id=eq.${existing.id}`, { is_admin: true });
-        currentUser.is_admin = true;
-      }
+    const users = await supabase.get("users","?order=created_at");
+    DB.users=users;
+    if (btn){btn.disabled=false;btn.textContent="ENTRAR A LA QUINIELA →";}
+    // Lista negra
+    const banned=(DB.bannedNames||[]).map(n=>n.toLowerCase());
+    if(banned.includes(name.toLowerCase())){
+      showToast("Este nombre fue removido del grupo. Contacta al organizador.","error"); return;
     }
-    sessionStorage.setItem("qm26_uid", currentUser.id);
-    hideLoading();
-    bootApp();
+    const existing=DB.users.find(u=>u.name.toLowerCase()===name.toLowerCase());
+    if(existing){await loginProceed(existing,isAdmin);return;}
+    const suggestions=fuzzyMatchUsers(name,DB.users);
+    _loginPending={name,code,isAdmin};
+    showNameConfirmModal(name,suggestions);
   } catch(e) {
-    hideLoading();
-    showToast("Error de conexión. Verifica la configuración de Supabase.", "error");
-    console.error(e);
+    if(btn){btn.disabled=false;btn.textContent="ENTRAR A LA QUINIELA →";}
+    showToast("Error al conectar. Intenta de nuevo.","error"); console.error(e);
   }
+}
+
+function levenshtein(a,b) {
+  a=a.toLowerCase();b=b.toLowerCase();
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)
+    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function fuzzyMatchUsers(typed,users) {
+  return users.map(u=>{
+    const dist=levenshtein(typed,u.name);
+    const maxLen=Math.max(typed.length,u.name.length);
+    const score=1-dist/maxLen;
+    const boost=u.name.toLowerCase().startsWith(typed.toLowerCase().slice(0,3))||
+                u.name.toLowerCase().includes(typed.toLowerCase())||
+                typed.toLowerCase().includes(u.name.toLowerCase().slice(0,4));
+    return{user:u,score,boost};
+  }).filter(r=>r.score>=0.45||r.boost)
+    .sort((a,b)=>(b.score+(b.boost?0.5:0))-(a.score+(a.boost?0.5:0)))
+    .slice(0,4).map(r=>({...r.user,score:r.score}));
+}
+
+function showNameConfirmModal(typed,suggestions) {
+  // Modal simple con confirm nativo para mantener el código compacto
+  const hasSugg = suggestions.length>0;
+  if(hasSugg) {
+    const names = suggestions.map((s,i)=>`${i+1}. ${s.name}`).join("\n");
+    const choice = prompt(`"${typed}" no está registrado.\n\n¿Quisiste decir alguno de estos?\n${names}\n\nEscribe el número o deja en blanco para crear cuenta nueva:`);
+    if(choice===null){_loginPending={};return;}
+    const idx=parseInt(choice)-1;
+    if(idx>=0&&idx<suggestions.length){loginAsSuggested(suggestions[idx].id);return;}
+  } else {
+    if(!confirm(`"${typed}" no está registrado en el grupo.\n\n¿Deseas crear una cuenta nueva con este nombre?`)){
+      _loginPending={};return;
+    }
+  }
+  loginConfirmNew();
+}
+
+async function loginAsSuggested(userId) {
+  const user=DB.users.find(u=>u.id===userId);
+  if(!user)return;
+  await loginProceed(user,_loginPending.isAdmin);
+}
+
+async function loginConfirmNew() {
+  const{name,isAdmin}=_loginPending;
+  const banned=(DB.bannedNames||[]).map(n=>n.toLowerCase());
+  if(banned.includes(name.toLowerCase())){showToast("Este nombre fue removido del grupo.","error");return;}
+  showLoading("Creando cuenta...");
+  try {
+    const result=await supabase.upsert("users",{name,is_admin:isAdmin});
+    const created=Array.isArray(result)?result[0]:result;
+    if(!created?.id)throw new Error("No se pudo crear el usuario");
+    DB.users.push(created);
+    await loginProceed(created,isAdmin);
+  } catch(e){hideLoading();showToast("Error al crear la cuenta","error");console.error(e);}
+}
+
+async function loginProceed(user,isAdmin) {
+  currentUser={...user};
+  if(isAdmin&&!user.is_admin){
+    await supabase.patch("users",`?id=eq.${user.id}`,{is_admin:true});
+    currentUser.is_admin=true;
+  }
+  sessionStorage.setItem("qm26_uid",currentUser.id);
+  showLoading("Cargando datos...");
+  await loadAll();
+  hideLoading();
+  bootApp();
 }
 
 function bootApp() {
-  document.getElementById("loginScreen").style.display = "none";
-  document.getElementById("appShell").style.display    = "block";
-  document.getElementById("headerUsername").textContent = currentUser.name;
-  if (currentUser.is_admin) {
-    document.getElementById("tab-admin").style.display  = "block";
-    document.getElementById("bnav-admin").style.display = "flex";
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("appShell").style.display="block";
+  document.getElementById("headerUsername").textContent=currentUser.name;
+  if(currentUser.is_admin){
+    document.getElementById("tab-admin").style.display="block";
+    document.getElementById("bnav-admin").style.display="flex";
   }
-  renderChampion();
-  renderMatches();
-  renderRanking();
-  if (currentUser.is_admin) renderAdmin();
-  // Refresco automático cada 60 s
-  setInterval(async () => { await loadAll(); renderMatches(); renderRanking(); if(currentUser.is_admin) renderAdmin(); }, 60000);
+  // Restaurar tema
+  const savedTheme=localStorage.getItem("qm26_theme")||"dark";
+  if(savedTheme==="light")document.body.classList.add("light");
+  document.getElementById("themeToggle").textContent=savedTheme==="light"?"🌙":"☀️";
+
+  renderChampion();renderMatches();renderRanking();
+  if(currentUser.is_admin)renderAdmin();
+  setInterval(async()=>{
+    try{await loadAll();renderMatches();renderRanking();if(currentUser.is_admin)renderAdmin();}
+    catch(e){console.error("Refresco falló:",e);}
+  },60000);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   TABS
-═══════════════════════════════════════════════════════════════ */
+/* ── TEMA ────────────────────────────────────────────────────────────────── */
+function toggleTheme() {
+  const isLight=document.body.classList.toggle("light");
+  localStorage.setItem("qm26_theme",isLight?"light":"dark");
+  document.getElementById("themeToggle").textContent=isLight?"🌙":"☀️";
+}
+
+/* ── TABS ────────────────────────────────────────────────────────────────── */
 function switchTab(id) {
-  ["picks","ranking","admin"].forEach(t => {
+  ["picks","ranking","stats","admin"].forEach(t=>{
     document.getElementById(`screen-${t}`)?.classList.remove("active");
     document.getElementById(`tab-${t}`)?.classList.remove("active");
     document.getElementById(`bnav-${t}`)?.classList.remove("active");
@@ -680,219 +860,209 @@ function switchTab(id) {
   document.getElementById(`screen-${id}`)?.classList.add("active");
   document.getElementById(`tab-${id}`)?.classList.add("active");
   document.getElementById(`bnav-${id}`)?.classList.add("active");
+  if(id==="stats")renderStats();
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   CAMPEÓN
-═══════════════════════════════════════════════════════════════ */
-function champLocked() { return DB.matches.some(m => isStarted(m)); }
-
-function renderChampion() {
-  const locked   = champLocked();
-  const selected = currentUser.champion;
-  document.getElementById("champSubtitle").textContent = locked
-    ? "⚠️ La fase comenzó. Tu elección de campeón está bloqueada."
-    : "Elige tu campeón antes del inicio del torneo (vale 5 pts).";
-  document.getElementById("champGrid").innerHTML = CHAMPION_TEAMS.map(t => `
-    <button class="champ-btn ${selected===t.id?"selected":""} ${locked && selected!==t.id?"locked-champ":""}"
-      onclick="${locked ? "" : `selectChampion('${t.id}')`}">
-      <span class="champ-flag">${t.id}</span>
-      <span class="champ-name">${t.name}</span>
+/* ── CAMPEÓN ─────────────────────────────────────────────────────────────── */
+function champLocked(){return DB.matches.some(m=>isStarted(m));}
+function renderChampion(){
+  const locked=champLocked(),selected=currentUser.champion;
+  document.getElementById("champSubtitle").textContent=locked
+    ?"⚠️ La fase comenzó. Tu elección de campeón está bloqueada."
+    :"Elige tu campeón antes del inicio del torneo (vale 5 pts).";
+  document.getElementById("champGrid").innerHTML=CHAMPION_TEAMS.map(t=>`
+    <button class="champ-btn ${selected===t.id?"selected":""} ${locked&&selected!==t.id?"locked-champ":""}"
+      onclick="${locked?"":`selectChampion('${t.id}')`}">
+      <span class="champ-flag">${t.id}</span><span class="champ-name">${t.name}</span>
     </button>`).join("");
-  const btn     = document.getElementById("saveChampBtn");
-  const selTeam = CHAMPION_TEAMS.find(t => t.id === selected);
-  btn.disabled  = locked || !selected;
-  btn.textContent = locked
-    ? `BLOQUEADO: ${selTeam ? selTeam.id + " " + selTeam.name : "Sin elegir"}`
-    : "GUARDAR MI CAMPEÓN";
+  const btn=document.getElementById("saveChampBtn");
+  const selTeam=CHAMPION_TEAMS.find(t=>t.id===selected);
+  btn.disabled=locked||!selected;
+  btn.textContent=locked?`BLOQUEADO: ${selTeam?selTeam.id+" "+selTeam.name:"Sin elegir"}`:"GUARDAR MI CAMPEÓN";
 }
-
-async function selectChampion(teamId) {
-  if (champLocked()) { showToast("Ya no puedes cambiar el campeón", "error"); return; }
-  currentUser.champion = currentUser.champion === teamId ? null : teamId;
-  // Actualiza en la copia local de usuarios también
-  const u = DB.users.find(u => u.id === currentUser.id);
-  if (u) u.champion = currentUser.champion;
-  try {
-    await supabase.patch("users", `?id=eq.${currentUser.id}`, { champion: currentUser.champion });
-  } catch(e) { showToast("Error al guardar", "error"); console.error(e); }
+async function selectChampion(teamId){
+  if(champLocked()){showToast("Ya no puedes cambiar el campeón","error");return;}
+  currentUser.champion=currentUser.champion===teamId?null:teamId;
+  const u=DB.users.find(u=>u.id===currentUser.id);if(u)u.champion=currentUser.champion;
+  try{await supabase.patch("users",`?id=eq.${currentUser.id}`,{champion:currentUser.champion});}
+  catch(e){showToast("Error al guardar","error");console.error(e);}
   renderChampion();
 }
-
-async function saveChampion() {
-  if (!currentUser.champion) { showToast("Elige un equipo primero", "error"); return; }
-  const t = CHAMPION_TEAMS.find(t => t.id === currentUser.champion);
-  showToast(`✅ Campeón guardado: ${t.id} ${t.name}`, "success");
+async function saveChampion(){
+  if(!currentUser.champion){showToast("Elige un equipo primero","error");return;}
+  const t=CHAMPION_TEAMS.find(t=>t.id===currentUser.champion);
+  showToast(`✅ Campeón guardado: ${t.id} ${t.name}`,"success");
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   PARTIDOS
-═══════════════════════════════════════════════════════════════ */
-function renderMatches() {
-  const days = {};
-  DB.matches.forEach(m => { if (!days[m.day]) days[m.day] = []; days[m.day].push(m); });
-  document.getElementById("matchesByDay").innerHTML =
-    `<div class="section-label">16VOS DE FINAL</div>` +
-    Object.entries(days).map(([day, matches]) => `
+/* ── PARTIDOS ────────────────────────────────────────────────────────────── */
+function renderMatches(){
+  const phaseOrder=PHASE_ORDER;
+  const phases=[...new Set(DB.matches.map(m=>m.phase||"General"))];
+  phases.sort((a,b)=>phaseOrder.indexOf(a)-phaseOrder.indexOf(b));
+  const accordions=phases.map(phase=>{
+    const pMatches=DB.matches.filter(m=>(m.phase||"General")===phase);
+    const openCnt=pMatches.filter(m=>!isLocked(m)&&!m.done).length;
+    const doneCnt=pMatches.filter(m=>m.done).length;
+    const pickedCnt=pMatches.filter(m=>{
+      const pick=DB.picks.find(p=>p.user_id===currentUser.id&&p.match_id===m.id);
+      return!!pick?.ot;
+    }).length;
+    const missingOpen=pMatches.filter(m=>{
+      const open=!isLocked(m)&&!m.done;
+      const pick=DB.picks.find(p=>p.user_id===currentUser.id&&p.match_id===m.id);
+      return open&&!pick?.ot;
+    }).length;
+    const chips=[];
+    if(openCnt>0)chips.push(`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(76,175,135,.18);color:var(--success)">🔓 ${openCnt} abierto${openCnt>1?"s":""}</span>`);
+    if(doneCnt===pMatches.length)chips.push(`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(160,160,180,.13);color:var(--muted)">✓ Completa</span>`);
+    if(pickedCnt>0)chips.push(`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(244,196,48,.15);color:var(--gold)">🎯 ${pickedCnt}/${pMatches.length}</span>`);
+    if(missingOpen>0)chips.push(`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(224,82,82,.15);color:var(--danger)">⚠️ ${missingOpen} pendiente${missingOpen>1?"s":""}</span>`);
+    const days={};
+    pMatches.forEach(m=>{if(!days[m.day])days[m.day]=[];days[m.day].push(m);});
+    const dayGroups=Object.entries(days).map(([day,matches])=>`
       <div class="day-group">
         <div class="day-header"><span class="day-label">${day}</span><div class="day-line"></div></div>
-        ${matches.map(m => renderMatchCard(m)).join("")}
+        ${matches.map(m=>renderMatchCard(m)).join("")}
       </div>`).join("");
-}
-
-function renderMatchCard(match) {
-  const pick   = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === match.id);
-  const status = getStatus(match);
-  const locked = isLocked(match);
-  const saved  = !!pick?.ot;
-  let predArea = "";
-  if (locked) {
-    let badgeHtml = "";
-    if (pick?.ot) {
-      const otClass  = { "1":"ot-1", "X":"ot-x", "2":"ot-2" }[pick.ot] || "";
-      const otLabel  = { "1":"LOCAL", "X":"EMPATE", "2":"VISITA" }[pick.ot];
-      const scoreStr = pick.home_score !== null && pick.home_score !== undefined
-        ? `${pick.home_score} - ${pick.away_score}` : "Sin marcador";
-      badgeHtml = `<div class="my-pick-badge">
-        <span class="pick-tag ${otClass}">${otLabel}</span>
-        <span class="pick-tag score">${scoreStr}</span>
-      </div>`;
-    }
-    predArea = `<div class="locked-msg"><span class="lock-icon">🔒</span>${match.done ? "Partido finalizado" : "Pronósticos cerrados"}</div>${badgeHtml}`;
-  } else {
-    const ptsHint = pick?.ot
-      ? `<div class="points-hint">Máximo posible: <b>${pick.home_score !== null ? "5" : "2"} pts</b></div>` : "";
-    predArea = `
-      <div class="prediction-area">
-        <div class="ot-row">
-          <button class="ot-btn ${pick?.ot==="1"?"sel-1":""}" onclick="setPick('${match.id}','1')">🏠 LOCAL</button>
-          <button class="ot-btn ${pick?.ot==="X"?"sel-x":""}" onclick="setPick('${match.id}','X')">🤝 EMPATE</button>
-          <button class="ot-btn ${pick?.ot==="2"?"sel-2":""}" onclick="setPick('${match.id}','2')">✈️ VISITA</button>
-        </div>
-        <div class="score-row">
-          <span class="score-label">MARCADOR</span>
-          <div class="score-inputs">
-            <input class="score-input" type="number" min="0" max="20"
-              id="hs_${match.id}" value="${pick?.home_score ?? ""}" placeholder="–"
-              oninput="autoSave('${match.id}')" />
-            <span class="score-sep">:</span>
-            <input class="score-input" type="number" min="0" max="20"
-              id="as_${match.id}" value="${pick?.away_score ?? ""}" placeholder="–"
-              oninput="autoSave('${match.id}')" />
+    const accId=`pacc_${phase.replace(/[^a-z0-9]/gi,"")}`;
+    const startOpen=openCnt>0||missingOpen>0;
+    return `
+      <div style="margin-bottom:10px;border-radius:var(--r);overflow:hidden;border:1px solid var(--gray-2)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--gray-2);cursor:pointer;user-select:none;gap:10px" onclick="togglePicksAcc('${accId}')">
+          <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+            <span style="font-family:'Bebas Neue','Arial Narrow',Arial,sans-serif;font-size:16px;letter-spacing:1.5px;color:var(--gold);white-space:nowrap">${phase}</span>
+            <div style="display:flex;gap:5px;flex-wrap:wrap">${chips.join("")}</div>
           </div>
-          <button class="save-btn" onclick="savePick('${match.id}')">GUARDAR</button>
+          <span style="font-size:11px;color:var(--muted);transition:transform .2s;display:inline-block" id="parr_${accId}">▼</span>
         </div>
-        ${ptsHint}
+        <div style="display:${startOpen?"block":"none"};padding:10px 10px 4px;background:var(--green-deep)" id="${accId}">
+          ${dayGroups}
+        </div>
       </div>`;
-  }
-  return `
-    <div class="match-card ${saved && !locked?"saved":""} ${locked?"locked":""}" id="card_${match.id}">
-      <div class="match-card-header">
-        <span class="match-time">🕐 ${fmtTime(match.timeISO)}</span>
-        <span class="match-status ${status.cls}">${status.label}</span>
+  }).join("");
+  document.getElementById("matchesByDay").innerHTML=accordions;
+}
+function togglePicksAcc(id){
+  const body=document.getElementById(id);
+  const arrow=document.getElementById(`parr_${id}`);
+  if(!body)return;
+  const open=body.style.display!=="none";
+  body.style.display=open?"none":"block";
+  if(arrow)arrow.style.transform=open?"":"rotate(180deg)";
+}
+
+function renderMatchCard(match){
+  const pick=DB.picks.find(p=>p.user_id===currentUser.id&&p.match_id===match.id);
+  const status=getStatus(match),locked=isLocked(match),saved=!!pick?.ot;
+  let predArea="";
+  if(locked){
+    let badgeHtml="";
+    if(pick?.ot){
+      const otClass={"1":"ot-1","X":"ot-x","2":"ot-2"}[pick.ot]||"";
+      const otLabel={"1":"LOCAL","X":"EMPATE","2":"VISITA"}[pick.ot];
+      const scoreStr=pick.home_score!==null&&pick.home_score!==undefined?`${pick.home_score} - ${pick.away_score}`:"Sin marcador";
+      badgeHtml=`<div class="my-pick-badge"><span class="pick-tag ${otClass}">${otLabel}</span><span class="pick-tag score">${scoreStr}</span></div>`;
+    }
+    predArea=`<div class="locked-msg"><span class="lock-icon">🔒</span>${match.done?"Partido finalizado":"Pronósticos cerrados"}</div>${badgeHtml}`;
+  } else {
+    const ptsHint=pick?.ot?`<div class="points-hint">Máximo posible: <b>5 pts</b></div>`:"";
+    predArea=`<div class="prediction-area">
+      <div class="ot-row">
+        <button class="ot-btn ${pick?.ot==="1"?"sel-1":""}" onclick="setPick('${match.id}','1')">🏠 LOCAL</button>
+        <button class="ot-btn ${pick?.ot==="X"?"sel-x":""}" onclick="setPick('${match.id}','X')">🤝 EMPATE</button>
+        <button class="ot-btn ${pick?.ot==="2"?"sel-2":""}" onclick="setPick('${match.id}','2')">✈️ VISITA</button>
       </div>
-      <div class="match-teams">
-        <div class="team"><span class="team-flag">${match.homeFlag}</span><span class="team-name">${match.home}</span></div>
-        <div class="vs-block">
-          ${match.done && match.result
-            ? `<span class="result-score">${match.result.homeScore} – ${match.result.awayScore}</span>`
-            : `<span class="vs-text">VS</span>`}
+      <div class="score-row">
+        <span class="score-label">MARCADOR</span>
+        <div class="score-inputs">
+          <input class="score-input" type="number" min="0" max="20" id="hs_${match.id}" value="${pick?.home_score??""}" placeholder="–" oninput="autoSave('${match.id}')"/>
+          <span class="score-sep">:</span>
+          <input class="score-input" type="number" min="0" max="20" id="as_${match.id}" value="${pick?.away_score??""}" placeholder="–" oninput="autoSave('${match.id}')"/>
         </div>
-        <div class="team"><span class="team-flag">${match.awayFlag}</span><span class="team-name">${match.away}</span></div>
-      </div>
-      ${predArea}
-    </div>`;
+        <button class="save-btn" onclick="savePick('${match.id}')">GUARDAR</button>
+      </div>${ptsHint}</div>`;
+  }
+  return `<div class="match-card ${saved&&!locked?"saved":""} ${locked?"locked":""}" id="card_${match.id}">
+    <div class="match-card-header"><span class="match-time">🕐 ${fmtTime(match.timeISO)}</span><span class="match-status ${status.cls}">${status.label}</span></div>
+    <div class="match-teams">
+      <div class="team"><span class="team-flag">${match.homeFlag}</span><span class="team-name">${match.home}</span></div>
+      <div class="vs-block">${match.done&&match.result?`<span class="result-score">${match.result.homeScore} – ${match.result.awayScore}</span>`:`<span class="vs-text">VS</span>`}</div>
+      <div class="team"><span class="team-flag">${match.awayFlag}</span><span class="team-name">${match.away}</span></div>
+    </div>${predArea}</div>`;
 }
 
-let autoSaveTimers = {};
-function autoSave(matchId) {
-  clearTimeout(autoSaveTimers[matchId]);
-  autoSaveTimers[matchId] = setTimeout(() => savePick(matchId, true), 1500);
+let autoSaveTimers={};
+function autoSave(matchId){clearTimeout(autoSaveTimers[matchId]);autoSaveTimers[matchId]=setTimeout(()=>savePick(matchId,true),1500);}
+
+async function setPick(matchId,value){
+  const match=DB.matches.find(m=>m.id===matchId);
+  if(isLocked(match)){showToast("Este partido ya está cerrado","error");return;}
+  let pick=DB.picks.find(p=>p.user_id===currentUser.id&&p.match_id===matchId);
+  const newOt=pick?.ot===value?null:value;
+  if(pick){pick.ot=newOt;}else{pick={user_id:currentUser.id,match_id:matchId,ot:newOt,home_score:null,away_score:null};DB.picks.push(pick);}
+  try{await supabase.upsert("picks",{user_id:currentUser.id,match_id:matchId,ot:newOt,home_score:pick.home_score,away_score:pick.away_score});}
+  catch(e){showToast("Error al guardar","error");console.error(e);}
+  const card=document.getElementById(`card_${matchId}`);
+  if(card)card.outerHTML=renderMatchCard(match);
 }
 
-async function setPick(matchId, value) {
-  const match = DB.matches.find(m => m.id === matchId);
-  if (isLocked(match)) { showToast("Este partido ya está cerrado", "error"); return; }
-  let pick = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === matchId);
-  const newOt = pick?.ot === value ? null : value;
-  if (pick) { pick.ot = newOt; } else { pick = { user_id: currentUser.id, match_id: matchId, ot: newOt, home_score: null, away_score: null }; DB.picks.push(pick); }
-  try { await supabase.upsert("picks", { user_id: currentUser.id, match_id: matchId, ot: newOt, home_score: pick.home_score, away_score: pick.away_score }); }
-  catch(e) { showToast("Error al guardar", "error"); console.error(e); }
-  // Re-render solo la tarjeta
-  const card = document.getElementById(`card_${matchId}`);
-  if (card) card.outerHTML = renderMatchCard(match);
-}
-
-async function savePick(matchId, silent = false) {
-  const match = DB.matches.find(m => m.id === matchId);
-  if (isLocked(match)) { if (!silent) showToast("Este partido ya está cerrado 🔒", "error"); return; }
-  let pick = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === matchId);
-  if (!pick?.ot) { if (!silent) showToast("Elige LOCAL, EMPATE o VISITA primero", "error"); return; }
-  const hs  = document.getElementById(`hs_${matchId}`)?.value ?? null;
-  const as_ = document.getElementById(`as_${matchId}`)?.value ?? null;
-  pick.home_score = hs !== "" ? hs : null;
-  pick.away_score = as_ !== "" ? as_ : null;
-  try {
-    await supabase.upsert("picks", { user_id: currentUser.id, match_id: matchId, ot: pick.ot, home_score: pick.home_score, away_score: pick.away_score });
-    if (!silent) showToast("✅ Pronóstico guardado", "success");
+async function savePick(matchId,silent=false){
+  const match=DB.matches.find(m=>m.id===matchId);
+  if(isLocked(match)){if(!silent)showToast("Este partido ya está cerrado 🔒","error");return;}
+  let pick=DB.picks.find(p=>p.user_id===currentUser.id&&p.match_id===matchId);
+  if(!pick?.ot){if(!silent)showToast("Elige LOCAL, EMPATE o VISITA primero","error");return;}
+  const hs=document.getElementById(`hs_${matchId}`)?.value??null;
+  const as_=document.getElementById(`as_${matchId}`)?.value??null;
+  pick.home_score=hs!==""?hs:null;pick.away_score=as_!==""?as_:null;
+  try{
+    await supabase.upsert("picks",{user_id:currentUser.id,match_id:matchId,ot:pick.ot,home_score:pick.home_score,away_score:pick.away_score});
+    if(!silent)showToast("✅ Pronóstico guardado","success");
     document.getElementById(`card_${matchId}`)?.classList.add("saved");
-  } catch(e) { if (!silent) showToast("Error al guardar", "error"); console.error(e); }
+  }catch(e){if(!silent)showToast("Error al guardar","error");console.error(e);}
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RANKING
-═══════════════════════════════════════════════════════════════ */
-function renderRanking() {
-  const ranking     = calcRanking();
-  const playedCount = DB.matches.filter(m => m.done).length;
-  const myStats     = ranking.find(u => u.id === currentUser.id) || { pts:0 };
-  const myPos       = ranking.findIndex(u => u.id === currentUser.id) + 1;
-
-  document.getElementById("rankingSummary").innerHTML = `
+/* ── RANKING ─────────────────────────────────────────────────────────────── */
+function renderRanking(){
+  const ranking=calcRanking();
+  const playedCount=DB.matches.filter(m=>m.done).length;
+  const myStats=ranking.find(u=>u.id===currentUser.id)||{pts:0};
+  const myPos=ranking.findIndex(u=>u.id===currentUser.id)+1;
+  document.getElementById("rankingSummary").innerHTML=`
     <div class="rank-stat"><div class="rank-stat-val">${myStats.pts}</div><div class="rank-stat-label">MIS PUNTOS</div></div>
-    <div class="rank-stat"><div class="rank-stat-val">${myPos || "–"}</div><div class="rank-stat-label">MI POSICIÓN</div></div>
+    <div class="rank-stat"><div class="rank-stat-val">${myPos||"–"}</div><div class="rank-stat-label">MI POSICIÓN</div></div>
     <div class="rank-stat"><div class="rank-stat-val">${playedCount}</div><div class="rank-stat-label">JUGADOS</div></div>`;
-
-  const medals = ["🥇","🥈","🥉"]; const pCls = ["p1","p2","p3"];
-  const top3   = ranking.slice(0, Math.min(3, ranking.length));
-  document.getElementById("podiumRow").innerHTML = top3.map((u, i) => {
-    const ct = CHAMPION_TEAMS.find(t => t.id === u.champion);
-    return `<div class="podium-card ${pCls[i]}">
-      <span class="podium-medal">${medals[i]}</span>
+  const medals=["🥇","🥈","🥉"],pCls=["p1","p2","p3"];
+  const top3=ranking.slice(0,Math.min(3,ranking.length));
+  document.getElementById("podiumRow").innerHTML=top3.map((u,i)=>{
+    const ct=CHAMPION_TEAMS.find(t=>t.id===u.champion);
+    return `<div class="podium-card ${pCls[i]}"><span class="podium-medal">${medals[i]}</span>
       <div class="podium-name">${u.name}${u.id===currentUser.id?" 👈":""}</div>
       <div class="podium-pts">${u.pts}</div><div class="podium-pts-lbl">puntos</div>
-      <div class="podium-champ">${ct ? ct.id+" "+ct.name : "Sin campeón"}</div>
-    </div>`;
+      <div class="podium-champ">${ct?ct.id+" "+ct.name:"Sin campeón"}</div></div>`;
   }).join("");
-
-  if (ranking.length === 0) {
-    document.getElementById("rankingList").innerHTML = `<div class="empty"><div class="empty-icon">🏁</div>Aún no hay participantes.</div>`;
-    return;
-  }
-
-  document.getElementById("rankingList").innerHTML = ranking.map((u, i) => {
-    const ct  = CHAMPION_TEAMS.find(t => t.id === u.champion);
-    const isMe = u.id === currentUser.id;
-    const pickRows = DB.matches.map(m => {
-      const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
-      if (!pick?.ot) return `<div class="detail-pick-row"><span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span><span class="detail-pick-sel" style="color:var(--muted)">–</span><span class="detail-pick-score">–</span><span class="detail-pick-pts zero">–</span></div>`;
-      const p = calcPickPts(pick, m);
-      const otLabel = { "1":"LOC","X":"EMP","2":"VIS" }[pick.ot];
-      const otColor = { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot];
-      const sc = pick.home_score !== null ? `${pick.home_score}-${pick.away_score}` : "–";
-      return `<div class="detail-pick-row">
-        <span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span>
-        <span class="detail-pick-sel" style="color:${otColor}">${otLabel}</span>
-        <span class="detail-pick-score">${sc}</span>
-        <span class="detail-pick-pts ${p.total===0?"zero":""}">${m.done ? p.total : "–"}</span>
-      </div>`;
+  if(!ranking.length){document.getElementById("rankingList").innerHTML=`<div class="empty"><div class="empty-icon">🏁</div>Aún no hay participantes.</div>`;return;}
+  document.getElementById("rankingList").innerHTML=ranking.map((u,i)=>{
+    const ct=CHAMPION_TEAMS.find(t=>t.id===u.champion),isMe=u.id===currentUser.id;
+    const streaks=calcStreaks(u);
+    let streakBadge="";
+    if(streaks.pos>=2)streakBadge=`<span class="streak-badge ${streaks.pos>=4?"fire":""}">${streaks.pos>=4?"🔥":"⚡"} ${streaks.pos} seguidos</span>`;
+    else if(streaks.neg>=2)streakBadge=`<span class="streak-badge neg">💤 ${streaks.neg} sin puntuar</span>`;
+    const pickRows=DB.matches.map(m=>{
+      const pick=DB.picks.find(p=>p.user_id===u.id&&p.match_id===m.id);
+      if(!isLocked(m)&&!m.done)return`<div class="detail-pick-row"><span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span><span class="detail-pick-sel" style="color:var(--muted)">🔓</span><span class="detail-pick-score">–</span><span class="detail-pick-pts zero">–</span></div>`;
+      if(!pick?.ot)return`<div class="detail-pick-row"><span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span><span class="detail-pick-sel" style="color:var(--muted)">–</span><span class="detail-pick-score">–</span><span class="detail-pick-pts zero">–</span></div>`;
+      const p=calcPickPts(pick,m);
+      const otLabel={"1":"LOC","X":"EMP","2":"VIS"}[pick.ot];
+      const otColor={"1":"var(--blue)","X":"var(--gold)","2":"var(--danger)"}[pick.ot];
+      const sc=pick.home_score!==null?`${pick.home_score}-${pick.away_score}`:"–";
+      return`<div class="detail-pick-row"><span class="detail-pick-match">${m.homeFlag} vs ${m.awayFlag}</span><span class="detail-pick-sel" style="color:${otColor}">${otLabel}</span><span class="detail-pick-score">${sc}</span><span class="detail-pick-pts ${p.total===0?"zero":""}">${m.done?p.total:"–"}</span></div>`;
     }).join("");
-    return `
+    return`
       <div class="ranking-row ${isMe?"me":""}" id="rrow_${u.id}" onclick="toggleDetail('${u.id}')">
         <div class="rank-pos ${i<3?"top":""}">${i+1}</div>
         <div class="rank-info">
-          <div class="rank-name">${u.name}${isMe?" 👈":""}</div>
-          <div class="rank-sub">${ct ? ct.id+" "+ct.name : "Sin campeón"} · ${playedCount} jugados</div>
+          <div class="rank-name">${u.name}${isMe?" 👈":""} ${streakBadge}</div>
+          <div class="rank-sub">${ct?ct.id+" "+ct.name:"Sin campeón"} · ${playedCount} jugados</div>
         </div>
         <div class="rank-pts-block"><div class="rank-pts">${u.pts}</div><div class="rank-pts-lbl">pts</div></div>
       </div>
@@ -902,117 +1072,261 @@ function renderRanking() {
           <div class="detail-cell"><div class="detail-val">${Math.floor(u.exact/3)}</div><div class="detail-lbl">Exactos</div></div>
           <div class="detail-cell"><div class="detail-val">${u.champ}</div><div class="detail-lbl">Campeón</div></div>
         </div>
-        <div class="detail-picks-title">PICKS POR PARTIDO</div>
-        ${pickRows}
+        <div class="detail-picks-title">PICKS POR PARTIDO</div>${pickRows}
       </div>`;
   }).join("");
 }
-
-function toggleDetail(userId) {
-  const detail = document.getElementById(`rdetail_${userId}`);
-  const row    = document.getElementById(`rrow_${userId}`);
-  if (!detail) return;
-  const isOpen = detail.classList.contains("open");
-  document.querySelectorAll(".rank-detail").forEach(el => el.classList.remove("open"));
-  document.querySelectorAll(".ranking-row").forEach(el => el.classList.remove("expanded"));
-  if (!isOpen) { detail.classList.add("open"); row.classList.add("expanded"); }
+function toggleDetail(userId){
+  const detail=document.getElementById(`rdetail_${userId}`),row=document.getElementById(`rrow_${userId}`);
+  if(!detail)return;
+  const isOpen=detail.classList.contains("open");
+  document.querySelectorAll(".rank-detail").forEach(el=>el.classList.remove("open"));
+  document.querySelectorAll(".ranking-row").forEach(el=>el.classList.remove("expanded"));
+  if(!isOpen){detail.classList.add("open");row.classList.add("expanded");}
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   ADMIN
-═══════════════════════════════════════════════════════════════ */
-function renderAdmin() {
-  if (!currentUser?.is_admin) return;
-  const playedCount = DB.matches.filter(m => m.done).length;
+/* ── ESTADÍSTICAS ────────────────────────────────────────────────────────── */
+function renderStats(){
+  const totalPicks=DB.picks.filter(p=>p.ot).length;
+  const totalUsers=DB.users.length;
+  const playedCount=DB.matches.filter(m=>m.done).length;
+  const avgPts=totalUsers?(DB.users.reduce((s,u)=>s+calcUserStats(u).pts,0)/totalUsers).toFixed(1):0;
 
-  const participantCards = DB.users.length === 0
-    ? `<div class="empty"><div class="empty-icon">👥</div>Sin participantes aún.</div>`
-    : DB.users.map(u => {
-        const stats  = calcUserStats(u);
-        const ct     = CHAMPION_TEAMS.find(t => t.id === u.champion);
-        const dots   = DB.matches.map(m => {
-          const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
-          if (!pick?.ot) return `<div class="prog-dot no-pick"></div>`;
-          if (!m.done)   return `<div class="prog-dot has-pick"></div>`;
-          return calcPickPts(pick, m).total > 0
-            ? `<div class="prog-dot done-correct"></div>`
-            : `<div class="prog-dot done-wrong"></div>`;
+  // Campeones
+  const champMap={};
+  DB.users.forEach(u=>{if(u.champion)champMap[u.champion]=(champMap[u.champion]||0)+1;});
+  const champSorted=Object.entries(champMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const champGrid=champSorted.length===0
+    ?`<div style="font-size:12px;color:var(--muted)">Nadie ha elegido campeón aún.</div>`
+    :champSorted.map(([id,cnt])=>{
+        const t=CHAMPION_TEAMS.find(t=>t.id===id);
+        return`<div style="background:var(--gray-1);border:1px solid var(--gray-2);border-radius:var(--rs);padding:8px 6px;text-align:center">
+          <div style="font-family:'Bebas Neue','Arial Narrow',Arial,sans-serif;font-size:11px;background:var(--gray-3);color:var(--white);border-radius:4px;padding:2px 5px;margin-bottom:4px;display:inline-block">${id}</div>
+          <div style="font-size:8px;color:var(--muted);font-weight:600;margin-bottom:4px">${t?.name||id}</div>
+          <div style="font-family:'Bebas Neue','Arial Narrow',Arial,sans-serif;font-size:20px;color:var(--gold);line-height:1">${cnt}</div>
+          <div style="font-size:8px;color:var(--muted)">${cnt===1?"voto":"votos"}</div>
+        </div>`;
+      }).join("");
+
+  // Ranking por fase
+  const phases=[...new Set(DB.matches.map(m=>m.phase||"General"))];
+  phases.sort((a,b)=>PHASE_ORDER.indexOf(a)-PHASE_ORDER.indexOf(b));
+
+  const phaseRankingSections=phases.map(phase=>{
+    const pMatches=DB.matches.filter(m=>(m.phase||"General")===phase);
+    const doneCnt=pMatches.filter(m=>m.done).length;
+    if(doneCnt===0)return""; // no mostrar fases sin partidos jugados
+
+    // Calcular ranking de esa fase para cada usuario
+    const phaseRanking=DB.users.map(u=>{
+      const ps=calcUserPhaseStats(u,phase);
+      return{...u,...ps};
+    }).sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.ot-a.ot||a.name.localeCompare(b.name));
+
+    const phaseTop3=phaseRanking.slice(0,Math.min(3,phaseRanking.length));
+    const restRanking=phaseRanking.slice(3);
+    const podMedals=["🥇","🥈","🥉"],podCls=["pp1","pp2","pp3"];
+
+    const podiumHtml=phaseTop3.map((u,i)=>`
+      <div class="phase-podium-card ${podCls[i]}">
+        <span class="phase-podium-medal">${podMedals[i]}</span>
+        <div class="phase-podium-name">${u.name}</div>
+        <div class="phase-podium-pts">${u.pts}</div>
+        <div class="phase-podium-lbl">pts</div>
+      </div>`).join("");
+
+    const restHtml=restRanking.map((u,i)=>`
+      <div class="phase-rank-row">
+        <span class="phase-rank-pos">${i+4}</span>
+        <span class="phase-rank-name">${u.name}</span>
+        <span class="phase-rank-pts">${u.pts}</span>
+      </div>`).join("");
+
+    const accId=`phrank_${phase.replace(/[^a-z0-9]/gi,"")}`;
+    return`
+      <div class="phase-rank-section">
+        <div class="phase-rank-header" onclick="togglePhaseRank('${accId}')">
+          <div>
+            <span class="phase-rank-title">${phase}</span>
+            <span class="phase-rank-meta" style="margin-left:8px">${doneCnt}/${pMatches.length} partidos jugados</span>
+          </div>
+          <span class="phase-rank-arrow" id="pharr_${accId}">▼</span>
+        </div>
+        <div class="phase-rank-body" id="${accId}">
+          <div class="phase-podium">${podiumHtml}</div>
+          ${restHtml?`<div class="phase-full-list">${restHtml}</div>`:""}
+        </div>
+      </div>`;
+  }).filter(Boolean).join("");
+
+  // Resumen de jornada
+  const summaryBtn=`<button class="summary-btn" onclick="copyDaySummary()">📋 Copiar resumen para WhatsApp</button>`;
+
+  document.getElementById("statsPanel").innerHTML=`
+    <div class="stats-global-grid">
+      <div class="stats-global-card"><div class="stats-global-val">${totalUsers}</div><div class="stats-global-lbl">PARTICIPANTES</div></div>
+      <div class="stats-global-card"><div class="stats-global-val">${totalPicks}</div><div class="stats-global-lbl">PICKS TOTALES</div></div>
+      <div class="stats-global-card"><div class="stats-global-val">${playedCount}</div><div class="stats-global-lbl">JUGADOS</div></div>
+      <div class="stats-global-card"><div class="stats-global-val">${avgPts}</div><div class="stats-global-lbl">PROM. PTS GRUPO</div></div>
+    </div>
+    ${summaryBtn}
+    <div class="section-label">CAMPEÓN MÁS APOSTADO</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:18px">${champGrid}</div>
+    <div class="section-label">RANKING POR FASE</div>
+    ${phaseRankingSections||`<div class="empty"><div class="empty-icon">⏳</div>Aún no hay partidos finalizados.</div>`}`;
+}
+
+function togglePhaseRank(id){
+  const body=document.getElementById(id),arrow=document.getElementById(`pharr_${id}`);
+  if(!body)return;
+  const open=body.classList.contains("open");
+  body.classList.toggle("open",!open);
+  if(arrow)arrow.classList.toggle("open",!open);
+}
+
+/* ── RESUMEN DE JORNADA ──────────────────────────────────────────────────── */
+function copyDaySummary(){
+  const ranking=calcRanking();
+  const playedToday=DB.matches.filter(m=>m.done);
+  const today=new Date().toLocaleDateString("es-CL",{day:"2-digit",month:"long"});
+  let text=`⚽ *QUINIELA MUNDIAL 2026*\n📅 Resumen ${today}\n\n`;
+
+  if(playedToday.length>0){
+    text+=`*Resultados del día:*\n`;
+    playedToday.slice(-4).forEach(m=>{
+      if(m.result)text+=`• ${m.homeFlag} ${m.home} ${m.result.homeScore}–${m.result.awayScore} ${m.away} ${m.awayFlag}\n`;
+    });
+    text+="\n";
+  }
+
+  text+=`*🏆 Tabla de posiciones:*\n`;
+  const medals=["🥇","🥈","🥉"];
+  ranking.slice(0,Math.min(5,ranking.length)).forEach((u,i)=>{
+    text+=`${medals[i]||`${i+1}.`} ${u.name} — *${u.pts} pts*\n`;
+  });
+  if(ranking.length>5)text+=`_...y ${ranking.length-5} participante${ranking.length-5>1?"s":" más"}_\n`;
+  text+=`\n_¡Haz tus picks antes de que cierren los partidos!_`;
+
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=>showToast("✅ Resumen copiado — pégalo en WhatsApp","success")).catch(()=>fallbackCopy(text));
+  } else { fallbackCopy(text); }
+}
+function fallbackCopy(text){
+  const ta=document.createElement("textarea");
+  ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand("copy");showToast("✅ Resumen copiado","success");}
+  catch{showToast("No se pudo copiar. Cópialo manualmente.","error");}
+  document.body.removeChild(ta);
+}
+
+/* ── ADMIN ───────────────────────────────────────────────────────────────── */
+function renderAdmin(){
+  if(!currentUser?.is_admin)return;
+  const playedCount=DB.matches.filter(m=>m.done).length;
+  const participantCards=DB.users.length===0
+    ?`<div class="empty"><div class="empty-icon">👥</div>Sin participantes aún.</div>`
+    :DB.users.map(u=>{
+        const stats=calcUserStats(u),ct=CHAMPION_TEAMS.find(t=>t.id===u.champion);
+        const dots=DB.matches.map(m=>{
+          const pick=DB.picks.find(p=>p.user_id===u.id&&p.match_id===m.id);
+          if(!pick?.ot)return`<div class="prog-dot no-pick"></div>`;
+          if(!m.done)return`<div class="prog-dot has-pick"></div>`;
+          return calcPickPts(pick,m).total>0?`<div class="prog-dot done-correct"></div>`:`<div class="prog-dot done-wrong"></div>`;
         }).join("");
-        const picksCount = DB.matches.filter(m => DB.picks.find(p => p.user_id === u.id && p.match_id === m.id && p.ot)).length;
-        return `
-          <div class="participant-card ${u.is_admin?"admin-user":""}" onclick="openParticipantModal('${u.id}')">
+        const picksCount=DB.matches.filter(m=>DB.picks.find(p=>p.user_id===u.id&&p.match_id===m.id&&p.ot)).length;
+        return`<div class="participant-card ${u.is_admin?"admin-user":""}" id="pcard_${u.id}">
+          <button style="position:absolute;top:8px;right:8px;background:transparent;border:none;color:var(--muted);font-size:14px;cursor:pointer;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .15s" onclick="event.stopPropagation();confirmDeleteUser('${u.id}')">✕</button>
+          <div onclick="openParticipantModal('${u.id}')">
             <div class="participant-name">${u.name}</div>
             <span class="participant-badge ${u.is_admin?"admin":"user"}">${u.is_admin?"⚙️ ADMIN":"✅ ACTIVO"}</span>
-            <div class="participant-champ">Campeón: <b>${ct ? ct.id+" "+ct.name : "Sin elegir"}</b></div>
+            <div class="participant-champ">Campeón: <b>${ct?ct.id+" "+ct.name:"Sin elegir"}</b></div>
             <div class="participant-progress">${dots}</div>
             <div class="participant-stats">
               <div class="pstat"><div class="pstat-val">${picksCount}</div><div class="pstat-lbl">PICKS</div></div>
               <div class="pstat"><div class="pstat-val">${playedCount}</div><div class="pstat-lbl">JUGADOS</div></div>
               <div class="pstat"><div class="pstat-val">${stats.pts}</div><div class="pstat-lbl">PUNTOS</div></div>
             </div>
-          </div>`;
+          </div></div>`;
       }).join("");
 
-  const matchCards = DB.matches.map(m => {
-    const pickRows = DB.users.map(u => {
-      const pick = DB.picks.find(p => p.user_id === u.id && p.match_id === m.id);
-      if (!pick?.ot) return `<div class="admin-pick-row"><span class="admin-pick-name">${u.name}</span><span class="admin-pick-ot" style="color:var(--muted)">–</span><span class="admin-pick-sc">–</span><span class="admin-pick-pts zero">–</span></div>`;
-      const p = calcPickPts(pick, m);
-      const otLabel = { "1":"LOC","X":"EMP","2":"VIS" }[pick.ot];
-      const otColor = { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot];
-      const sc = pick.home_score !== null ? `${pick.home_score} - ${pick.away_score}` : "–";
-      return `<div class="admin-pick-row">
-        <span class="admin-pick-name">${u.name}</span>
-        <span class="admin-pick-ot" style="color:${otColor}">${otLabel}</span>
-        <span class="admin-pick-sc">${sc}</span>
-        <span class="admin-pick-pts ${p.total===0?"zero":""}">${m.done ? p.total : "–"}</span>
-      </div>`;
-    }).join("") || `<div style="font-size:11px;color:var(--muted);padding:4px 0">Sin participantes aún</div>`;
-
-    return `
-      <div class="admin-match-card ${m.done?"done-card":""}" id="admc_${m.id}">
-        <div class="admin-match-title">${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag} · ${fmtTime(m.timeISO)}</div>
-        <div class="admin-row">
-          <span class="admin-label">MARCADOR</span>
-          <input class="admin-score-input" type="number" min="0" max="20" id="adm_hs_${m.id}" value="${m.result?.homeScore??""}" placeholder="–" />
+  // Acordeón por fase
+  const phaseOrder=PHASE_ORDER;
+  const matchPhases=[...new Set(DB.matches.map(m=>m.phase||"General"))];
+  matchPhases.sort((a,b)=>phaseOrder.indexOf(a)-phaseOrder.indexOf(b));
+  const matchCards=matchPhases.map(phase=>{
+    const pMatches=DB.matches.filter(m=>(m.phase||"General")===phase);
+    const doneCnt=pMatches.filter(m=>m.done).length;
+    const cards=pMatches.map(m=>{
+      const pickRows=DB.users.map(u=>{
+        const pick=DB.picks.find(p=>p.user_id===u.id&&p.match_id===m.id);
+        if(!pick?.ot)return`<div class="admin-pick-row"><span class="admin-pick-name">${u.name}</span><span class="admin-pick-ot" style="color:var(--muted)">–</span><span class="admin-pick-sc">–</span><span class="admin-pick-pts zero">–</span></div>`;
+        const p=calcPickPts(pick,m),otLabel={"1":"LOC","X":"EMP","2":"VIS"}[pick.ot];
+        const otColor={"1":"var(--blue)","X":"var(--gold)","2":"var(--danger)"}[pick.ot];
+        const sc=pick.home_score!==null?`${pick.home_score} - ${pick.away_score}`:"–";
+        return`<div class="admin-pick-row"><span class="admin-pick-name">${u.name}</span><span class="admin-pick-ot" style="color:${otColor}">${otLabel}</span><span class="admin-pick-sc">${sc}</span><span class="admin-pick-pts ${p.total===0?"zero":""}">${m.done?p.total:"–"}</span></div>`;
+      }).join("")||`<div style="font-size:11px;color:var(--muted);padding:4px 0">Sin participantes aún</div>`;
+      return`<div class="admin-match-card ${m.done?"done-card":""}" id="admc_${m.id}">
+        <div class="admin-match-title">${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag} · ${m.day} ${fmtTime(m.timeISO)}</div>
+        <div class="admin-row"><span class="admin-label">MARCADOR</span>
+          <input class="admin-score-input" type="number" min="0" max="20" id="adm_hs_${m.id}" value="${m.result?.homeScore??""}" placeholder="–"/>
           <span style="color:var(--gray-3);font-size:20px;font-family:'Bebas Neue',Arial,sans-serif"> : </span>
-          <input class="admin-score-input" type="number" min="0" max="20" id="adm_as_${m.id}" value="${m.result?.awayScore??""}" placeholder="–" />
+          <input class="admin-score-input" type="number" min="0" max="20" id="adm_as_${m.id}" value="${m.result?.awayScore??""}" placeholder="–"/>
         </div>
-        <div class="admin-row">
-          <span class="admin-label">CLASIFICADO</span>
+        <div class="admin-row"><span class="admin-label">CLASIFICADO</span>
           <select class="admin-select" id="adm_w_${m.id}">
             <option value="">-- Seleccionar --</option>
             <option value="home" ${m.winner==="home"?"selected":""}>${m.homeFlag} ${m.home}</option>
             <option value="away" ${m.winner==="away"?"selected":""}>${m.awayFlag} ${m.away}</option>
           </select>
         </div>
-        <div class="admin-row">
-          <span class="admin-label">ESTADO</span>
+        <div class="admin-row"><span class="admin-label">ESTADO</span>
           <select class="admin-select" id="adm_done_${m.id}">
             <option value="0" ${!m.done?"selected":""}>Pendiente / En juego</option>
             <option value="1" ${m.done?"selected":""}>✅ Finalizado</option>
           </select>
         </div>
-        <div class="admin-footer">
-          <button class="admin-save-btn" onclick="adminSaveMatch('${m.id}')">💾 GUARDAR RESULTADO</button>
-        </div>
+        <div class="admin-footer"><button class="admin-save-btn" onclick="adminSaveMatch('${m.id}')">💾 GUARDAR RESULTADO</button></div>
         <div class="admin-picks-summary">
-          <div class="admin-picks-title">PICKS DE PARTICIPANTES</div>
+          <div class="admin-picks-title" style="display:flex;justify-content:space-between">
+            <span>PICKS DE PARTICIPANTES</span>
+            <span style="font-size:9px;color:var(--gold);font-weight:700">${m.phase?.toUpperCase()||""} · ${m.day}</span>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 42px 58px 32px;margin-bottom:3px;padding-bottom:4px;border-bottom:1px solid var(--gray-3)">
             <span style="font-size:9px;color:var(--muted);font-weight:700">JUGADOR</span>
             <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RES.</span>
             <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARCADOR</span>
             <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
-          </div>
-          ${pickRows}
+          </div>${pickRows}
+        </div></div>`;
+    }).join("");
+    const accId=`acc_${phase.replace(/[^a-z0-9]/gi,"")}`;
+    return`<div style="margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 13px;background:var(--gray-2);border-radius:var(--rs);margin-bottom:6px;border:1px solid var(--gray-3)" onclick="toggleAdminAcc('${accId}')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:'Bebas Neue','Arial Narrow',Arial,sans-serif;font-size:14px;letter-spacing:1.5px;color:var(--gold)">${phase}</span>
+          <span style="font-size:10px;color:var(--muted)">${doneCnt}/${pMatches.length} finalizados</span>
         </div>
-      </div>`;
+        <span style="font-size:11px;color:var(--muted);transition:transform .2s;display:inline-block" id="arr_${accId}">▼</span>
+      </div>
+      <div style="display:none" id="${accId}">${cards}</div></div>`;
   }).join("");
 
-  document.getElementById("adminPanel").innerHTML = `
+  const bannedSection=DB.bannedNames?.length?`
+    <div style="margin-top:10px;padding:10px 12px;background:var(--gray-2);border-radius:var(--rs)">
+      <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:6px">ACCESO BLOQUEADO</div>
+      ${DB.bannedNames.map(n=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--gray-3)">
+          <span style="flex:1;font-size:12px;color:var(--danger)">🚫 ${n}</span>
+          <button class="admin-save-btn" style="padding:4px 10px;font-size:10px;background:var(--gray-3)" onclick="unbanUser('${n}')">Desbloquear</button>
+        </div>`).join("")}
+    </div>`:"";
+
+  document.getElementById("adminPanel").innerHTML=`
     <div class="admin-section">
       <div class="admin-title">PARTICIPANTES (${DB.users.length})</div>
-      <div class="participants-grid">${participantCards}</div>
+      <div class="participants-grid" style="position:relative">${participantCards}</div>
+      ${bannedSection}
     </div>
     <div class="admin-section">
       <div class="admin-title">RESULTADOS DE PARTIDOS</div>
@@ -1021,86 +1335,79 @@ function renderAdmin() {
     <div class="admin-section">
       <div class="admin-title">CAMPEÓN DEL TORNEO</div>
       <div class="admin-match-card">
-        <div class="admin-row">
-          <span class="admin-label">GANADOR</span>
+        <div class="admin-row"><span class="admin-label">GANADOR</span>
           <select class="admin-select" id="adm_champ_winner">
             <option value="">-- No definido --</option>
-            ${CHAMPION_TEAMS.map(t => `<option value="${t.id}" ${DB.championWinner===t.id?"selected":""}>${t.id} ${t.name}</option>`).join("")}
+            ${CHAMPION_TEAMS.map(t=>`<option value="${t.id}" ${DB.championWinner===t.id?"selected":""}>${t.id} ${t.name}</option>`).join("")}
           </select>
         </div>
-        <div class="admin-footer">
-          <button class="admin-save-btn" onclick="adminSaveChampion()">💾 GUARDAR CAMPEÓN</button>
-        </div>
+        <div class="admin-footer"><button class="admin-save-btn" onclick="adminSaveChampion()">💾 GUARDAR CAMPEÓN</button></div>
       </div>
     </div>
     <button class="recalc-btn" onclick="recalcAll()">🔄 ACTUALIZAR TABLA DE POSICIONES</button>`;
 }
 
-async function adminSaveMatch(matchId) {
-  const match  = DB.matches.find(m => m.id === matchId);
-  const hs     = parseInt(document.getElementById(`adm_hs_${matchId}`).value);
-  const as_    = parseInt(document.getElementById(`adm_as_${matchId}`).value);
-  const winner = document.getElementById(`adm_w_${matchId}`).value;
-  const done   = document.getElementById(`adm_done_${matchId}`).value === "1";
-  const payload = { match_id: matchId, home_score: isNaN(hs)?null:hs, away_score: isNaN(as_)?null:as_, winner: winner||null, done };
-  try {
-    await supabase.upsert("match_results", payload);
-    if (!isNaN(hs) && !isNaN(as_)) match.result = { homeScore: hs, awayScore: as_ };
-    match.winner = winner || null;
-    match.done   = done;
-    showToast(`✅ ${match.homeFlag} vs ${match.awayFlag} guardado`, "success");
-    renderMatches(); renderRanking(); renderAdmin();
-  } catch(e) { showToast("Error al guardar", "error"); console.error(e); }
+function toggleAdminAcc(id){
+  const body=document.getElementById(id),arrow=document.getElementById(`arr_${id}`);
+  if(!body)return;const open=body.style.display!=="none";
+  body.style.display=open?"none":"block";
+  if(arrow)arrow.style.transform=open?"":"rotate(180deg)";
 }
 
-async function adminSaveChampion() {
-  const val = document.getElementById("adm_champ_winner").value || null;
-  try {
-    await supabase.upsert("settings", { key: "champion_winner", value: val });
-    DB.championWinner = val;
-    const t = CHAMPION_TEAMS.find(t => t.id === val);
-    showToast(t ? `✅ Campeón: ${t.id} ${t.name}` : "✅ Campeón eliminado", "success");
+async function adminSaveMatch(matchId){
+  const match=DB.matches.find(m=>m.id===matchId);
+  const hs=parseInt(document.getElementById(`adm_hs_${matchId}`).value);
+  const as_=parseInt(document.getElementById(`adm_as_${matchId}`).value);
+  const winner=document.getElementById(`adm_w_${matchId}`).value;
+  const done=document.getElementById(`adm_done_${matchId}`).value==="1";
+  const payload={match_id:matchId,home_score:isNaN(hs)?null:hs,away_score:isNaN(as_)?null:as_,winner:winner||null,done};
+  try{
+    await supabase.upsert("match_results",payload);
+    if(!isNaN(hs)&&!isNaN(as_))match.result={homeScore:hs,awayScore:as_};
+    match.winner=winner||null;match.done=done;
+    showToast(`✅ ${match.homeFlag} vs ${match.awayFlag} guardado`,"success");
+    renderMatches();renderRanking();renderAdmin();
+  }catch(e){showToast("Error al guardar","error");console.error(e);}
+}
+async function adminSaveChampion(){
+  const val=document.getElementById("adm_champ_winner").value||null;
+  try{
+    await supabase.upsert("settings",{key:"champion_winner",value:val});
+    DB.championWinner=val;
+    const t=CHAMPION_TEAMS.find(t=>t.id===val);
+    showToast(t?`✅ Campeón: ${t.id} ${t.name}`:"✅ Campeón eliminado","success");
     renderRanking();
-  } catch(e) { showToast("Error al guardar", "error"); console.error(e); }
+  }catch(e){showToast("Error al guardar","error");console.error(e);}
+}
+async function recalcAll(){
+  showLoading("Actualizando...");await loadAll();hideLoading();
+  renderRanking();showToast("✅ Tabla actualizada","success");switchTab("ranking");
 }
 
-async function recalcAll() {
-  showLoading("Actualizando...");
-  await loadAll();
-  hideLoading();
-  renderRanking();
-  showToast("✅ Tabla actualizada", "success");
-  switchTab("ranking");
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   MODAL PARTICIPANTE
-═══════════════════════════════════════════════════════════════ */
-function openParticipantModal(userId) {
-  const user  = DB.users.find(u => u.id === userId);
-  if (!user) return;
-  const stats = calcUserStats(user);
-  const ct    = CHAMPION_TEAMS.find(t => t.id === user.champion);
-  document.getElementById("modalTitle").textContent = user.name;
-  const pickRows = DB.matches.map(m => {
-    const pick   = DB.picks.find(p => p.user_id === user.id && p.match_id === m.id);
-    const p      = calcPickPts(pick, m);
-    const otLabel = pick?.ot ? { "1":"LOCAL","X":"EMPATE","2":"VISITA" }[pick.ot] : "–";
-    const otColor = pick?.ot ? { "1":"var(--blue)","X":"var(--gold)","2":"var(--danger)" }[pick.ot] : "var(--muted)";
-    const sc = pick?.home_score !== null && pick?.home_score !== undefined ? `${pick.home_score} - ${pick.away_score}` : "–";
-    const ptsStr = m.done ? p.total : (pick?.ot ? "?" : "–");
-    return `<div class="modal-pick-row">
+/* ── MODAL PARTICIPANTE ──────────────────────────────────────────────────── */
+function openParticipantModal(userId){
+  const user=DB.users.find(u=>u.id===userId);if(!user)return;
+  const stats=calcUserStats(user),ct=CHAMPION_TEAMS.find(t=>t.id===user.champion);
+  document.getElementById("modalTitle").textContent=user.name;
+  const pickRows=DB.matches.map(m=>{
+    const pick=DB.picks.find(p=>p.user_id===user.id&&p.match_id===m.id);
+    const p=calcPickPts(pick,m);
+    const otLabel=pick?.ot?{"1":"LOCAL","X":"EMPATE","2":"VISITA"}[pick.ot]:"–";
+    const otColor=pick?.ot?{"1":"var(--blue)","X":"var(--gold)","2":"var(--danger)"}[pick.ot]:"var(--muted)";
+    const sc=pick?.home_score!==null&&pick?.home_score!==undefined?`${pick.home_score} - ${pick.away_score}`:"–";
+    const ptsStr=m.done?p.total:(pick?.ot?"?":"–");
+    return`<div class="modal-pick-row">
       <div class="modal-pick-match"><b>${m.homeFlag} vs ${m.awayFlag}</b><br>${m.home} · ${m.away}</div>
       <div class="modal-pick-ot" style="color:${otColor}">${otLabel}</div>
       <div class="modal-pick-sc">${sc}</div>
-      <div class="modal-pick-pts ${p.total===0 && m.done?"zero":""}">${ptsStr}</div>
+      <div class="modal-pick-pts ${p.total===0&&m.done?"zero":""}">${ptsStr}</div>
     </div>`;
   }).join("");
-  document.getElementById("modalBody").innerHTML = `
+  document.getElementById("modalBody").innerHTML=`
     <div class="modal-champ-row">
       <span class="modal-champ-icon">🏆</span>
-      <div class="modal-champ-text">Campeón elegido: <b>${ct ? ct.id+" "+ct.name : "Sin elegir"}</b>
-        ${DB.championWinner ? (DB.championWinner===user.champion ? " · <span style='color:var(--success)'>✅ +5 pts</span>" : " · <span style='color:var(--danger)'>✗ 0 pts</span>") : ""}
+      <div class="modal-champ-text">Campeón elegido: <b>${ct?ct.id+" "+ct.name:"Sin elegir"}</b>
+        ${DB.championWinner?(DB.championWinner===user.champion?" · <span style='color:var(--success)'>✅ +5 pts</span>":" · <span style='color:var(--danger)'>✗ 0 pts</span>"):""}
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 54px 54px 28px;gap:4px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--gray-2)">
@@ -1108,73 +1415,94 @@ function openParticipantModal(userId) {
       <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RESULTADO</span>
       <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARCADOR</span>
       <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
-    </div>
-    ${pickRows}
+    </div>${pickRows}
     <div class="modal-total-row">
       <span class="modal-total-label">TOTAL ACUMULADO</span>
       <span class="modal-total-pts">${stats.pts} <span style="font-size:14px;color:var(--muted)">pts</span></span>
     </div>`;
   document.getElementById("participantModal").classList.add("open");
 }
-
-function closeParticipantModal(event) {
-  if (event && event.target !== document.getElementById("participantModal")) return;
+function closeParticipantModal(event){
+  if(event&&event.target!==document.getElementById("participantModal"))return;
   document.getElementById("participantModal").classList.remove("open");
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   UTILIDADES
-═══════════════════════════════════════════════════════════════ */
-function showLoading(msg = "Cargando...") {
-  document.getElementById("loadingText").textContent = msg;
-  document.getElementById("loadingOverlay").classList.remove("hidden");
-}
-function hideLoading() { document.getElementById("loadingOverlay").classList.add("hidden"); }
-
-let toastTimer;
-function showToast(msg, type = "success") {
-  const t = document.getElementById("toast");
-  t.textContent = msg; t.className = `toast ${type} visible`;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove("visible"), 2800);
-}
-
-function showUserMenu() {
-  if (confirm(`Sesión activa: ${currentUser.name}\n\n¿Cerrar sesión?`)) {
-    sessionStorage.removeItem("qm26_uid");
-    location.reload();
+/* ── ELIMINAR / DESBLOQUEAR USUARIO ──────────────────────────────────────── */
+function confirmDeleteUser(userId){
+  const card=document.getElementById(`pcard_${userId}`);if(!card)return;
+  if(userId===currentUser.id){showToast("No puedes eliminarte a ti mismo","error");return;}
+  if(card.classList.contains("confirm-delete")){
+    card.classList.remove("confirm-delete");card.querySelector(".confirm-delete-bar")?.remove();return;
   }
+  const user=DB.users.find(u=>u.id===userId);
+  card.classList.add("confirm-delete");
+  card.style.borderColor="var(--danger)";
+  const bar=document.createElement("div");
+  bar.className="confirm-delete-bar";
+  bar.style.cssText="display:flex;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(224,82,82,.3)";
+  bar.innerHTML=`
+    <button style="flex:1;background:var(--gray-2);border:1px solid var(--gray-3);border-radius:6px;padding:6px 4px;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer" onclick="event.stopPropagation();cancelDeleteUser('${userId}')">CANCELAR</button>
+    <button style="flex:1;background:var(--danger);border:none;border-radius:6px;padding:6px 4px;font-size:10px;font-weight:700;color:var(--white);cursor:pointer" onclick="event.stopPropagation();deleteUser('${userId}')">🗑 ELIMINAR</button>`;
+  card.appendChild(bar);
 }
-
-/* ═══════════════════════════════════════════════════════════════
-   INICIO
-═══════════════════════════════════════════════════════════════ */
-(async function init() {
-  // Verifica config de Supabase
-  if (CONFIG.SUPABASE_URL.includes("TU_PROYECTO") || CONFIG.SUPABASE_ANON === "TU_ANON_KEY") {
-    document.getElementById("loginScreen").querySelector(".login-card").insertAdjacentHTML("afterbegin",
-      `<div class="config-banner"><b>⚠️ Configuración pendiente</b>Reemplaza <code>SUPABASE_URL</code> y <code>SUPABASE_ANON</code> en el bloque CONFIG del archivo HTML. Consulta el README para los pasos.</div>`);
-    return;
-  }
-  try {
-    showLoading("Conectando...");
-    await loadAll();
-    hideLoading();
-    // Intenta reanudar sesión
-    const uid = sessionStorage.getItem("qm26_uid");
-    if (uid) {
-      const user = DB.users.find(u => u.id === uid);
-      if (user) { currentUser = user; bootApp(); return; }
+function cancelDeleteUser(userId){
+  const card=document.getElementById(`pcard_${userId}`);if(!card)return;
+  card.classList.remove("confirm-delete");card.style.borderColor="";
+  card.querySelector(".confirm-delete-bar")?.remove();
+}
+async function deleteUser(userId){
+  const user=DB.users.find(u=>u.id===userId);if(!user)return;
+  showLoading(`Eliminando a ${user.name}...`);
+  try{
+    await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/picks?user_id=eq.${userId}`,{method:"DELETE",headers:SB_HEADERS()});
+    await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/users?id=eq.${userId}`,{method:"DELETE",headers:SB_HEADERS()});
+    // Lista negra
+    const bannedRaw=await supabase.get("settings","?key=eq.banned_names").catch(()=>[]);
+    const bannedList=bannedRaw?.[0]?.value?JSON.parse(bannedRaw[0].value):[];
+    if(!bannedList.map(n=>n.toLowerCase()).includes(user.name.toLowerCase())){
+      bannedList.push(user.name);
+      await supabase.upsert("settings",{key:"banned_names",value:JSON.stringify(bannedList)});
     }
-    // Muestra login
-    document.getElementById("loginScreen").style.display = "flex";
-  } catch(e) {
-    hideLoading();
-    document.getElementById("loginScreen").style.display = "flex";
-    document.getElementById("loginScreen").querySelector(".login-card").insertAdjacentHTML("afterbegin",
-      `<div class="config-banner"><b>⚠️ Error de conexión</b>No se pudo conectar con Supabase. Verifica que la URL y la clave sean correctas.</div>`);
-    console.error(e);
+    DB.bannedNames=bannedList;
+    DB.picks=DB.picks.filter(p=>p.user_id!==userId);
+    DB.users=DB.users.filter(u=>u.id!==userId);
+    hideLoading();showToast(`✅ ${user.name} eliminado`,"success");
+    renderAdmin();renderRanking();
+  }catch(e){hideLoading();showToast("Error al eliminar","error");console.error(e);}
+}
+async function unbanUser(name){
+  DB.bannedNames=(DB.bannedNames||[]).filter(n=>n.toLowerCase()!==name.toLowerCase());
+  await supabase.upsert("settings",{key:"banned_names",value:JSON.stringify(DB.bannedNames)});
+  showToast(`✅ ${name} puede volver a registrarse`,"success");renderAdmin();
+}
+
+/* ── UTILIDADES ──────────────────────────────────────────────────────────── */
+function showLoading(msg="Cargando..."){document.getElementById("loadingText").textContent=msg;document.getElementById("loadingOverlay").classList.remove("hidden");}
+function hideLoading(){document.getElementById("loadingOverlay").classList.add("hidden");}
+let toastTimer;
+function showToast(msg,type="success"){
+  const t=document.getElementById("toast");t.textContent=msg;t.className=`toast ${type} visible`;
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("visible"),2800);
+}
+function showUserMenu(){
+  if(confirm(`Sesión activa: ${currentUser.name}\n\n¿Cerrar sesión?`)){
+    sessionStorage.removeItem("qm26_uid");location.reload();
   }
+}
+
+/* ── INICIO ──────────────────────────────────────────────────────────────── */
+(async function init(){
+  if(CONFIG.SUPABASE_URL.includes("TU_PROYECTO")||CONFIG.SUPABASE_ANON==="TU_ANON_KEY"){
+    document.getElementById("loginScreen").querySelector(".login-card").insertAdjacentHTML("afterbegin",
+      `<div class="config-banner"><b>⚠️ Configuración pendiente</b>Reemplaza <code>SUPABASE_URL</code> y <code>SUPABASE_ANON</code> en el bloque CONFIG.</div>`);
+    document.getElementById("loginScreen").style.display="flex";return;
+  }
+  const uid=sessionStorage.getItem("qm26_uid");
+  try{
+    showLoading("Conectando...");await loadAll();hideLoading();
+    if(uid){const user=DB.users.find(u=>u.id===uid);if(user){currentUser=user;bootApp();return;}sessionStorage.removeItem("qm26_uid");}
+  }catch(e){hideLoading();console.error("init error:",e);}
+  document.getElementById("loginScreen").style.display="flex";
 })();
 </script>
 </body>
