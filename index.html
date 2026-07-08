@@ -472,6 +472,44 @@
     .modal-total-pts { font-family: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif; font-size: 30px; color: var(--gold); line-height: 1; }
 
     /* RECALC */
+
+    /* ─── ADMIN: AGREGAR PARTIDO ─────────────────────────────── */
+    .add-match-form {
+      background: var(--gray-1); border: 1px solid var(--gray-2);
+      border-radius: var(--r); padding: 14px; margin-bottom: 8px;
+    }
+    .add-match-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .add-match-input {
+      width: 100%; background: var(--gray-2); border: 1.5px solid var(--gray-3);
+      border-radius: var(--rs); padding: 10px 12px; color: var(--white);
+      font-size: 13px; margin-bottom: 0;
+    }
+    .add-match-input:focus { outline: none; border-color: var(--gold); }
+    .add-match-select {
+      flex: 1; background: var(--gray-2); border: 1.5px solid var(--gray-3);
+      border-radius: var(--rs); color: var(--white); font-size: 13px;
+      padding: 9px 8px; cursor: pointer;
+    }
+    .add-match-select:focus { outline: none; border-color: var(--gold); }
+    .add-match-label {
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      letter-spacing: 0.5px; margin-bottom: 5px; display: block;
+    }
+    .add-match-group { margin-bottom: 10px; }
+    .add-match-preview {
+      font-size: 10px; color: var(--muted); padding: 7px 10px;
+      background: var(--gray-2); border-radius: var(--rs); margin-bottom: 10px;
+      min-height: 28px; line-height: 1.5;
+    }
+    .add-match-preview b { color: var(--white); }
+    .add-match-preview span { color: var(--gray-3); font-size: 9px; }
+    .add-match-btn {
+      width: 100%; background: var(--green-mid); border: none;
+      border-radius: var(--rs); padding: 11px; color: var(--white);
+      font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.15s;
+    }
+    .add-match-btn:active { background: var(--success); }
+
     .recalc-btn { width: 100%; background: var(--gold); border: none; border-radius: var(--rs); padding: 13px; font-size: 14px; font-weight: 700; color: var(--green-deep); cursor: pointer; margin-top: 6px; letter-spacing: 0.3px; }
 
     /* LOADING */
@@ -1508,6 +1546,98 @@ function togglePhaseRank(id){
 }
 
 /* ── RESUMEN DE JORNADA ──────────────────────────────────────────────────── */
+
+/* ═══════════════════════════════════════════════════════════════
+   AGREGAR PARTIDO DESDE ADMIN
+═══════════════════════════════════════════════════════════════ */
+function nmBuildDayLabel(d, m, y) {
+  const DIAS  = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+  const MESES = ["","Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+  const date  = new Date(`${y}-${m}-${d}T12:00:00`);
+  return `${DIAS[date.getDay()]} ${d} ${MESES[parseInt(m)]}`;
+}
+
+function nmBuildISO(d, m, y, hh, mm) {
+  return `${y}-${m}-${d}T${hh}:${mm}:00-04:00`;
+}
+
+function nmPreview() {
+  const d  = document.getElementById("nm_d")?.value;
+  const m  = document.getElementById("nm_m")?.value;
+  const y  = document.getElementById("nm_y")?.value;
+  const hh = document.getElementById("nm_hh")?.value;
+  const mm = document.getElementById("nm_mm")?.value;
+  const phase = document.getElementById("nm_phase")?.value || "";
+  const prev = document.getElementById("nm_preview");
+  if (!prev || !d || !m || !y || !hh || !mm) return;
+  const label = nmBuildDayLabel(d, m, y);
+  const iso   = nmBuildISO(d, m, y, hh, mm);
+  prev.innerHTML = `<b>${phase} · ${label} · ${hh}:${mm} (Chile)</b><br><span>${iso}</span>`;
+}
+
+async function adminAddMatch() {
+  const home     = document.getElementById("nm_home")?.value.trim();
+  const homeFlag = document.getElementById("nm_home_flag")?.value.trim().toUpperCase();
+  const away     = document.getElementById("nm_away")?.value.trim();
+  const awayFlag = document.getElementById("nm_away_flag")?.value.trim().toUpperCase();
+  const phase    = document.getElementById("nm_phase")?.value;
+  const d  = document.getElementById("nm_d")?.value;
+  const m  = document.getElementById("nm_m")?.value;
+  const y  = document.getElementById("nm_y")?.value;
+  const hh = document.getElementById("nm_hh")?.value;
+  const mm = document.getElementById("nm_mm")?.value;
+
+  // Validaciones
+  if (!home || !homeFlag || !away || !awayFlag) {
+    showToast("Completa los nombres y códigos FIFA de ambos equipos", "error"); return;
+  }
+  if (homeFlag.length < 2 || awayFlag.length < 2) {
+    showToast("Los códigos FIFA deben tener 2-3 letras", "error"); return;
+  }
+
+  const day     = nmBuildDayLabel(d, m, y);
+  const timeISO = nmBuildISO(d, m, y, hh, mm);
+
+  // Generar ID único que no colisione con los existentes
+  const existingIds = DB.matches.map(mx => mx.id);
+  let num = DB.matches.length + 1;
+  let newId = `m${String(num).padStart(2, "0")}`;
+  while (existingIds.includes(newId)) { num++; newId = `m${String(num).padStart(2, "0")}`; }
+
+  const newMatch = { id: newId, phase, day, timeISO, home, homeFlag, away, awayFlag };
+
+  try {
+    // Guardar en Supabase tabla extra_matches
+    await supabase.upsert("extra_matches", {
+      match_id:  newId,
+      phase, day,
+      time_iso:  timeISO,
+      home,      home_flag: homeFlag,
+      away,      away_flag: awayFlag,
+    });
+
+    // Actualizar cache local y re-ordenar por hora
+    DB.matches.push({ ...newMatch, result: null, winner: null, done: false });
+    DB.matches.sort((a, b) => new Date(a.timeISO) - new Date(b.timeISO));
+
+    showToast(`✅ ${homeFlag} ${home} vs ${away} ${awayFlag} · ${day} ${hh}:${mm}`, "success");
+
+    // Limpiar campos de texto (mantener selects en sus valores)
+    ["nm_home","nm_home_flag","nm_away","nm_away_flag"].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = "";
+    });
+    const prev = document.getElementById("nm_preview");
+    if (prev) prev.innerHTML = "Completa los campos para ver la vista previa";
+
+    // Refrescar vistas
+    renderAdmin();
+    renderMatches();
+  } catch(e) {
+    showToast("Error al guardar en Supabase. ¿Existe la tabla extra_matches?", "error");
+    console.error(e);
+  }
+}
+
 function copyDaySummary(){
   const ranking=calcRanking();
   const playedToday=DB.matches.filter(m=>m.done);
@@ -1665,6 +1795,59 @@ function renderAdmin(){
           </select>
         </div>
         <div class="admin-footer"><button class="admin-save-btn" onclick="adminSaveChampion()">💾 GUARDAR CAMPEÓN</button></div>
+      </div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-title">AGREGAR PARTIDO</div>
+      <div class="add-match-form">
+
+        <div class="add-match-group">
+          <label class="add-match-label">EQUIPO LOCAL</label>
+          <div class="add-match-row">
+            <input class="add-match-input" id="nm_home" placeholder="Nombre (ej: España)" style="flex:1" />
+            <input class="add-match-input" id="nm_home_flag" placeholder="FIFA" style="max-width:72px;text-transform:uppercase" maxlength="3" />
+          </div>
+        </div>
+
+        <div class="add-match-group">
+          <label class="add-match-label">EQUIPO VISITA</label>
+          <div class="add-match-row">
+            <input class="add-match-input" id="nm_away" placeholder="Nombre (ej: Croacia)" style="flex:1" />
+            <input class="add-match-input" id="nm_away_flag" placeholder="FIFA" style="max-width:72px;text-transform:uppercase" maxlength="3" />
+          </div>
+        </div>
+
+        <div class="add-match-group">
+          <label class="add-match-label">FASE</label>
+          <select class="add-match-select" id="nm_phase" onchange="nmPreview()">
+            <option value="8vos">8vos de Final</option>
+            <option value="Cuartos">Cuartos de Final</option>
+            <option value="Semis">Semifinales</option>
+            <option value="Final">Final</option>
+          </select>
+        </div>
+
+        <div class="add-match-group">
+          <label class="add-match-label">FECHA (hora Chile, UTC-4)</label>
+          <div class="add-match-row">
+            <select class="add-match-select" id="nm_d" onchange="nmPreview()"><option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option><option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option><option value="09">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option></select>
+            <select class="add-match-select" id="nm_m" onchange="nmPreview()"><option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option></select>
+            <select class="add-match-select" id="nm_y" onchange="nmPreview()" style="max-width:90px"><option value="2026">2026</option><option value="2027">2027</option></select>
+          </div>
+        </div>
+
+        <div class="add-match-group">
+          <label class="add-match-label">HORA DE INICIO</label>
+          <div class="add-match-row" style="align-items:center">
+            <select class="add-match-select" id="nm_hh" onchange="nmPreview()"><option value="00">00</option><option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option><option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option><option value="09">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option></select>
+            <span style="color:var(--muted);font-family:'Bebas Neue',Arial,sans-serif;font-size:20px;padding:0 4px;line-height:1">:</span>
+            <select class="add-match-select" id="nm_mm" onchange="nmPreview()"><option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select>
+          </div>
+        </div>
+
+        <div class="add-match-preview" id="nm_preview">Completa los campos para ver la vista previa</div>
+
+        <button class="add-match-btn" onclick="adminAddMatch()">➕ AGREGAR PARTIDO</button>
       </div>
     </div>
     <button class="recalc-btn" onclick="recalcAll()">🔄 ACTUALIZAR TABLA DE POSICIONES</button>`;
