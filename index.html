@@ -541,6 +541,46 @@
       font-weight: 700; cursor: pointer; white-space: nowrap;
     }
 
+
+    /* ─── GOLEADOR DEL TORNEO ───────────────────────────────────── */
+    .scorer-section {
+      background: linear-gradient(135deg, rgba(244,196,48,.06) 0%, transparent 100%);
+      border: 2px solid rgba(244,196,48,.4); border-radius: var(--r);
+      padding: 15px; margin-bottom: 18px;
+    }
+    .scorer-title {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 21px; color: var(--gold); letter-spacing: 2px; margin-bottom: 3px;
+    }
+    .scorer-subtitle { font-size: 11px; color: var(--muted); margin-bottom: 13px; line-height: 1.4; }
+    .scorer-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 7px; margin-bottom: 11px; }
+    .scorer-btn {
+      background: var(--gray-2); border: 1.5px solid var(--gray-3);
+      border-radius: var(--rs); padding: 10px 8px; cursor: pointer;
+      text-align: left; transition: all 0.14s; display: flex; align-items: center; gap: 10px;
+    }
+    .scorer-btn:active { transform: scale(0.97); }
+    .scorer-btn.selected { border-color: var(--gold); background: rgba(244,196,48,.12); }
+    .scorer-btn.locked-scorer { opacity: 0.45; cursor: not-allowed; }
+    .scorer-avatar {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: var(--gray-3); border: 2px solid var(--gray-3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 13px; color: var(--muted); letter-spacing: 0.5px;
+    }
+    .scorer-btn.selected .scorer-avatar { border-color: var(--gold); color: var(--gold); background: rgba(244,196,48,.15); }
+    .scorer-info { flex: 1; min-width: 0; }
+    .scorer-name { font-size: 12px; font-weight: 700; color: var(--white); }
+    .scorer-btn.selected .scorer-name { color: var(--gold); }
+    .scorer-team { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .save-scorer-btn {
+      width: 100%; background: var(--gold); border: none; border-radius: var(--rs);
+      padding: 11px; font-size: 14px; font-weight: 700; color: var(--green-deep);
+      cursor: pointer; letter-spacing: 0.4px; transition: opacity 0.18s;
+    }
+    .save-scorer-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+
     /* ─── ADMIN: AGREGAR PARTIDO ─────────────────────────────── */
     .add-match-form {
       background: var(--gray-1); border: 1px solid var(--gray-2);
@@ -665,6 +705,12 @@
         <div class="champion-grid" id="champGrid"></div>
         <button class="save-champ-btn" id="saveChampBtn" onclick="saveChampion()">GUARDAR MI CAMPEÓN</button>
       </div>
+      <div class="scorer-section" id="scorerSection">
+        <div class="scorer-title">⚽ GOLEADOR DEL TORNEO</div>
+        <div class="scorer-subtitle" id="scorerSubtitle"></div>
+        <div class="scorer-grid" id="scorerGrid"></div>
+        <button class="save-scorer-btn" id="saveScorerBtn" onclick="saveScorer()">GUARDAR MI GOLEADOR</button>
+      </div>
       <div id="matchesByDay"></div>
     </div>
 
@@ -751,6 +797,13 @@ const CHAMPION_TEAMS = [
 
 const PHASE_ORDER = ["16vos","8vos","Cuartos","Semis","Final","General"];
 
+const SCORER_PLAYERS = [
+  { id:"mbappe",  name:"K. Mbappé",  team:"FRA", initials:"KM" },
+  { id:"messi",   name:"L. Messi",   team:"ARG", initials:"LM" },
+  { id:"haaland", name:"E. Haaland", team:"NOR", initials:"EH" },
+  { id:"kane",    name:"H. Kane",    team:"ENG", initials:"HK" },
+];
+
 /* ── SUPABASE ────────────────────────────────────────────────────────────── */
 const SB_HEADERS = () => ({
   "Content-Type":  "application/json",
@@ -784,7 +837,7 @@ const supabase = {
 
 /* ── ESTADO GLOBAL ───────────────────────────────────────────────────────── */
 let currentUser = null;
-let DB = { users:[], matches:[], picks:[], championWinner:null, bannedNames:[] };
+let DB = { users:[], matches:[], picks:[], championWinner:null, scorerWinner:null, bannedNames:[] };
 
 /* ── CARGA DE DATOS ──────────────────────────────────────────────────────── */
 async function loadAll() {
@@ -815,6 +868,8 @@ async function loadAll() {
   DB.picks = picks;
   const cs = settings.find(s=>s.key==="champion_winner");
   DB.championWinner = cs?.value||null;
+  const ss = settings.find(s=>s.key==="scorer_winner");
+  DB.scorerWinner = ss?.value||null;
   const bs = settings.find(s=>s.key==="banned_names");
   DB.bannedNames = bs?.value ? JSON.parse(bs.value) : [];
 }
@@ -882,7 +937,9 @@ function calcUserStats(user) {
     ot+=p.ot; exact+=p.exact; advance+=p.advance; pts+=p.total;
   });
   if(DB.championWinner&&user.champion===DB.championWinner){champ=5;pts+=5;}
-  return {pts,ot,exact,advance,champ};
+  let scorer=0;
+  if(DB.scorerWinner&&user.scorer===DB.scorerWinner){scorer=5;pts+=5;}
+  return {pts,ot,exact,advance,champ,scorer};
 }
 
 // Puntos de un usuario en una fase específica
@@ -1037,7 +1094,7 @@ function bootApp() {
   if(savedTheme==="light")document.body.classList.add("light");
   document.getElementById("themeToggle").textContent=savedTheme==="light"?"🌙":"☀️";
 
-  renderChampion();renderMatches();renderRanking();
+  renderChampion();renderScorer();renderMatches();renderRanking();
   if(currentUser.is_admin)renderAdmin();
   setInterval(async()=>{
     try{await loadAll();renderMatches();renderRanking();if(currentUser.is_admin)renderAdmin();}
@@ -1063,6 +1120,55 @@ function switchTab(id) {
   document.getElementById(`tab-${id}`)?.classList.add("active");
   document.getElementById(`bnav-${id}`)?.classList.add("active");
   if(id==="stats")renderStats();
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   GOLEADOR DEL TORNEO
+═══════════════════════════════════════════════════════════════ */
+function scorerLocked() { return DB.matches.some(m => isStarted(m)); }
+
+function renderScorer() {
+  const locked   = scorerLocked();
+  const selected = currentUser.scorer;
+  const sp = SCORER_PLAYERS.find(p => p.id === selected);
+
+  document.getElementById("scorerSubtitle").textContent = locked
+    ? "⚠️ El torneo comenzó. Tu elección de goleador está bloqueada."
+    : "¿Quién será el máximo goleador? Acertar vale 5 pts.";
+
+  document.getElementById("scorerGrid").innerHTML = SCORER_PLAYERS.map(p => `
+    <button class="scorer-btn ${selected===p.id?"selected":""} ${locked&&selected!==p.id?"locked-scorer":""}"
+      onclick="${locked?"":` selectScorer('${p.id}')`}">
+      <div class="scorer-avatar">${p.initials}</div>
+      <div class="scorer-info">
+        <div class="scorer-name">${p.name}</div>
+        <div class="scorer-team">${p.team}</div>
+      </div>
+    </button>`).join("");
+
+  const btn = document.getElementById("saveScorerBtn");
+  btn.disabled = locked || !selected;
+  btn.textContent = locked
+    ? `BLOQUEADO: ${sp ? sp.name : "Sin elegir"}`
+    : "GUARDAR MI GOLEADOR";
+}
+
+async function selectScorer(playerId) {
+  if (scorerLocked()) { showToast("Ya no puedes cambiar el goleador","error"); return; }
+  currentUser.scorer = currentUser.scorer === playerId ? null : playerId;
+  const u = DB.users.find(u => u.id === currentUser.id);
+  if (u) u.scorer = currentUser.scorer;
+  try {
+    await supabase.patch("users", `?id=eq.${currentUser.id}`, { scorer: currentUser.scorer });
+  } catch(e) { showToast("Error al guardar","error"); console.error(e); }
+  renderScorer();
+}
+
+async function saveScorer() {
+  if (!currentUser.scorer) { showToast("Elige un goleador primero","error"); return; }
+  const sp = SCORER_PLAYERS.find(p => p.id === currentUser.scorer);
+  showToast(`✅ Goleador guardado: ${sp.name}`,"success");
 }
 
 /* ── CAMPEÓN ─────────────────────────────────────────────────────────────── */
@@ -1349,7 +1455,7 @@ function renderRanking(){
         <div class="rank-pos ${i<3?"top":""}">${i+1}</div>
         <div class="rank-info">
           <div class="rank-name">${u.name}${isMe?" 👈":""} ${streakBadge}</div>
-          <div class="rank-sub">${ct?ct.id+" "+ct.name:"Sin campeón"} · ${playedCount} jugados</div>
+          <div class="rank-sub">${ct?ct.id+" "+ct.name:"Sin campeón"} · ${(()=>{const sp=SCORER_PLAYERS.find(p=>p.id===u.scorer);return sp?sp.name:"Sin goleador";})()}</div>
         </div>
         <div class="rank-pts-block"><div class="rank-pts">${u.pts}</div><div class="rank-pts-lbl">pts</div></div>
       </div>
@@ -1487,13 +1593,30 @@ function renderStats(){
         }
       }
 
+      // Chip de marcador popular: mostrar el marcador exacto más frecuente
+      let popularChip = "";
+      if(locked && total > 0){
+        const scoreMap={};
+        mPicks.forEach(p=>{
+          if(p.home_score!==null&&p.away_score!==null){
+            const k=`${p.home_score}-${p.away_score}`;
+            scoreMap[k]=(scoreMap[k]||0)+1;
+          }
+        });
+        const top=Object.entries(scoreMap).sort((a,b)=>b[1]-a[1])[0];
+        if(top){
+          // Mostrar el marcador exacto y la cantidad de picks
+          popularChip=`<span class="sdchip sdchip-pop">🎯 ${top[0].replace("-"," – ")} (${top[1]})</span>`;
+        }
+      }
+
       // Chips de distribución
       const chips=total>0?`
         <span class="sdchip sdchip-home">🏠 ${pct(cnt1)}%</span>
         <span class="sdchip sdchip-draw">🤝 ${pct(cntX)}%</span>
         <span class="sdchip sdchip-away">✈️ ${pct(cnt2)}%</span>
         <span class="sdchip sdchip-none">${total} pick${total!==1?"s":""}</span>
-        ${popularHtml.includes("Marcador")?`<span class="sdchip sdchip-pop">🎯 marcador popular</span>`:""}
+        ${popularChip}
       `:`<span class="sdchip sdchip-none">Sin picks</span>`;
 
       // Resultado / estado
@@ -1519,7 +1642,7 @@ function renderStats(){
             <span class="stats-bar-val away">${cnt2} · ${pct(cnt2)}%</span>
           </div>
         </div>
-        ${popularHtml}`
+        `
       :`<div class="stats-locked-msg">Sin pronósticos registrados</div>`;
 
       // Picks individuales (solo si cerrado)
@@ -1888,6 +2011,18 @@ function renderAdmin(){
       </div>
     </div>
     <div class="admin-section">
+      <div class="admin-title">GOLEADOR DEL TORNEO</div>
+      <div class="admin-match-card">
+        <div class="admin-row"><span class="admin-label">GOLEADOR</span>
+          <select class="admin-select" id="adm_scorer_winner">
+            <option value="">-- No definido --</option>
+            ${SCORER_PLAYERS.map(p=>`<option value="${p.id}" ${DB.scorerWinner===p.id?"selected":""}>${p.name} (${p.team})</option>`).join("")}
+          </select>
+        </div>
+        <div class="admin-footer"><button class="admin-save-btn" onclick="adminSaveScorer()">💾 GUARDAR GOLEADOR</button></div>
+      </div>
+    </div>
+    <div class="admin-section">
       <div class="admin-title">AGREGAR PARTIDO</div>
       <div class="add-match-form">
 
@@ -1975,6 +2110,17 @@ async function adminSaveChampion(){
     renderRanking();
   }catch(e){showToast("Error al guardar","error");console.error(e);}
 }
+async function adminSaveScorer(){
+  const val = document.getElementById("adm_scorer_winner").value || null;
+  try {
+    await supabase.upsert("settings", { key:"scorer_winner", value:val });
+    DB.scorerWinner = val;
+    const sp = SCORER_PLAYERS.find(p => p.id === val);
+    showToast(sp ? `✅ Goleador: ${sp.name}` : "✅ Goleador eliminado","success");
+    renderRanking();
+  } catch(e) { showToast("Error al guardar","error"); console.error(e); }
+}
+
 async function recalcAll(){
   showLoading("Actualizando...");await loadAll();hideLoading();
   renderRanking();showToast("✅ Tabla actualizada","success");switchTab("ranking");
@@ -1997,13 +2143,22 @@ function _renderModalContent(userId){
   document.getElementById("modalTitle").textContent = user.name;
 
   // ── Encabezado campeón ──────────────────────────────────────────
+  const sp = SCORER_PLAYERS.find(p => p.id === user.scorer);
   const champHtml = `
     <div class="modal-champ-row">
       <span class="modal-champ-icon">🏆</span>
-      <div class="modal-champ-text">Campeón elegido: <b>${ct?ct.id+" "+ct.name:"Sin elegir"}</b>
+      <div class="modal-champ-text">Campeón: <b>${ct?ct.id+" "+ct.name:"Sin elegir"}</b>
         ${DB.championWinner?(DB.championWinner===user.champion
-          ?" · <span style='color:var(--success)'>✅ +5 pts</span>"
-          :" · <span style='color:var(--danger)'>✗ 0 pts</span>"):""}
+          ?" · <span style='color:var(--success)'>✅ +5</span>"
+          :" · <span style='color:var(--danger)'>✗ 0</span>"):""}
+      </div>
+    </div>
+    <div class="modal-champ-row" style="margin-top:-8px">
+      <span class="modal-champ-icon">⚽</span>
+      <div class="modal-champ-text">Goleador: <b>${sp?sp.name:"Sin elegir"}</b>
+        ${DB.scorerWinner?(DB.scorerWinner===user.scorer
+          ?" · <span style='color:var(--success)'>✅ +5</span>"
+          :" · <span style='color:var(--danger)'>✗ 0</span>"):""}
       </div>
     </div>`;
 
