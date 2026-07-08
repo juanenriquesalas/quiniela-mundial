@@ -870,6 +870,20 @@ async function loadAll() {
   DB.championWinner = cs?.value||null;
   const ss = settings.find(s=>s.key==="scorer_winner");
   DB.scorerWinner = ss?.value||null;
+
+  // Cargar picks de goleador individuales desde settings (fallback si columna scorer no existe en users)
+  // Si users ya tiene scorer en columna, usar ese valor; si no, buscar en settings
+  DB.users.forEach(u => {
+    if (!u.scorer) {
+      const fallback = settings.find(s => s.key === `scorer_pick_${u.id}`);
+      if (fallback?.value) u.scorer = fallback.value;
+    }
+  });
+  // Sincronizar currentUser si ya está logueado
+  if (currentUser?.id) {
+    const fresh = DB.users.find(u => u.id === currentUser.id);
+    if (fresh) currentUser.scorer = fresh.scorer || currentUser.scorer || null;
+  }
   const bs = settings.find(s=>s.key==="banned_names");
   DB.bannedNames = bs?.value ? JSON.parse(bs.value) : [];
 }
@@ -1128,6 +1142,7 @@ function switchTab(id) {
 ═══════════════════════════════════════════════════════════════ */
 function scorerLocked() {
   // Se bloquea 5 minutos antes del primer partido de Cuartos de Final
+  if (!DB.matches?.length) return false;
   const cuartos = DB.matches
     .filter(m => (m.phase || "") === "Cuartos")
     .sort((a, b) => new Date(a.timeISO) - new Date(b.timeISO));
@@ -1142,7 +1157,7 @@ function scorerLocked() {
 
 function renderScorer() {
   const locked   = scorerLocked();
-  const selected = currentUser.scorer;
+  const selected = currentUser?.scorer || null;
   const sp = SCORER_PLAYERS.find(p => p.id === selected);
 
   const cuartosMatches = DB.matches
@@ -1179,7 +1194,22 @@ async function selectScorer(playerId) {
   if (u) u.scorer = currentUser.scorer;
   try {
     await supabase.patch("users", `?id=eq.${currentUser.id}`, { scorer: currentUser.scorer });
-  } catch(e) { showToast("Error al guardar","error"); console.error(e); }
+    showToast(currentUser.scorer
+      ? `✅ ${SCORER_PLAYERS.find(p=>p.id===currentUser.scorer)?.name} guardado`
+      : "Selección eliminada", "success");
+  } catch(e) {
+    // Si falla por columna inexistente, guardar en settings como fallback
+    try {
+      const key = `scorer_pick_${currentUser.id}`;
+      await supabase.upsert("settings", { key, value: currentUser.scorer || "" });
+      showToast(currentUser.scorer
+        ? `✅ ${SCORER_PLAYERS.find(p=>p.id===currentUser.scorer)?.name} guardado`
+        : "Selección eliminada", "success");
+    } catch(e2) {
+      showToast("Error al guardar. Verifica la conexión.", "error");
+      console.error("selectScorer error:", e2);
+    }
+  }
   renderScorer();
 }
 
