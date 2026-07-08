@@ -473,6 +473,74 @@
 
     /* RECALC */
 
+
+    /* ─── MODAL ADMIN: EDICIÓN DE PICKS ─────────────────────── */
+    .modal-edit-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 9px; font-weight: 700; padding: 2px 8px;
+      border-radius: 10px; background: rgba(244,196,48,.15);
+      color: var(--gold); border: 1px solid rgba(244,196,48,.25);
+      margin-bottom: 10px;
+    }
+    .modal-pick-edit-row {
+      background: var(--gray-2); border-radius: var(--rs);
+      padding: 10px 10px 8px; margin-bottom: 7px;
+    }
+    .modal-pick-edit-match {
+      font-size: 11px; font-weight: 700; color: var(--white);
+      margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-pick-edit-pts {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 16px; color: var(--gold);
+    }
+    .modal-pick-edit-pts.zero { color: var(--gray-3); }
+    /* OT derivado badge en modal edición */
+    .modal-ot-derived {
+      font-size: 11px; font-weight: 700; padding: 5px 10px;
+      border-radius: var(--rs); margin-bottom: 7px; text-align: center;
+      border: 1.5px dashed var(--gray-3); color: var(--muted);
+    }
+    .modal-ot-derived.home { border-color: var(--blue);   background: rgba(74,158,255,.10); color: var(--blue); }
+    .modal-ot-derived.draw { border-color: var(--gold);   background: rgba(244,196,48,.10); color: var(--gold); }
+    .modal-ot-derived.away { border-color: var(--danger); background: rgba(224,82,82,.10);  color: var(--danger); }
+    /* Selector clasificado en modal */
+    .modal-advance-row {
+      display: flex; align-items: center; gap: 6px; margin-bottom: 7px;
+      padding: 7px 8px; background: rgba(244,196,48,.06);
+      border: 1px solid rgba(244,196,48,.2); border-radius: var(--rs);
+    }
+    .modal-advance-label { font-size: 9px; color: var(--gold); font-weight: 700; white-space: nowrap; }
+    .modal-advance-btn {
+      flex: 1; background: var(--gray-1); border: 1.5px solid var(--gray-3);
+      border-radius: 6px; padding: 5px 4px; font-size: 10px; font-weight: 700;
+      color: var(--muted); cursor: pointer; text-align: center; transition: all 0.12s;
+    }
+    .modal-advance-btn.sel { border-color: var(--gold); background: rgba(244,196,48,.18); color: var(--gold); }
+    /* Score inputs en modal */
+    .modal-score-row { display: flex; align-items: center; gap: 6px; }
+    .modal-score-inputs { display: flex; align-items: center; gap: 4px; flex: 1; justify-content: center; }
+    .modal-score-input {
+      width: 42px; height: 34px; background: var(--gray-1); border: 1.5px solid var(--gray-3);
+      border-radius: 6px; color: var(--white); font-size: 17px; font-weight: 700;
+      text-align: center; -moz-appearance: textfield;
+    }
+    .modal-score-input::-webkit-outer-spin-button,
+    .modal-score-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .modal-score-input:focus { outline: none; border-color: var(--gold); }
+    .modal-score-sep { font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif; font-size: 18px; color: var(--gray-3); }
+    .modal-save-pick-btn {
+      background: var(--green-mid); border: none; border-radius: 6px;
+      padding: 0 10px; height: 34px; color: var(--white); font-size: 12px;
+      font-weight: 700; cursor: pointer; white-space: nowrap; transition: background .15s;
+    }
+    .modal-save-pick-btn:active { background: var(--success); }
+    .modal-clear-pick-btn {
+      background: transparent; border: 1px solid var(--gray-3); border-radius: 6px;
+      padding: 0 8px; height: 34px; color: var(--muted); font-size: 12px;
+      font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+
     /* ─── ADMIN: AGREGAR PARTIDO ─────────────────────────────── */
     .add-match-form {
       background: var(--gray-1); border: 1px solid var(--gray-2);
@@ -767,18 +835,40 @@ function fmtTime(iso) {
 
 /* ── PUNTUACIÓN ──────────────────────────────────────────────────────────── */
 function calcPickPts(pick, match) {
-  if (!match.done||!match.result||!pick?.ot) return {ot:0,exact:0,advance:0,total:0};
+  if (!match.done||!match.result) return {ot:0,exact:0,advance:0,total:0};
   const {homeScore:rh,awayScore:ra} = match.result;
   const realOT = rh>ra?"1":rh===ra?"X":"2";
-  const otOk   = pick.ot===realOT;
-  const ph=parseInt(pick.home_score), pa=parseInt(pick.away_score);
-  const exactOk = !isNaN(ph)&&!isNaN(pa)&&ph===rh&&pa===ra;
+
+  const ph=parseInt(pick?.home_score), pa=parseInt(pick?.away_score);
+  const hasScore = !isNaN(ph) && !isNaN(pa);
+
+  // OT siempre derivado del marcador apostado (ignora pick.ot guardado)
+  // Si no hay marcador pero hay ot guardado (picks legacy), usa pick.ot como fallback
+  let pickOT;
+  if (hasScore) {
+    pickOT = ph>pa?"1":ph===pa?"X":"2";
+  } else if (pick?.ot) {
+    pickOT = pick.ot;   // fallback para picks sin marcador
+  } else {
+    return {ot:0,exact:0,advance:0,total:0};
+  }
+
+  const otOk    = pickOT===realOT;
+  const exactOk = hasScore && ph===rh && pa===ra;
+
   // Clasificado: independiente del 1X2
   let advanceOk = false;
   if (match.winner) {
-    if (pick.ot==="X") advanceOk = pick.advance===match.winner;
-    else { const pw=ph>pa?"home":"away"; advanceOk = pw===match.winner; }
+    if (pickOT==="X") {
+      // Empate apostado: requiere advance explícito
+      advanceOk = !!pick?.advance && pick.advance===match.winner;
+    } else {
+      // Victoria apostada: el clasificado implícito es el ganador según marcador
+      const pw = hasScore ? (ph>pa?"home":"away") : (pick?.ot==="1"?"home":"away");
+      advanceOk = pw===match.winner;
+    }
   }
+
   const pts_ot=otOk?1:0, pts_exact=exactOk?3:0, pts_adv=advanceOk?1:0;
   return {ot:pts_ot,exact:pts_exact,advance:pts_adv,total:pts_ot+pts_exact+pts_adv};
 }
@@ -1891,43 +1981,257 @@ async function recalcAll(){
 }
 
 /* ── MODAL PARTICIPANTE ──────────────────────────────────────────────────── */
+let _modalUserId = null;
+
 function openParticipantModal(userId){
-  const user=DB.users.find(u=>u.id===userId);if(!user)return;
-  const stats=calcUserStats(user),ct=CHAMPION_TEAMS.find(t=>t.id===user.champion);
-  document.getElementById("modalTitle").textContent=user.name;
-  const pickRows=DB.matches.map(m=>{
-    const pick=DB.picks.find(p=>p.user_id===user.id&&p.match_id===m.id);
-    const p=calcPickPts(pick,m);
-    const otLabel=pick?.ot?{"1":"LOCAL","X":"EMPATE","2":"VISITA"}[pick.ot]:"–";
-    const otColor=pick?.ot?{"1":"var(--blue)","X":"var(--gold)","2":"var(--danger)"}[pick.ot]:"var(--muted)";
-    const sc=pick?.home_score!==null&&pick?.home_score!==undefined?`${pick.home_score} - ${pick.away_score}`:"–";
-    const ptsStr=m.done?p.total:(pick?.ot?"?":"–");
-    return`<div class="modal-pick-row">
-      <div class="modal-pick-match"><b>${m.homeFlag} vs ${m.awayFlag}</b><br>${m.home} · ${m.away}</div>
-      <div class="modal-pick-ot" style="color:${otColor}">${otLabel}</div>
-      <div class="modal-pick-sc">${sc}</div>
-      <div class="modal-pick-pts ${p.total===0&&m.done?"zero":""}">${ptsStr}</div>
-    </div>`;
-  }).join("");
-  document.getElementById("modalBody").innerHTML=`
+  _modalUserId = userId;
+  _renderModalContent(userId);
+  document.getElementById("participantModal").classList.add("open");
+}
+
+function _renderModalContent(userId){
+  const user  = DB.users.find(u=>u.id===userId); if(!user) return;
+  const stats = calcUserStats(user);
+  const ct    = CHAMPION_TEAMS.find(t=>t.id===user.champion);
+  const isAdm = currentUser?.is_admin;
+  document.getElementById("modalTitle").textContent = user.name;
+
+  // ── Encabezado campeón ──────────────────────────────────────────
+  const champHtml = `
     <div class="modal-champ-row">
       <span class="modal-champ-icon">🏆</span>
       <div class="modal-champ-text">Campeón elegido: <b>${ct?ct.id+" "+ct.name:"Sin elegir"}</b>
-        ${DB.championWinner?(DB.championWinner===user.champion?" · <span style='color:var(--success)'>✅ +5 pts</span>":" · <span style='color:var(--danger)'>✗ 0 pts</span>"):""}
+        ${DB.championWinner?(DB.championWinner===user.champion
+          ?" · <span style='color:var(--success)'>✅ +5 pts</span>"
+          :" · <span style='color:var(--danger)'>✗ 0 pts</span>"):""}
       </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 54px 54px 28px;gap:4px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--gray-2)">
-      <span style="font-size:9px;color:var(--muted);font-weight:700">PARTIDO</span>
-      <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RESULTADO</span>
-      <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARCADOR</span>
-      <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
-    </div>${pickRows}
-    <div class="modal-total-row">
+    </div>`;
+
+  if (!isAdm) {
+    // ── VISTA SOLO LECTURA (jugadores normales) ──────────────────
+    const pickRows = DB.matches.map(m=>{
+      const pick = DB.picks.find(p=>p.user_id===user.id&&p.match_id===m.id);
+      const p    = calcPickPts(pick,m);
+      const ph   = parseInt(pick?.home_score), pa = parseInt(pick?.away_score);
+      const pickOT = !isNaN(ph)&&!isNaN(pa) ? (ph>pa?"1":ph===pa?"X":"2") : pick?.ot;
+      const otLabel= pickOT?{"1":"LOCAL","X":"EMPATE","2":"VISITA"}[pickOT]:"–";
+      const otColor= pickOT?{"1":"var(--blue)","X":"var(--gold)","2":"var(--danger)"}[pickOT]:"var(--muted)";
+      const sc     = pick?.home_score!=null&&pick?.home_score!==undefined?`${pick.home_score} - ${pick.away_score}`:"–";
+      const ptsStr = m.done?p.total:(pick?.ot?"?":"–");
+      return`<div class="modal-pick-row">
+        <div class="modal-pick-match"><b>${m.homeFlag} vs ${m.awayFlag}</b><br>${m.home} · ${m.away}</div>
+        <div class="modal-pick-ot" style="color:${otColor}">${otLabel}</div>
+        <div class="modal-pick-sc">${sc}</div>
+        <div class="modal-pick-pts ${p.total===0&&m.done?"zero":""}">${ptsStr}</div>
+      </div>`;
+    }).join("");
+
+    document.getElementById("modalBody").innerHTML = `
+      ${champHtml}
+      <div style="display:grid;grid-template-columns:1fr 54px 54px 28px;gap:4px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--gray-2)">
+        <span style="font-size:9px;color:var(--muted);font-weight:700">PARTIDO</span>
+        <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">RESULTADO</span>
+        <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:center">MARCADOR</span>
+        <span style="font-size:9px;color:var(--muted);font-weight:700;text-align:right">PTS</span>
+      </div>${pickRows}
+      <div class="modal-total-row">
+        <span class="modal-total-label">TOTAL ACUMULADO</span>
+        <span class="modal-total-pts">${stats.pts} <span style="font-size:14px;color:var(--muted)">pts</span></span>
+      </div>`;
+    return;
+  }
+
+  // ── VISTA EDICIÓN ADMIN ─────────────────────────────────────────
+  const editRows = DB.matches.map(m=>{
+    const pick    = DB.picks.find(p=>p.user_id===user.id&&p.match_id===m.id);
+    const p       = calcPickPts(pick,m);
+    const ph      = parseInt(pick?.home_score), pa = parseInt(pick?.away_score);
+    const hasScore= !isNaN(ph)&&!isNaN(pa);
+    const pickOT  = hasScore?(ph>pa?"1":ph===pa?"X":"2"):pick?.ot||null;
+    const ptsStr  = m.done?p.total:(pick?.ot?"?":"–");
+    const ptsCls  = m.done&&p.total===0?"zero":"";
+
+    // Badge OT derivado
+    const otBadge = pickOT
+      ? `<div class="modal-ot-derived ${pickOT==="1"?"home":pickOT==="X"?"draw":"away"}">
+           ${ pickOT==="1" ? `🏠 LOCAL — ${m.homeFlag} gana`
+            : pickOT==="X" ? `🤝 EMPATE — elige quién avanza`
+            :                `✈️ VISITA — ${m.awayFlag} gana` }
+         </div>`
+      : `<div class="modal-ot-derived">Ingresa marcador</div>`;
+
+    // Selector de clasificado (solo si hay empate)
+    const advRow = pickOT==="X"
+      ? `<div class="modal-advance-row">
+           <span class="modal-advance-label">¿CLASIFICA?</span>
+           <button class="modal-advance-btn ${pick?.advance==="home"?"sel":""}"
+             onclick="adminSetAdvance('${user.id}','${m.id}','home')">${m.homeFlag} ${m.home}</button>
+           <button class="modal-advance-btn ${pick?.advance==="away"?"sel":""}"
+             onclick="adminSetAdvance('${user.id}','${m.id}','away')">${m.awayFlag} ${m.away}</button>
+         </div>`
+      : "";
+
+    return`<div class="modal-pick-edit-row" id="merow_${m.id}">
+      <div class="modal-pick-edit-match">
+        <span>${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag}</span>
+        <span class="modal-pick-edit-pts ${ptsCls}">${m.done?ptsStr+" pts":m.homeFlag+" – "+m.awayFlag}</span>
+      </div>
+      <div id="meobd_${user.id}_${m.id}">
+        ${otBadge}
+        ${advRow}
+        <div class="modal-score-row">
+          <div class="modal-score-inputs">
+            <input class="modal-score-input" type="number" min="0" max="20"
+              id="mhs_${user.id}_${m.id}" value="${pick?.home_score??""}" placeholder="–"
+              oninput="adminOnScoreInput('${user.id}','${m.id}')" />
+            <span class="modal-score-sep">:</span>
+            <input class="modal-score-input" type="number" min="0" max="20"
+              id="mas_${user.id}_${m.id}" value="${pick?.away_score??""}" placeholder="–"
+              oninput="adminOnScoreInput('${user.id}','${m.id}')" />
+          </div>
+          <button class="modal-save-pick-btn" onclick="adminSavePickForUser('${user.id}','${m.id}')">💾</button>
+          <button class="modal-clear-pick-btn" onclick="adminClearPickForUser('${user.id}','${m.id}')">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("modalBody").innerHTML = `
+    ${champHtml}
+    <div class="modal-edit-badge">✏️ MODO EDICIÓN ADMIN</div>
+    ${editRows}
+    <div class="modal-total-row" style="margin-top:10px">
       <span class="modal-total-label">TOTAL ACUMULADO</span>
       <span class="modal-total-pts">${stats.pts} <span style="font-size:14px;color:var(--muted)">pts</span></span>
     </div>`;
-  document.getElementById("participantModal").classList.add("open");
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN — EDICIÓN DE PICKS EN MODAL
+═══════════════════════════════════════════════════════════════ */
+
+// Actualiza el badge OT y el selector de clasificado en tiempo real
+function adminOnScoreInput(userId, matchId) {
+  const match  = DB.matches.find(m => m.id === matchId);
+  const hsEl   = document.getElementById(`mhs_${userId}_${matchId}`);
+  const asEl   = document.getElementById(`mas_${userId}_${matchId}`);
+  if (!hsEl || !asEl) return;
+  const ph = parseInt(hsEl.value), pa = parseInt(asEl.value);
+  const hasScore = !isNaN(ph) && !isNaN(pa);
+  const pickOT   = hasScore ? (ph>pa?"1":ph===pa?"X":"2") : null;
+
+  // Recuperar advance actual del pick en cache
+  const pick = DB.picks.find(p=>p.user_id===userId&&p.match_id===matchId);
+
+  const otBadge = pickOT
+    ? `<div class="modal-ot-derived ${pickOT==="1"?"home":pickOT==="X"?"draw":"away"}">
+         ${ pickOT==="1" ? `🏠 LOCAL — ${match.homeFlag} gana`
+          : pickOT==="X" ? `🤝 EMPATE — elige quién avanza`
+          :                `✈️ VISITA — ${match.awayFlag} gana` }
+       </div>`
+    : `<div class="modal-ot-derived">Ingresa marcador</div>`;
+
+  const advRow = pickOT==="X"
+    ? `<div class="modal-advance-row">
+         <span class="modal-advance-label">¿CLASIFICA?</span>
+         <button class="modal-advance-btn ${pick?.advance==="home"?"sel":""}"
+           onclick="adminSetAdvance('${userId}','${matchId}','home')">${match.homeFlag} ${match.home}</button>
+         <button class="modal-advance-btn ${pick?.advance==="away"?"sel":""}"
+           onclick="adminSetAdvance('${userId}','${matchId}','away')">${match.awayFlag} ${match.away}</button>
+       </div>`
+    : "";
+
+  // Re-renderizar solo el bloque de OT + advance + inputs
+  const wrapper = document.getElementById(`meobd_${userId}_${matchId}`);
+  if (!wrapper) return;
+  const newHs = hsEl.value, newAs = asEl.value;
+  wrapper.innerHTML = `
+    ${otBadge}${advRow}
+    <div class="modal-score-row">
+      <div class="modal-score-inputs">
+        <input class="modal-score-input" type="number" min="0" max="20"
+          id="mhs_${userId}_${matchId}" value="${newHs}" placeholder="–"
+          oninput="adminOnScoreInput('${userId}','${matchId}')" />
+        <span class="modal-score-sep">:</span>
+        <input class="modal-score-input" type="number" min="0" max="20"
+          id="mas_${userId}_${matchId}" value="${newAs}" placeholder="–"
+          oninput="adminOnScoreInput('${userId}','${matchId}')" />
+      </div>
+      <button class="modal-save-pick-btn" onclick="adminSavePickForUser('${userId}','${matchId}')">💾</button>
+      <button class="modal-clear-pick-btn" onclick="adminClearPickForUser('${userId}','${matchId}')">✕</button>
+    </div>`;
+}
+
+// Guarda o actualiza un advance en el cache local sin ir a Supabase
+// (el Supabase se actualiza al guardar con 💾)
+function adminSetAdvance(userId, matchId, value) {
+  let pick = DB.picks.find(p=>p.user_id===userId&&p.match_id===matchId);
+  if (!pick) { pick={user_id:userId,match_id:matchId,ot:null,home_score:null,away_score:null,advance:null}; DB.picks.push(pick); }
+  pick.advance = pick.advance===value ? null : value;
+  // Re-renderizar solo el advance row
+  adminOnScoreInput(userId, matchId);
+}
+
+// Guardar pick editado por admin en Supabase
+async function adminSavePickForUser(userId, matchId) {
+  const match  = DB.matches.find(m=>m.id===matchId);
+  const hsEl   = document.getElementById(`mhs_${userId}_${matchId}`);
+  const asEl   = document.getElementById(`mas_${userId}_${matchId}`);
+  if (!hsEl || !asEl) return;
+  const ph = hsEl.value, pa = asEl.value;
+  if (ph===""||pa==="") { showToast("Ingresa ambos valores del marcador","error"); return; }
+
+  const phn = parseInt(ph), pan = parseInt(pa);
+  const derivedOT = phn>pan?"1":phn===pan?"X":"2";
+
+  // Si es empate, verificar que se eligió clasificado
+  let pick = DB.picks.find(p=>p.user_id===userId&&p.match_id===matchId);
+  const advance = derivedOT==="X" ? (pick?.advance||null) : null;
+  if (derivedOT==="X"&&!advance) { showToast("Elige quién clasifica en el empate","error"); return; }
+
+  const payload = {
+    user_id:    userId,
+    match_id:   matchId,
+    ot:         derivedOT,
+    home_score: parseInt(ph),
+    away_score: parseInt(pa),
+    advance:    advance,
+  };
+
+  try {
+    await supabase.upsert("picks", payload);
+    // Actualizar cache local
+    if (!pick) { pick={user_id:userId,match_id:matchId}; DB.picks.push(pick); }
+    Object.assign(pick, payload);
+    showToast(`✅ Pick guardado: ${match.homeFlag}${ph} – ${pa}${match.awayFlag}`,"success");
+    // Refrescar modal y ranking
+    _renderModalContent(userId);
+    renderRanking();
+    renderAdmin();
+  } catch(e) {
+    showToast("Error al guardar el pick","error"); console.error(e);
+  }
+}
+
+// Limpiar pick de un partido para un jugador
+async function adminClearPickForUser(userId, matchId) {
+  const match = DB.matches.find(m=>m.id===matchId);
+  if (!confirm(`¿Eliminar el pick de ${match?.homeFlag} vs ${match?.awayFlag}?`)) return;
+  try {
+    await fetch(
+      `${CONFIG.SUPABASE_URL}/rest/v1/picks?user_id=eq.${userId}&match_id=eq.${matchId}`,
+      { method:"DELETE", headers:SB_HEADERS() }
+    );
+    DB.picks = DB.picks.filter(p=>!(p.user_id===userId&&p.match_id===matchId));
+    showToast("✅ Pick eliminado","success");
+    _renderModalContent(userId);
+    renderRanking();
+    renderAdmin();
+  } catch(e) {
+    showToast("Error al eliminar el pick","error"); console.error(e);
+  }
+}
+
 function closeParticipantModal(event){
   if(event&&event.target!==document.getElementById("participantModal"))return;
   document.getElementById("participantModal").classList.remove("open");
