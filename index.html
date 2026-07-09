@@ -706,6 +706,17 @@
     .cmp-tie  { color: var(--muted); }
     .cmp-none { color: var(--gray-3); }
 
+
+    /* ─── COMPARADOR: IMAGEN COMPARTIR ──────────────────────── */
+    .compare-share-btn {
+      width: 100%; background: var(--gray-2); border: 1px solid var(--gray-3);
+      border-radius: var(--rs); padding: 10px; font-size: 12px; font-weight: 700;
+      color: var(--white); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 7px; margin-top: 8px; transition: border-color .15s;
+    }
+    .compare-share-btn:active { border-color: var(--gold); color: var(--gold); }
+    #cmpCanvas { display: none; }
+
     /* ─── ADMIN: AGREGAR PARTIDO ─────────────────────────────── */
     .add-match-form {
       background: var(--gray-1); border: 1px solid var(--gray-2);
@@ -880,6 +891,7 @@
   </div>
 </div>
 
+<canvas id="cmpCanvas"></canvas>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1224,6 +1236,189 @@ async function loginProceed(user,isAdmin) {
   bootApp();
 }
 
+
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPARADOR: IMAGEN PARA COMPARTIR (Canvas API)
+═══════════════════════════════════════════════════════════════ */
+function shareCompareImage(idA, idB) {
+  const uA = DB.users.find(u=>u.id===idA);
+  const uB = DB.users.find(u=>u.id===idB);
+  if (!uA || !uB) return;
+
+  const sA = calcUserStats(uA), sB = calcUserStats(uB);
+  const rankAll = calcRanking();
+  const rankA   = rankAll.findIndex(u=>u.id===idA)+1;
+  const rankB   = rankAll.findIndex(u=>u.id===idB)+1;
+  const ctA     = CHAMPION_TEAMS.find(t=>t.id===uA.champion);
+  const ctB     = CHAMPION_TEAMS.find(t=>t.id===uB.champion);
+  const spA     = SCORER_PLAYERS.find(p=>p.id===uA.scorer);
+  const spB     = SCORER_PLAYERS.find(p=>p.id===uB.scorer);
+
+  // Top 3 partidos con mayor diferencia de puntos entre ambos
+  const played = DB.matches
+    .filter(m=>m.done&&m.result)
+    .sort((a,b)=>new Date(a.timeISO)-new Date(b.timeISO));
+
+  const diffs = played.map(m=>{
+    const pickA = DB.picks.find(p=>p.user_id===idA&&p.match_id===m.id);
+    const pickB = DB.picks.find(p=>p.user_id===idB&&p.match_id===m.id);
+    const pA = calcPickPts(pickA,m).total;
+    const pB = calcPickPts(pickB,m).total;
+    return { m, pA, pB, diff: Math.abs(pA-pB) };
+  }).filter(d=>d.diff>0).sort((a,b)=>b.diff-a.diff).slice(0,3);
+
+  // ── Canvas ────────────────────────────────────────────────────
+  const W = 600, PAD = 28;
+  const ROWS_STATS = 5; // pts, pos, exactos, campeón, goleador
+  const ROW_H = 46;
+  const DIFF_H = diffs.length > 0 ? 30 + diffs.length * 52 : 0;
+  const H = PAD + 90 + ROWS_STATS * ROW_H + (diffs.length > 0 ? 36 + DIFF_H : 0) + PAD + 40;
+
+  const canvas = document.getElementById("cmpCanvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+
+  // Helpers
+  const hex  = v => v;
+  const col  = { bg:"#0a1628", gray1:"#1c1c2e", gray2:"#2a2a3e", gray3:"#3d3d55",
+                  gold:"#f4c430", muted:"#8888aa", white:"#f5f5f0",
+                  success:"#4caf87", danger:"#e05252" };
+
+  // Fondo
+  ctx.fillStyle = col.bg;
+  ctx.fillRect(0, 0, W, H);
+  // Borde dorado top/bottom
+  ctx.fillStyle = col.gold;
+  ctx.fillRect(0,0,W,5);
+  ctx.fillRect(0,H-5,W,5);
+
+  // Título
+  ctx.fillStyle = col.gold;
+  ctx.font = "bold 20px 'Arial Narrow', Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("⚽ QUINIELA MUNDIAL 2026 — COMPARATIVA", W/2, PAD+28);
+
+  // Fecha
+  ctx.fillStyle = col.muted;
+  ctx.font = "13px Arial, sans-serif";
+  ctx.fillText(new Date().toLocaleDateString("es-CL",{day:"2-digit",month:"long",year:"numeric"}), W/2, PAD+48);
+
+  // Header nombres
+  const hY = PAD + 68;
+  ctx.fillStyle = col.gray2;
+  ctx.fillRect(PAD, hY, W-PAD*2, 36);
+  ctx.font = "bold 16px Arial, sans-serif";
+  ctx.fillStyle = col.white;
+  ctx.textAlign = "left";
+  ctx.fillText(uA.name, PAD+12, hY+24);
+  ctx.textAlign = "right";
+  ctx.fillText(uB.name, W-PAD-12, hY+24);
+  ctx.fillStyle = col.muted;
+  ctx.font = "13px Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("VS", W/2, hY+24);
+
+  // Separador
+  ctx.strokeStyle = col.gray3;
+  ctx.lineWidth = 1;
+
+  // Filas de stats
+  const statsData = [
+    { lbl:"PUNTOS TOTALES", a:sA.pts, b:sB.pts, fmt:v=>`${v}` },
+    { lbl:"POSICIÓN GLOBAL", a:rankB, b:rankA, fmt:(v,isA)=>isA?`#${rankA}`:`#${rankB}`, flip:true },
+    { lbl:"EXACTOS", a:Math.floor(sA.exact/3), b:Math.floor(sB.exact/3), fmt:v=>`${v}` },
+    { lbl:"CAMPEÓN", a:0, b:0, txtA:ctA?ctA.id+" "+ctA.name:"–", txtB:ctB?ctB.id+" "+ctB.name:"–", noWin:true },
+    { lbl:"GOLEADOR", a:0, b:0, txtA:spA?spA.name:"–", txtB:spB?spB.name:"–", noWin:true },
+  ];
+
+  statsData.forEach((row, i) => {
+    const y = PAD + 104 + i * ROW_H;
+    // Fondo alternado
+    if (i%2===0) { ctx.fillStyle = col.gray1; ctx.fillRect(PAD, y, W-PAD*2, ROW_H); }
+
+    // Label central
+    ctx.fillStyle = col.muted;
+    ctx.font = "bold 9px Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(row.lbl, W/2, y+14);
+
+    // Líneas separadoras
+    ctx.strokeStyle = col.gray3; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(W/2-50, y); ctx.lineTo(W/2-50, y+ROW_H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W/2+50, y); ctx.lineTo(W/2+50, y+ROW_H); ctx.stroke();
+
+    if (row.noWin) {
+      ctx.font = "12px Arial, sans-serif";
+      ctx.fillStyle = col.muted;
+      ctx.textAlign = "left";
+      ctx.fillText(row.txtA, PAD+12, y+ROW_H/2+5);
+      ctx.textAlign = "right";
+      ctx.fillText(row.txtB, W-PAD-12, y+ROW_H/2+5);
+    } else {
+      const winA = row.flip ? rankA<rankB : row.a>row.b;
+      const winB = row.flip ? rankB<rankA : row.b>row.a;
+      const valA = row.flip ? `#${rankA}` : `${row.a}`;
+      const valB = row.flip ? `#${rankB}` : `${row.b}`;
+      ctx.font = "bold 22px 'Arial Narrow', Arial, sans-serif";
+      ctx.fillStyle = winA ? col.success : winB ? col.danger : col.gold;
+      ctx.textAlign = "left";
+      ctx.fillText(valA, PAD+12, y+ROW_H/2+8);
+      ctx.fillStyle = winB ? col.success : winA ? col.danger : col.gold;
+      ctx.textAlign = "right";
+      ctx.fillText(valB, W-PAD-12, y+ROW_H/2+8);
+    }
+  });
+
+  // Partidos con mayor diferencia
+  if (diffs.length > 0) {
+    const secY = PAD + 104 + ROWS_STATS * ROW_H + 16;
+    ctx.fillStyle = col.gray2;
+    ctx.fillRect(PAD, secY, W-PAD*2, 26);
+    ctx.font = "bold 9px Arial, sans-serif";
+    ctx.fillStyle = col.gold;
+    ctx.textAlign = "center";
+    ctx.fillText("PARTIDOS CON MAYOR DIFERENCIA", W/2, secY+18);
+
+    diffs.forEach((d, i) => {
+      const ry = secY + 30 + i * 52;
+      if (i%2===0) { ctx.fillStyle = col.gray1; ctx.fillRect(PAD, ry, W-PAD*2, 50); }
+
+      // Nombre del partido
+      const matchLabel = `${d.m.homeFlag} ${d.m.home} vs ${d.m.away} ${d.m.awayFlag}`;
+      const resultLabel = `${d.m.result.homeScore} – ${d.m.result.awayScore}`;
+      ctx.font = "bold 11px Arial, sans-serif";
+      ctx.fillStyle = col.white;
+      ctx.textAlign = "center";
+      ctx.fillText(matchLabel, W/2, ry+15);
+      ctx.font = "10px Arial, sans-serif";
+      ctx.fillStyle = col.muted;
+      ctx.fillText(resultLabel, W/2, ry+29);
+
+      // Puntos de cada jugador
+      ctx.font = "bold 20px 'Arial Narrow', Arial, sans-serif";
+      ctx.fillStyle = d.pA>d.pB ? col.success : d.pA<d.pB ? col.danger : col.muted;
+      ctx.textAlign = "left";
+      ctx.fillText(`${d.pA} pts`, PAD+12, ry+34);
+      ctx.fillStyle = d.pB>d.pA ? col.success : d.pB<d.pA ? col.danger : col.muted;
+      ctx.textAlign = "right";
+      ctx.fillText(`${d.pB} pts`, W-PAD-12, ry+34);
+    });
+  }
+
+  // Footer
+  ctx.fillStyle = col.muted;
+  ctx.font = "10px Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("Quiniela Mundial 2026", W/2, H-PAD+8);
+
+  // Descargar
+  const link = document.createElement("a");
+  link.download = `comparativa-${uA.name.replace(/\s/g,"-")}-vs-${uB.name.replace(/\s/g,"-")}.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+  showToast("✅ Imagen descargada — ¡compártela en WhatsApp!", "success");
+}
 
 /* ═══════════════════════════════════════════════════════════════
    HISTORIAL DE POSICIONES POR FASE
@@ -1936,7 +2131,10 @@ function renderComparePlayers() {
       ${played.length?`
         <div style="padding:6px 12px;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;background:var(--gray-2);border-top:1px solid var(--gray-2)">PARTIDO A PARTIDO</div>
         ${matchRows}`:""}
-    </div>`;
+    </div>
+    <button class="compare-share-btn" onclick="shareCompareImage('${idA}','${idB}')">
+      📸 Compartir comparativa por WhatsApp
+    </button>`;
 }
 
 /* ── ESTADÍSTICAS ────────────────────────────────────────────────────────── */
@@ -2066,7 +2264,7 @@ function renderStats(){
         const top=Object.entries(scoreMap).sort((a,b)=>b[1]-a[1])[0];
         if(top){
           // Mostrar el marcador exacto y la cantidad de picks
-          popularChip=`<span class="sdchip sdchip-pop">🎯 Más apostado: ${top[0].replace("-"," – ")} · ${top[1]} pick${top[1]!==1?"s":""}</span>`;
+          popularChip=`<span class="sdchip sdchip-pop">🎯 Más apostado: ${top[0].replace("-"," – ")} (${top[1]})</span>`;
         }
       }
 
