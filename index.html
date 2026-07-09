@@ -581,6 +581,131 @@
     }
     .save-scorer-btn:disabled { opacity: 0.38; cursor: not-allowed; }
 
+
+    /* ─── RESUMEN DE FASE (Admin) ───────────────────────────── */
+    .phase-summary-card {
+      background: linear-gradient(135deg, rgba(244,196,48,.07) 0%, transparent 100%);
+      border: 1px solid rgba(244,196,48,.3); border-radius: var(--r);
+      padding: 13px; margin-bottom: 8px;
+    }
+    .phase-summary-title {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 15px; color: var(--gold); letter-spacing: 1.5px; margin-bottom: 10px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .phase-summary-copy-btn {
+      background: var(--gray-2); border: 1px solid var(--gray-3); border-radius: 6px;
+      padding: 4px 10px; font-size: 10px; font-weight: 700; color: var(--muted);
+      cursor: pointer; transition: all .15s;
+    }
+    .phase-summary-copy-btn:active { border-color: var(--gold); color: var(--gold); }
+    .phase-summary-row {
+      display: flex; align-items: center; gap: 8px; padding: 5px 0;
+      border-bottom: 1px solid var(--gray-2); font-size: 11px;
+    }
+    .phase-summary-row:last-child { border-bottom: none; }
+    .phase-summary-pos {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 16px; color: var(--gray-3); width: 18px; flex-shrink: 0; text-align: center;
+    }
+    .phase-summary-pos.top { color: var(--gold); }
+    .phase-summary-name { flex: 1; font-weight: 600; color: var(--white); }
+    .phase-summary-pts {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 18px; color: var(--gold);
+    }
+    .phase-summary-exact { font-size: 9px; color: var(--muted); text-align: right; }
+    .phase-pending-note { font-size: 10px; color: var(--muted); padding: 6px 0; }
+
+    /* ─── HISTORIAL POSICIONES (Ranking) ────────────────────── */
+    .pos-history-wrap { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--gray-2); }
+    .pos-history-title { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; margin-bottom: 7px; }
+    .pos-history-track { display: flex; align-items: center; gap: 0; overflow-x: auto; padding-bottom: 3px; }
+    .pos-history-step {
+      display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+      min-width: 52px;
+    }
+    .pos-history-phase { font-size: 8px; color: var(--muted); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; text-align: center; }
+    .pos-badge {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 16px; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; border: 2px solid var(--gray-3);
+      color: var(--muted); background: var(--gray-1);
+    }
+    .pos-badge.p1 { border-color: #ffd700; color: #ffd700; background: rgba(255,215,0,.08); }
+    .pos-badge.p2 { border-color: #c0c0c0; color: #c0c0c0; background: rgba(192,192,192,.06); }
+    .pos-badge.p3 { border-color: #cd7f32; color: #cd7f32; background: rgba(205,127,50,.06); }
+    .pos-badge.top { border-color: var(--gold); color: var(--gold); background: rgba(244,196,48,.08); }
+    .pos-history-arrow { color: var(--gray-3); font-size: 14px; flex-shrink: 0; margin: 0 1px; padding-top: 14px; }
+
+    /* ─── PICKS PENDIENTES (Admin) ──────────────────────────── */
+    .pending-accordion { margin-bottom: 8px; border-radius: var(--r); overflow: hidden; border: 1px solid var(--gray-2); }
+    .pending-acc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 13px; background: var(--gray-2); cursor: pointer; user-select: none;
+    }
+    .pending-acc-title { font-size: 12px; font-weight: 700; color: var(--white); }
+    .pending-acc-meta  { font-size: 10px; color: var(--muted); }
+    .pending-acc-arrow { font-size: 11px; color: var(--muted); transition: transform .2s; }
+    .pending-acc-arrow.open { transform: rotate(180deg); }
+    .pending-acc-body  { display: none; padding: 8px 12px; background: var(--gray-1); }
+    .pending-acc-body.open { display: block; }
+    .pending-names { display: flex; flex-wrap: wrap; gap: 5px; }
+    .pending-name-chip {
+      font-size: 11px; font-weight: 600; padding: 3px 9px;
+      border-radius: 10px; background: rgba(224,82,82,.13);
+      color: var(--danger); border: 1px solid rgba(224,82,82,.2);
+    }
+    .pending-all-ok { font-size: 11px; color: var(--success); padding: 4px 0; }
+
+    /* ─── COMPARADOR DE JUGADORES ───────────────────────────── */
+    .compare-select-row {
+      display: flex; gap: 8px; align-items: center; margin-bottom: 14px;
+    }
+    .compare-select {
+      flex: 1; background: var(--gray-2); border: 1.5px solid var(--gray-3);
+      border-radius: var(--rs); color: var(--white); font-size: 13px; padding: 9px 8px;
+    }
+    .compare-select:focus { outline: none; border-color: var(--gold); }
+    .compare-btn {
+      background: var(--gold); border: none; border-radius: var(--rs);
+      padding: 9px 14px; font-size: 12px; font-weight: 700;
+      color: var(--green-deep); cursor: pointer; white-space: nowrap;
+    }
+    .compare-panel { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: var(--r); overflow: hidden; }
+    .compare-header {
+      display: grid; grid-template-columns: 1fr 28px 1fr;
+      padding: 10px 12px; background: var(--gray-2); text-align: center;
+      font-size: 12px; font-weight: 700; color: var(--white); gap: 4px; align-items: center;
+    }
+    .compare-header-vs { color: var(--muted); font-size: 11px; }
+    .compare-stat-row {
+      display: grid; grid-template-columns: 1fr 90px 1fr;
+      padding: 6px 12px; border-bottom: 1px solid var(--gray-2);
+      align-items: center; font-size: 11px;
+    }
+    .compare-stat-row:last-child { border-bottom: none; }
+    .compare-val-a { font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif; font-size: 18px; color: var(--gold); text-align: left; }
+    .compare-val-b { font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif; font-size: 18px; color: var(--gold); text-align: right; }
+    .compare-val-a.win { color: var(--success); }
+    .compare-val-b.win { color: var(--success); }
+    .compare-lbl { font-size: 9px; color: var(--muted); font-weight: 700; text-align: center; letter-spacing: 0.5px; }
+    /* Picks por partido comparados */
+    .compare-match-row {
+      display: grid; grid-template-columns: 1fr 80px 1fr;
+      padding: 4px 12px; border-bottom: 1px solid var(--gray-2);
+      align-items: center; font-size: 10px;
+    }
+    .compare-match-row:last-child { border-bottom: none; }
+    .cmp-pick-a { text-align: left; font-weight: 700; }
+    .cmp-pick-b { text-align: right; font-weight: 700; }
+    .cmp-match-name { font-size: 9px; color: var(--muted); text-align: center; line-height: 1.3; }
+    .cmp-win  { color: var(--success); }
+    .cmp-lose { color: var(--danger); }
+    .cmp-tie  { color: var(--muted); }
+    .cmp-none { color: var(--gray-3); }
+
     /* ─── ADMIN: AGREGAR PARTIDO ─────────────────────────────── */
     .add-match-form {
       background: var(--gray-1); border: 1px solid var(--gray-2);
@@ -719,6 +844,10 @@
       <div id="rankingSummary" class="ranking-summary"></div>
       <div id="podiumRow"      class="podium-row"></div>
       <div id="rankingList"    class="ranking-list"></div>
+      <div id="compareSection" style="display:none;margin-top:16px">
+        <div class="section-label">COMPARAR JUGADORES</div>
+        <div id="comparePanel"></div>
+      </div>
     </div>
 
     <div id="screen-stats" class="screen">
@@ -1093,6 +1222,192 @@ async function loginProceed(user,isAdmin) {
   await loadAll();
   hideLoading();
   bootApp();
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   HISTORIAL DE POSICIONES POR FASE
+═══════════════════════════════════════════════════════════════ */
+function generatePosHistory(user, currentRanking) {
+  const phases = [...new Set(DB.matches.map(m=>m.phase||"General"))];
+  phases.sort((a,b)=>PHASE_ORDER.indexOf(a)-PHASE_ORDER.indexOf(b));
+
+  // Solo fases con al menos un partido finalizado
+  const donePhases = phases.filter(ph =>
+    DB.matches.some(m=>(m.phase||"General")===ph && m.done)
+  );
+  if (donePhases.length < 1) return "";
+
+  // Calcular posición acumulada al cierre de cada fase
+  const steps = donePhases.map(phase => {
+    // Puntos acumulados hasta el final de esta fase (inclusive)
+    const phaseIdx = PHASE_ORDER.indexOf(phase);
+    const phasesUpTo = PHASE_ORDER.slice(0, phaseIdx + 1);
+    const snapshot = DB.users.map(u => {
+      let pts = 0;
+      DB.matches
+        .filter(m => phasesUpTo.includes(m.phase||"General") && m.done)
+        .forEach(m => {
+          const pick = DB.picks.find(p=>p.user_id===u.id&&p.match_id===m.id);
+          pts += calcPickPts(pick,m).total;
+        });
+      if (DB.championWinner && u.champion===DB.championWinner) pts += 5;
+      return { id: u.id, pts };
+    }).sort((a,b) => b.pts - a.pts);
+
+    const pos = snapshot.findIndex(u=>u.id===user.id) + 1;
+    return { phase, pos };
+  });
+
+  const posBadgeClass = pos => pos===1?"p1":pos===2?"p2":pos===3?"p3":pos<=5?"top":"";
+
+  const stepHtml = steps.map((s, i) => {
+    const arrow = i < steps.length-1
+      ? `<span class="pos-history-arrow">${steps[i+1].pos < s.pos?"▲":steps[i+1].pos > s.pos?"▼":"—"}</span>`
+      : "";
+    return `
+      <div class="pos-history-step">
+        <div class="pos-history-phase">${s.phase}</div>
+        <div class="pos-badge ${posBadgeClass(s.pos)}">${s.pos}</div>
+      </div>${arrow}`;
+  }).join("");
+
+  return `
+    <div class="pos-history-wrap">
+      <div class="pos-history-title">HISTORIAL DE POSICIONES</div>
+      <div class="pos-history-track">${stepHtml}</div>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESUMEN DE FASE (Admin)
+═══════════════════════════════════════════════════════════════ */
+function renderPhaseSummaries() {
+  const phases = [...new Set(DB.matches.map(m=>m.phase||"General"))];
+  phases.sort((a,b)=>PHASE_ORDER.indexOf(a)-PHASE_ORDER.indexOf(b));
+
+  return phases.map(phase => {
+    const pMatches = DB.matches.filter(m=>(m.phase||"General")===phase);
+    const done     = pMatches.every(m=>m.done);
+    const doneCnt  = pMatches.filter(m=>m.done).length;
+    if (doneCnt === 0) return "";
+
+    // Ranking de la fase
+    const phaseRanking = DB.users.map(u => {
+      const ps = calcUserPhaseStats(u, phase);
+      return { ...u, ...ps };
+    }).sort((a,b) => b.pts-a.pts || b.exact-a.exact || a.name.localeCompare(b.name));
+
+    const medals = ["🥇","🥈","🥉"];
+    const rows = phaseRanking.map((u,i) => `
+      <div class="phase-summary-row">
+        <span class="phase-summary-pos ${i<3?"top":""}">${medals[i]||i+1}</span>
+        <span class="phase-summary-name">${u.name}</span>
+        <span class="phase-summary-exact">${Math.floor(u.exact/3)} exactos</span>
+        <span class="phase-summary-pts">${u.pts}</span>
+      </div>`).join("");
+
+    const status = done ? "COMPLETA" : `${doneCnt}/${pMatches.length} jugados`;
+
+    return `
+      <div class="phase-summary-card">
+        <div class="phase-summary-title">
+          <span>${phase} <span style="font-size:10px;color:var(--muted);font-weight:400">${status}</span></span>
+          <button class="phase-summary-copy-btn" onclick="copyPhaseSummary('${phase}')">📋 Copiar</button>
+        </div>
+        ${rows}
+      </div>`;
+  }).filter(Boolean).join("");
+}
+
+function copyPhaseSummary(phase) {
+  const pMatches = DB.matches.filter(m=>(m.phase||"General")===phase);
+  const phaseRanking = DB.users.map(u => {
+    const ps = calcUserPhaseStats(u, phase);
+    return { ...u, ...ps };
+  }).sort((a,b) => b.pts-a.pts || b.exact-a.exact || a.name.localeCompare(b.name));
+
+  const medals = ["🥇","🥈","🥉"];
+  let text = `⚽ *QUINIELA MUNDIAL 2026*\n`;
+  text += `📊 Resumen ${phase}\n`;
+  text += `${"─".repeat(22)}\n`;
+  phaseRanking.forEach((u,i) => {
+    text += `${medals[i]||`${i+1}.`} ${u.name} — *${u.pts} pts*`;
+    if (Math.floor(u.exact/3) > 0) text += ` (${Math.floor(u.exact/3)} exacto${Math.floor(u.exact/3)>1?"s":""})`;
+    text += "\n";
+  });
+  text += `\n_¡A por la siguiente fase!_`;
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text)
+      .then(()=>showToast("✅ Resumen copiado — pégalo en WhatsApp","success"))
+      .catch(()=>_fallbackCopyText(text));
+  } else { _fallbackCopyText(text); }
+}
+
+function _fallbackCopyText(text) {
+  const ta=document.createElement("textarea");ta.value=text;
+  ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);
+  ta.select();
+  try{document.execCommand("copy");showToast("✅ Copiado","success");}
+  catch{showToast("No se pudo copiar","error");}
+  document.body.removeChild(ta);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PICKS PENDIENTES (Admin)
+═══════════════════════════════════════════════════════════════ */
+function renderPendingPicks() {
+  // Partidos próximos o en curso con picks faltantes
+  const upcoming = DB.matches
+    .filter(m => !m.done)
+    .sort((a,b) => new Date(a.timeISO) - new Date(b.timeISO));
+
+  if (!upcoming.length) return `<div style="font-size:11px;color:var(--muted);padding:8px 0">No hay partidos pendientes.</div>`;
+
+  return upcoming.map(m => {
+    const missing = DB.users.filter(u => {
+      const pick = DB.picks.find(p=>p.user_id===u.id&&p.match_id===m.id);
+      return !pick?.ot;
+    });
+    const locked    = isLocked(m);
+    const accId     = `pend_${m.id}`;
+    const allOk     = missing.length === 0;
+    const metaColor = locked ? "var(--muted)" : allOk ? "var(--success)" : "var(--danger)";
+    const metaTxt   = locked
+      ? "CERRADO"
+      : allOk
+        ? "✅ Todos apostaron"
+        : `⚠️ ${missing.length} sin apostar`;
+
+    const body = allOk
+      ? `<div class="pending-all-ok">✅ Todos los jugadores registraron su pick.</div>`
+      : `<div class="pending-names">${missing.map(u=>`<span class="pending-name-chip">${u.name}</span>`).join("")}</div>`;
+
+    return `
+      <div class="pending-accordion">
+        <div class="pending-acc-header" onclick="togglePendingAcc('${accId}')">
+          <div>
+            <span class="pending-acc-title">${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag}</span>
+            <span style="font-size:9px;color:var(--muted);margin-left:6px">${m.day} · ${fmtTime(m.timeISO)}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:10px;color:${metaColor};font-weight:700">${metaTxt}</span>
+            <span class="pending-acc-arrow" id="parr2_${accId}">▼</span>
+          </div>
+        </div>
+        <div class="pending-acc-body" id="${accId}">${body}</div>
+      </div>`;
+  }).join("");
+}
+
+function togglePendingAcc(id) {
+  const body  = document.getElementById(id);
+  const arrow = document.getElementById(`parr2_${id}`);
+  if (!body) return;
+  const open = body.classList.contains("open");
+  body.classList.toggle("open", !open);
+  if (arrow) arrow.classList.toggle("open", !open);
 }
 
 function bootApp() {
@@ -1482,6 +1797,7 @@ function renderRanking(){
       <div class="podium-champ">${ct?ct.id+" "+ct.name:"Sin campeón"}</div></div>`;
   }).join("");
   if(!ranking.length){document.getElementById("rankingList").innerHTML=`<div class="empty"><div class="empty-icon">🏁</div>Aún no hay participantes.</div>`;return;}
+  renderCompareSelector();
   document.getElementById("rankingList").innerHTML=ranking.map((u,i)=>{
     const ct=CHAMPION_TEAMS.find(t=>t.id===u.champion),isMe=u.id===currentUser.id;
     const streaks=calcStreaks(u);
@@ -1514,6 +1830,7 @@ function renderRanking(){
           <div class="detail-cell"><div class="detail-val">${u.champ}</div><div class="detail-lbl">Campeón</div></div>
         </div>
         ${generateEvoChart(u)}
+        ${generatePosHistory(u, ranking)}
         <div class="detail-picks-title" style="margin-top:10px">PICKS POR PARTIDO</div>${pickRows}
       </div>`;
   }).join("");
@@ -1525,6 +1842,101 @@ function toggleDetail(userId){
   document.querySelectorAll(".rank-detail").forEach(el=>el.classList.remove("open"));
   document.querySelectorAll(".ranking-row").forEach(el=>el.classList.remove("expanded"));
   if(!isOpen){detail.classList.add("open");row.classList.add("expanded");}
+}
+
+/* ── COMPARADOR DE JUGADORES ─────────────────────────────────────────────── */
+function renderCompareSelector() {
+  const sec = document.getElementById("compareSection");
+  if (!sec || DB.users.length < 2) return;
+  sec.style.display = "block";
+  const opts = DB.users.map(u =>
+    `<option value="${u.id}">${u.name}</option>`).join("");
+  document.getElementById("comparePanel").innerHTML = `
+    <div class="compare-select-row">
+      <select class="compare-select" id="cmp_a">${opts}</select>
+      <span style="color:var(--muted);font-weight:700;font-size:13px">VS</span>
+      <select class="compare-select" id="cmp_b">${opts}</select>
+    </div>
+    <button class="compare-btn" style="width:100%;margin-bottom:12px" onclick="renderComparePlayers()">⚡ COMPARAR</button>
+    <div id="compareResult"></div>`;
+  // Pre-seleccionar segundo jugador diferente al primero
+  const bSel = document.getElementById("cmp_b");
+  if (bSel && DB.users.length > 1) bSel.value = DB.users[1].id;
+}
+
+function renderComparePlayers() {
+  const idA = document.getElementById("cmp_a")?.value;
+  const idB = document.getElementById("cmp_b")?.value;
+  if (!idA || !idB || idA === idB) {
+    document.getElementById("compareResult").innerHTML =
+      `<div style="font-size:11px;color:var(--muted);text-align:center;padding:12px">Elige dos jugadores distintos</div>`;
+    return;
+  }
+  const uA = DB.users.find(u=>u.id===idA), uB = DB.users.find(u=>u.id===idB);
+  const sA = calcUserStats(uA), sB = calcUserStats(uB);
+  const rankA = calcRanking().findIndex(u=>u.id===idA)+1;
+  const rankB = calcRanking().findIndex(u=>u.id===idB)+1;
+  const ctA   = CHAMPION_TEAMS.find(t=>t.id===uA.champion);
+  const ctB   = CHAMPION_TEAMS.find(t=>t.id===uB.champion);
+  const spA   = SCORER_PLAYERS.find(p=>p.id===uA.scorer);
+  const spB   = SCORER_PLAYERS.find(p=>p.id===uB.scorer);
+
+  const stat = (a, b, lblA, lbl, lblB) => `
+    <div class="compare-stat-row">
+      <span class="compare-val-a ${a>b?"win":""}">${lblA}</span>
+      <span class="compare-lbl">${lbl}</span>
+      <span class="compare-val-b ${b>a?"win":""}" style="text-align:right">${lblB}</span>
+    </div>`;
+
+  // Picks por partido
+  const played = DB.matches.filter(m=>m.done&&m.result)
+    .sort((a,b)=>new Date(a.timeISO)-new Date(b.timeISO));
+
+  const matchRows = played.map(m=>{
+    const pickA = DB.picks.find(p=>p.user_id===idA&&p.match_id===m.id);
+    const pickB = DB.picks.find(p=>p.user_id===idB&&p.match_id===m.id);
+    const pA = calcPickPts(pickA,m).total, pB = calcPickPts(pickB,m).total;
+    const phA=parseInt(pickA?.home_score),paA=parseInt(pickA?.away_score);
+    const phB=parseInt(pickB?.home_score),paB=parseInt(pickB?.away_score);
+    const otA = pickA?.ot ? (!isNaN(phA)&&!isNaN(paA)?(phA>paA?"1":phA===paA?"X":"2"):pickA.ot) : null;
+    const otB = pickB?.ot ? (!isNaN(phB)&&!isNaN(paB)?(phB>paB?"1":phB===paB?"X":"2"):pickB.ot) : null;
+    const labelOT = o => o?{"1":"LOC","X":"EMP","2":"VIS"}[o]:"–";
+    const colorA = pA>pB?"cmp-win":pA<pB?"cmp-lose":"cmp-tie";
+    const colorB = pB>pA?"cmp-win":pB<pA?"cmp-lose":"cmp-tie";
+    const scA = !isNaN(phA)?`${phA}-${paA}`:"–";
+    const scB = !isNaN(phB)?`${phB}-${paB}`:"–";
+    return`<div class="compare-match-row">
+      <span class="cmp-pick-a ${colorA}">${labelOT(otA)} ${scA}<br><span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:13px">${pA} pts</span></span>
+      <span class="cmp-match-name">${m.homeFlag}<br>vs<br>${m.awayFlag}<br><span style="font-size:8px">${m.result.homeScore}–${m.result.awayScore}</span></span>
+      <span class="cmp-pick-b ${colorB}">${labelOT(otB)} ${scB}<br><span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:13px">${pB} pts</span></span>
+    </div>`;
+  }).join("");
+
+  document.getElementById("compareResult").innerHTML = `
+    <div class="compare-panel">
+      <div class="compare-header">
+        <span>${uA.name}</span>
+        <span class="compare-header-vs">VS</span>
+        <span>${uB.name}</span>
+      </div>
+      ${stat(sA.pts,sB.pts,sA.pts,"PUNTOS TOTALES",sB.pts)}
+      ${stat(rankB,rankA,"#"+rankA,"POSICIÓN","#"+rankB)}
+      ${stat(Math.floor(sA.exact/3),Math.floor(sB.exact/3),Math.floor(sA.exact/3),"EXACTOS",Math.floor(sB.exact/3))}
+      ${stat(sA.ot+sA.advance,sB.ot+sB.advance,sA.ot+sA.advance,"RESULTADOS",sB.ot+sB.advance)}
+      <div class="compare-stat-row">
+        <span style="font-size:10px;color:var(--muted);text-align:left">${ctA?ctA.id+" "+ctA.name:"–"}</span>
+        <span class="compare-lbl">CAMPEÓN</span>
+        <span style="font-size:10px;color:var(--muted);text-align:right">${ctB?ctB.id+" "+ctB.name:"–"}</span>
+      </div>
+      <div class="compare-stat-row">
+        <span style="font-size:10px;color:var(--muted);text-align:left">${spA?spA.name:"–"}</span>
+        <span class="compare-lbl">GOLEADOR</span>
+        <span style="font-size:10px;color:var(--muted);text-align:right">${spB?spB.name:"–"}</span>
+      </div>
+      ${played.length?`
+        <div style="padding:6px 12px;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;background:var(--gray-2);border-top:1px solid var(--gray-2)">PARTIDO A PARTIDO</div>
+        ${matchRows}`:""}
+    </div>`;
 }
 
 /* ── ESTADÍSTICAS ────────────────────────────────────────────────────────── */
@@ -1949,12 +2361,14 @@ function renderAdmin(){
           return calcPickPts(pick,m).total>0?`<div class="prog-dot done-correct"></div>`:`<div class="prog-dot done-wrong"></div>`;
         }).join("");
         const picksCount=DB.matches.filter(m=>DB.picks.find(p=>p.user_id===u.id&&p.match_id===m.id&&p.ot)).length;
+        const sp = SCORER_PLAYERS.find(p => p.id === u.scorer);
         return`<div class="participant-card ${u.is_admin?"admin-user":""}" id="pcard_${u.id}">
           <button style="position:absolute;top:8px;right:8px;background:transparent;border:none;color:var(--muted);font-size:14px;cursor:pointer;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .15s" onclick="event.stopPropagation();confirmDeleteUser('${u.id}')">✕</button>
           <div onclick="openParticipantModal('${u.id}')">
             <div class="participant-name">${u.name}</div>
             <span class="participant-badge ${u.is_admin?"admin":"user"}">${u.is_admin?"⚙️ ADMIN":"✅ ACTIVO"}</span>
-            <div class="participant-champ">Campeón: <b>${ct?ct.id+" "+ct.name:"Sin elegir"}</b></div>
+            <div class="participant-champ">🏆 <b>${ct?ct.id+" "+ct.name:"Sin elegir"}</b></div>
+            <div class="participant-champ" style="margin-top:-3px">⚽ <b>${sp?sp.name:"Sin elegir"}</b></div>
             <div class="participant-progress">${dots}</div>
             <div class="participant-stats">
               <div class="pstat"><div class="pstat-val">${picksCount}</div><div class="pstat-lbl">PICKS</div></div>
@@ -2122,6 +2536,14 @@ function renderAdmin(){
 
         <button class="add-match-btn" onclick="adminAddMatch()">➕ AGREGAR PARTIDO</button>
       </div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-title">PICKS PENDIENTES</div>
+      ${renderPendingPicks()}
+    </div>
+    <div class="admin-section">
+      <div class="admin-title">RESUMEN POR FASE</div>
+      ${renderPhaseSummaries()||`<div style="font-size:11px;color:var(--muted)">Aún no hay partidos finalizados.</div>`}
     </div>
     <button class="recalc-btn" onclick="recalcAll()">🔄 ACTUALIZAR TABLA DE POSICIONES</button>`;
 }
