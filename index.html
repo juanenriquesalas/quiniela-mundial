@@ -542,6 +542,112 @@
     }
 
 
+
+    /* ─── SUGERENCIA 1: Banner cierre inminente ─────────────────── */
+    .closing-banner {
+      background: rgba(224,82,82,.10); border: 1px solid rgba(224,82,82,.35);
+      border-radius: var(--rs); padding: 10px 14px; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+    }
+    .closing-banner-icon { font-size: 20px; flex-shrink: 0; }
+    .closing-banner-text { flex: 1; font-size: 12px; line-height: 1.4; }
+    .closing-banner-text b { color: var(--danger); display: block; font-size: 13px; }
+    .closing-banner-text span { color: var(--muted); font-size: 11px; }
+    .closing-banner-cta {
+      font-size: 10px; font-weight: 700; color: var(--danger);
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* ─── SUGERENCIA 2: Flash de guardado ───────────────────────── */
+    @keyframes flashSave {
+      0%   { box-shadow: 0 0 0 0 rgba(76,175,135,.7); }
+      50%  { box-shadow: 0 0 0 8px rgba(76,175,135,.15); }
+      100% { box-shadow: 0 0 0 0 rgba(76,175,135,.0); }
+    }
+    .match-card.flash-save { animation: flashSave .6s ease; }
+
+    /* ─── SUGERENCIA 3: Vista rápida del día ────────────────────── */
+    .today-strip {
+      background: var(--gray-1); border: 1px solid var(--gray-2);
+      border-radius: var(--r); padding: 10px 12px; margin-bottom: 14px;
+    }
+    .today-strip-title {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 12px; letter-spacing: 2px; color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .today-match-row {
+      display: flex; align-items: center; gap: 8px; padding: 5px 0;
+      border-bottom: 1px solid var(--gray-2); font-size: 11px;
+    }
+    .today-match-row:last-child { border-bottom: none; }
+    .today-match-time { font-weight: 700; color: var(--gold); width: 38px; flex-shrink: 0; font-size: 10px; }
+    .today-match-teams { flex: 1; color: var(--white); font-weight: 600; }
+    .today-match-pick {
+      font-size: 10px; font-weight: 700; padding: 2px 7px;
+      border-radius: 6px; white-space: nowrap;
+    }
+    .today-pick-ok   { background: rgba(76,175,135,.15);  color: var(--success); }
+    .today-pick-none { background: rgba(224,82,82,.12);   color: var(--danger); }
+    .today-pick-done { background: rgba(160,160,180,.12); color: var(--muted); }
+
+    /* ─── SUGERENCIA 4: Toast de resultado ──────────────────────── */
+    .result-toast {
+      position: fixed; top: 80px; left: 50%;
+      transform: translateX(-50%) translateY(-16px);
+      background: var(--gray-1); border-radius: var(--r);
+      padding: 12px 18px; z-index: 998; opacity: 0;
+      transition: all 0.3s; pointer-events: none;
+      border: 2px solid var(--gray-3); text-align: center;
+      min-width: 200px; box-shadow: 0 6px 24px rgba(0,0,0,.4);
+    }
+    .result-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .result-toast.win  { border-color: var(--success); }
+    .result-toast.loss { border-color: var(--gray-3); }
+    .result-toast-pts  {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 32px; color: var(--gold); line-height: 1;
+    }
+    .result-toast-pts.zero { color: var(--muted); }
+    .result-toast-match { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .result-toast-label { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+
+    /* ─── SUGERENCIA 5: Distancia al vecino (sobria) ────────────── */
+    .rank-gap-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 12px; margin-top: 4px;
+      background: var(--gray-1); border-radius: var(--rs);
+      font-size: 10px; color: var(--muted);
+    }
+    .rank-gap-up   { color: var(--success); font-weight: 700; }
+    .rank-gap-down { color: var(--muted); }
+
+    /* ─── STATS: GOLEADOR MÁS APOSTADO ──────────────────────────── */
+    .scorer-stats-grid {
+      display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 18px;
+    }
+    .scorer-stats-card {
+      background: var(--gray-1); border: 1px solid var(--gray-2);
+      border-radius: var(--rs); padding: 10px 10px 8px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .scorer-stats-avatar {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      background: var(--gray-2); border: 2px solid var(--gray-3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 13px; color: var(--muted);
+    }
+    .scorer-stats-avatar.leader { border-color: var(--gold); color: var(--gold); background: rgba(244,196,48,.12); }
+    .scorer-stats-info { flex: 1; min-width: 0; }
+    .scorer-stats-name { font-size: 11px; font-weight: 700; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .scorer-stats-team { font-size: 9px; color: var(--muted); }
+    .scorer-stats-cnt  {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 22px; color: var(--gold); line-height: 1; flex-shrink: 0;
+    }
+    .scorer-stats-lbl  { font-size: 8px; color: var(--muted); text-align: right; }
+
     /* ─── GOLEADOR DEL TORNEO ───────────────────────────────────── */
     .scorer-section {
       background: linear-gradient(135deg, rgba(244,196,48,.06) 0%, transparent 100%);
@@ -871,6 +977,7 @@
         <div class="scorer-grid" id="scorerGrid"></div>
         <button class="save-scorer-btn" id="saveScorerBtn" onclick="saveScorer()">GUARDAR MI GOLEADOR</button>
       </div>
+      <div id="todayStrip"></div>
       <div id="matchesByDay"></div>
     </div>
 
@@ -916,6 +1023,11 @@
 </div>
 
 <canvas id="cmpCanvas"></canvas>
+<div class="result-toast" id="resultToast">
+  <div class="result-toast-label" id="resultToastLabel"></div>
+  <div class="result-toast-pts"  id="resultToastPts"></div>
+  <div class="result-toast-match" id="resultToastMatch"></div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1629,6 +1741,155 @@ function togglePendingAcc(id) {
   if (arrow) arrow.classList.toggle("open", !open);
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   SUGERENCIA 1 — Banner de cierre inminente
+═══════════════════════════════════════════════════════════════ */
+function renderClosingBanner() {
+  const el = document.getElementById("todayStrip");
+  if (!el) return;
+
+  // Partidos que cierran en los próximos 60 min sin pick del usuario
+  const urgent = DB.matches.filter(m => {
+    if (isLocked(m) || m.done) return false;
+    const diff = (new Date(m.timeISO) - new Date()) / 60000;
+    if (diff > 60) return false;
+    const pick = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === m.id);
+    return !pick?.ot;
+  });
+
+  if (urgent.length === 0) {
+    renderTodayStrip(); // mostrar vista del día en su lugar
+    return;
+  }
+
+  const names = urgent.map(m => `${m.homeFlag} vs ${m.awayFlag}`).join(", ");
+  const minLeft = Math.round((new Date(urgent[0].timeISO) - new Date()) / 60000);
+
+  el.innerHTML = `
+    <div class="closing-banner" onclick="scrollToMatch('${urgent[0].id}')">
+      <span class="closing-banner-icon">⚠️</span>
+      <div class="closing-banner-text">
+        <b>${urgent.length} partido${urgent.length>1?"s":""}  sin tu pronóstico</b>
+        <span>${names} · cierra${urgent.length>1?"n":""} en ~${minLeft} min</span>
+      </div>
+      <span class="closing-banner-cta">IR →</span>
+    </div>`;
+
+  // Después del banner también mostrar la vista del día
+  el.innerHTML += renderTodayStripHtml();
+}
+
+function scrollToMatch(matchId) {
+  // Abrir el acordeón correspondiente y hacer scroll
+  const card = document.getElementById(`card_${matchId}`);
+  if (card) { card.scrollIntoView({ behavior:"smooth", block:"center" }); return; }
+  // Si está dentro de un acordeón colapsado, intentar abrirlo
+  DB.matches.forEach(m => {
+    if (m.id !== matchId) return;
+    const phase = m.phase || "General";
+    const accId = `pacc_${phase.replace(/[^a-z0-9]/gi,"")}`;
+    const body  = document.getElementById(accId);
+    const arrow = document.getElementById(`parr_${accId}`);
+    if (body && body.style.display === "none") {
+      body.style.display = "block";
+      if (arrow) arrow.style.transform = "rotate(180deg)";
+    }
+    setTimeout(() => {
+      const c2 = document.getElementById(`card_${matchId}`);
+      if (c2) c2.scrollIntoView({ behavior:"smooth", block:"center" });
+    }, 100);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SUGERENCIA 3 — Vista rápida del día
+═══════════════════════════════════════════════════════════════ */
+function renderTodayStripHtml() {
+  const today = new Date();
+  const todayMatches = DB.matches.filter(m => {
+    const d = new Date(m.timeISO);
+    return d.getFullYear() === today.getFullYear() &&
+           d.getMonth()    === today.getMonth()    &&
+           d.getDate()     === today.getDate();
+  });
+  if (!todayMatches.length) return "";
+
+  const rows = todayMatches.map(m => {
+    const pick   = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === m.id);
+    const ph     = parseInt(pick?.home_score), pa = parseInt(pick?.away_score);
+    const hasScore = !isNaN(ph) && !isNaN(pa);
+    const pickOT = hasScore ? (ph>pa?"1":ph===pa?"X":"2") : pick?.ot;
+
+    let pickLabel = "", pickCls = "";
+    if (m.done) {
+      const p = calcPickPts(pick, m);
+      pickLabel = pick?.ot ? `${p.total} pts` : "Sin pick";
+      pickCls   = "today-pick-done";
+    } else if (isLocked(m)) {
+      pickLabel = pick?.ot ? "✓ Registrado" : "Sin pick";
+      pickCls   = pick?.ot ? "today-pick-ok" : "today-pick-none";
+    } else {
+      pickLabel = pick?.ot ? "✓ Guardado" : "⚠ Pendiente";
+      pickCls   = pick?.ot ? "today-pick-ok" : "today-pick-none";
+    }
+
+    return `<div class="today-match-row" onclick="scrollToMatch('${m.id}')">
+      <span class="today-match-time">${fmtTime(m.timeISO)}</span>
+      <span class="today-match-teams">${m.homeFlag} ${m.home} vs ${m.away} ${m.awayFlag}</span>
+      <span class="today-match-pick ${pickCls}">${pickLabel}</span>
+    </div>`;
+  }).join("");
+
+  return `<div class="today-strip">
+    <div class="today-strip-title">HOY</div>
+    ${rows}
+  </div>`;
+}
+
+function renderTodayStrip() {
+  const el = document.getElementById("todayStrip");
+  if (el) el.innerHTML = renderTodayStripHtml();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SUGERENCIA 4 — Toast de resultado por partido
+═══════════════════════════════════════════════════════════════ */
+let _prevMatchStates = {};
+let _resultToastTimer = null;
+
+function checkNewResults() {
+  DB.matches.forEach(m => {
+    if (!m.done) return;
+    const wasKnown = _prevMatchStates[m.id];
+    if (wasKnown) return; // ya se notificó
+    _prevMatchStates[m.id] = true;
+
+    const pick = DB.picks.find(p => p.user_id === currentUser.id && p.match_id === m.id);
+    const p    = calcPickPts(pick, m);
+
+    const toast  = document.getElementById("resultToast");
+    const label  = document.getElementById("resultToastLabel");
+    const pts    = document.getElementById("resultToastPts");
+    const match  = document.getElementById("resultToastMatch");
+    if (!toast) return;
+
+    clearTimeout(_resultToastTimer);
+    const scored = p.total > 0;
+    toast.className = `result-toast ${scored?"win":"loss"}`;
+    label.textContent  = scored ? "¡Sumaste puntos!" : "Esta vez no";
+    pts.textContent    = `+${p.total} pts`;
+    pts.className      = `result-toast-pts ${p.total===0?"zero":""}`;
+    match.textContent  = `${m.homeFlag} ${m.home} ${m.result?.homeScore??""} – ${m.result?.awayScore??""} ${m.away} ${m.awayFlag}`;
+
+    // Mostrar solo si el resultado es nuevo (no al abrir la app por primera vez)
+    if (Object.keys(_prevMatchStates).length > 1) {
+      toast.classList.add("visible");
+      _resultToastTimer = setTimeout(() => toast.classList.remove("visible"), 4000);
+    }
+  });
+}
+
 function bootApp() {
   document.getElementById("loginScreen").style.display="none";
   document.getElementById("appShell").style.display="block";
@@ -1643,9 +1904,13 @@ function bootApp() {
   document.getElementById("themeToggle").textContent=savedTheme==="light"?"🌙":"☀️";
 
   renderChampion();renderScorer();renderMatches();renderRanking();
+  renderClosingBanner();
+  // Inicializar estado de partidos conocidos (para no notificar al entrar)
+  DB.matches.forEach(m=>{ if(m.done)_prevMatchStates[m.id]=true; });
   if(currentUser.is_admin)renderAdmin();
   setInterval(async()=>{
-    try{await loadAll();renderMatches();renderRanking();if(currentUser.is_admin)renderAdmin();}
+    try{await loadAll();renderMatches();renderRanking();if(currentUser.is_admin)renderAdmin();
+      renderClosingBanner();checkNewResults();}
     catch(e){console.error("Refresco falló:",e);}
   },60000);
 }
@@ -1668,6 +1933,7 @@ function switchTab(id) {
   document.getElementById(`tab-${id}`)?.classList.add("active");
   document.getElementById(`bnav-${id}`)?.classList.add("active");
   if(id==="stats")renderStats();
+  if(id==="picks")renderClosingBanner();
 }
 
 
@@ -2079,7 +2345,12 @@ async function savePick(matchId,silent=false){
       ot:derivedOT, home_score:parseInt(hsVal), away_score:parseInt(asVal), advance
     });
     if(!silent)showToast("✅ Pronóstico guardado","success");
-    document.getElementById(`card_${matchId}`)?.classList.add("saved");
+    const card=document.getElementById(`card_${matchId}`);
+    if(card){
+      card.classList.add("saved");
+      card.classList.add("flash-save");
+      setTimeout(()=>card.classList.remove("flash-save"),700);
+    }
   }catch(e){if(!silent)showToast("Error al guardar","error");console.error(e);}
 }
 
@@ -2174,10 +2445,22 @@ function renderRanking(){
   const playedCount=DB.matches.filter(m=>m.done).length;
   const myStats=ranking.find(u=>u.id===currentUser.id)||{pts:0};
   const myPos=ranking.findIndex(u=>u.id===currentUser.id)+1;
+  // Distancia al vecino (sobria)
+  const above = myPos > 1 ? ranking[myPos-2] : null;
+  const below = myPos < ranking.length ? ranking[myPos] : null;
+  const gapUp   = above ? above.pts - myStats.pts : null;
+  const gapDown = below ? myStats.pts - below.pts : null;
+  const gapHtml = (myPos > 0 && ranking.length > 1) ? `
+    <div class="rank-gap-row">
+      <span class="rank-gap-up">${gapUp!==null ? (gapUp===0?"Empate con #"+(myPos-1):"↑ "+gapUp+" pts para #"+(myPos-1)) : "Vas 1°"}</span>
+      <span class="rank-gap-down">${gapDown!==null ? "↓ "+gapDown+" pts sobre #"+(myPos+1) : "Último"}</span>
+    </div>` : "";
+
   document.getElementById("rankingSummary").innerHTML=`
     <div class="rank-stat"><div class="rank-stat-val">${myStats.pts}</div><div class="rank-stat-label">MIS PUNTOS</div></div>
     <div class="rank-stat"><div class="rank-stat-val">${myPos||"–"}</div><div class="rank-stat-label">MI POSICIÓN</div></div>
-    <div class="rank-stat"><div class="rank-stat-val">${playedCount}</div><div class="rank-stat-label">JUGADOS</div></div>`;
+    <div class="rank-stat"><div class="rank-stat-val">${playedCount}</div><div class="rank-stat-label">JUGADOS</div></div>
+    ${gapHtml}`;
   const medals=["🥇","🥈","🥉"],pCls=["p1","p2","p3"];
   const top3=ranking.slice(0,Math.min(3,ranking.length));
   document.getElementById("podiumRow").innerHTML=top3.map((u,i)=>{
@@ -2408,6 +2691,26 @@ function renderStats(){
   }).filter(Boolean).join("");
 
   // Resumen de jornada
+  // Goleadores apostados
+  const scorerMap={};
+  DB.users.forEach(u=>{if(u.scorer)scorerMap[u.scorer]=(scorerMap[u.scorer]||0)+1;});
+  const maxScorerVotes=Math.max(0,...Object.values(scorerMap));
+  const scorerGrid=SCORER_PLAYERS.map(p=>{
+    const cnt=scorerMap[p.id]||0;
+    const isLeader=cnt>0&&cnt===maxScorerVotes;
+    return`<div class="scorer-stats-card">
+      <div class="scorer-stats-avatar ${isLeader?"leader":""}">${p.initials}</div>
+      <div class="scorer-stats-info">
+        <div class="scorer-stats-name">${p.name}</div>
+        <div class="scorer-stats-team">${p.team}</div>
+      </div>
+      <div>
+        <div class="scorer-stats-cnt">${cnt}</div>
+        <div class="scorer-stats-lbl">${cnt===1?"voto":"votos"}</div>
+      </div>
+    </div>`;
+  }).join("");
+
   const summaryBtn=`<button class="summary-btn" onclick="copyDaySummary()">📋 Copiar resumen para WhatsApp</button>`;
 
   // ── PICKS POR PARTIDO (acordeón por fase → partido) ──────────────
@@ -2586,6 +2889,8 @@ function renderStats(){
     ${summaryBtn}
     <div class="section-label">CAMPEÓN MÁS APOSTADO</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:18px">${champGrid}</div>
+    <div class="section-label">GOLEADOR MÁS APOSTADO</div>
+    <div class="scorer-stats-grid">${scorerGrid}</div>
     <div class="section-label">RANKING POR FASE</div>
     ${phaseRankingSections||`<div class="empty"><div class="empty-icon">⏳</div>Aún no hay partidos finalizados.</div>`}
     <div class="section-label" style="margin-top:18px">PICKS POR PARTIDO</div>
