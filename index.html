@@ -1161,18 +1161,36 @@ async function loadAll() {
   const ss = settings.find(s=>s.key==="scorer_winner");
   DB.scorerWinner = ss?.value||null;
 
-  // Cargar picks de goleador individuales desde settings (fallback si columna scorer no existe en users)
-  // Si users ya tiene scorer en columna, usar ese valor; si no, buscar en settings
-  DB.users.forEach(u => {
-    if (!u.scorer) {
-      const fallback = settings.find(s => s.key === `scorer_pick_${u.id}`);
-      if (fallback?.value) u.scorer = fallback.value;
+  // Cargar picks de goleador: intentar desde columna users, luego desde settings
+  // Construir mapa de scorer_pick_* desde settings para acceso O(1)
+  const scorerPickMap = {};
+  settings.forEach(s => {
+    if (s.key && s.key.startsWith("scorer_pick_")) {
+      const uid = s.key.replace("scorer_pick_", "");
+      // value puede ser string directo o JSON con comillas — normalizar
+      let val = s.value;
+      if (typeof val === "string" && val.startsWith('"')) {
+        try { val = JSON.parse(val); } catch(e) {}
+      }
+      if (val && typeof val === "string" && val.length > 0) {
+        scorerPickMap[uid] = val;
+      }
     }
   });
+
+  DB.users.forEach(u => {
+    // Prioridad 1: columna scorer en tabla users (si existe y tiene valor)
+    if (u.scorer && typeof u.scorer === "string" && u.scorer.length > 0) return;
+    // Prioridad 2: settings scorer_pick_{userId}
+    if (scorerPickMap[u.id]) { u.scorer = scorerPickMap[u.id]; return; }
+    // Sin pick de goleador
+    u.scorer = null;
+  });
+
   // Sincronizar currentUser si ya está logueado
   if (currentUser?.id) {
     const fresh = DB.users.find(u => u.id === currentUser.id);
-    if (fresh) currentUser.scorer = fresh.scorer || currentUser.scorer || null;
+    if (fresh) currentUser.scorer = fresh.scorer || null;
   }
   const bs = settings.find(s=>s.key==="banned_names");
   DB.bannedNames = bs?.value ? JSON.parse(bs.value) : [];
@@ -2014,7 +2032,8 @@ async function selectScorer(playerId) {
     // Si falla por columna inexistente, guardar en settings como fallback
     try {
       const key = `scorer_pick_${currentUser.id}`;
-      await supabase.upsert("settings", { key, value: currentUser.scorer || "" });
+      // Guardar como string limpio (no JSON) para facilitar lectura en loadAll
+      await supabase.upsert("settings", { key, value: currentUser.scorer || null });
       showToast(currentUser.scorer
         ? `✅ ${SCORER_PLAYERS.find(p=>p.id===currentUser.scorer)?.name} guardado`
         : "Selección eliminada", "success");
