@@ -612,15 +612,28 @@
     .result-toast-match { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .result-toast-label { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
 
-    /* ─── SUGERENCIA 5: Distancia al vecino (sobria) ────────────── */
-    .rank-gap-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 6px 12px; margin-top: 4px;
-      background: var(--gray-1); border-radius: var(--rs);
-      font-size: 10px; color: var(--muted);
+    /* ─── SUGERENCIA 5: Distancia al vecino ────────────────────── */
+    .rank-gap-wrap {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+      margin-top: 6px; margin-bottom: 2px;
     }
-    .rank-gap-up   { color: var(--success); font-weight: 700; }
-    .rank-gap-down { color: var(--muted); }
+    .rank-gap-card {
+      background: var(--gray-1); border: 1px solid var(--gray-2);
+      border-radius: var(--rs); padding: 8px 10px;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .rank-gap-card.up   { border-left: 3px solid var(--success); }
+    .rank-gap-card.down { border-left: 3px solid var(--gray-3); }
+    .rank-gap-card.alone { grid-column: 1 / -1; border-left: 3px solid var(--gold); }
+    .rank-gap-arrow { font-size: 14px; line-height: 1; }
+    .rank-gap-pts {
+      font-family: 'Bebas Neue','Arial Narrow',Arial,sans-serif;
+      font-size: 20px; color: var(--gold); line-height: 1;
+    }
+    .rank-gap-pts.success { color: var(--success); }
+    .rank-gap-pts.muted   { color: var(--muted); }
+    .rank-gap-label { font-size: 9px; color: var(--muted); font-weight: 600; letter-spacing: 0.3px; }
+    .rank-gap-rival { font-size: 10px; color: var(--white); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* ─── STATS: GOLEADOR MÁS APOSTADO ──────────────────────────── */
     .scorer-stats-grid {
@@ -2445,16 +2458,40 @@ function renderRanking(){
   const playedCount=DB.matches.filter(m=>m.done).length;
   const myStats=ranking.find(u=>u.id===currentUser.id)||{pts:0};
   const myPos=ranking.findIndex(u=>u.id===currentUser.id)+1;
-  // Distancia al vecino (sobria)
+  // Distancia al vecino — tarjetas con nombre del rival
   const above = myPos > 1 ? ranking[myPos-2] : null;
-  const below = myPos < ranking.length ? ranking[myPos] : null;
+  const below  = myPos < ranking.length ? ranking[myPos] : null;
   const gapUp   = above ? above.pts - myStats.pts : null;
-  const gapDown = below ? myStats.pts - below.pts : null;
-  const gapHtml = (myPos > 0 && ranking.length > 1) ? `
-    <div class="rank-gap-row">
-      <span class="rank-gap-up">${gapUp!==null ? (gapUp===0?"Empate con #"+(myPos-1):"↑ "+gapUp+" pts para #"+(myPos-1)) : "Vas 1°"}</span>
-      <span class="rank-gap-down">${gapDown!==null ? "↓ "+gapDown+" pts sobre #"+(myPos+1) : "Último"}</span>
-    </div>` : "";
+  const gapDown = below  ? myStats.pts - below.pts  : null;
+
+  let gapHtml = "";
+  if (myPos > 0 && ranking.length > 1) {
+    const cardUp = above
+      ? `<div class="rank-gap-card up">
+           <span class="rank-gap-arrow">📈</span>
+           <span class="rank-gap-pts success">${gapUp === 0 ? "=" : "-"+gapUp+" pts"}</span>
+           <span class="rank-gap-label">${gapUp === 0 ? "EMPATE CON" : "PARA SUPERAR"}</span>
+           <span class="rank-gap-rival">#${myPos-1} ${above.name}</span>
+         </div>`
+      : `<div class="rank-gap-card alone">
+           <span class="rank-gap-arrow">🏆</span>
+           <span class="rank-gap-pts success">1°</span>
+           <span class="rank-gap-label">LIDER DEL GRUPO</span>
+         </div>`;
+
+    const cardDown = below
+      ? `<div class="rank-gap-card down">
+           <span class="rank-gap-arrow">📉</span>
+           <span class="rank-gap-pts muted">+${gapDown} pts</span>
+           <span class="rank-gap-label">DE VENTAJA SOBRE</span>
+           <span class="rank-gap-rival">#${myPos+1} ${below.name}</span>
+         </div>`
+      : "";
+
+    gapHtml = above
+      ? `<div class="rank-gap-wrap">${cardUp}${cardDown}</div>`
+      : `<div class="rank-gap-wrap">${cardUp}</div>`;
+  }
 
   document.getElementById("rankingSummary").innerHTML=`
     <div class="rank-stat"><div class="rank-stat-val">${myStats.pts}</div><div class="rank-stat-label">MIS PUNTOS</div></div>
@@ -2465,15 +2502,19 @@ function renderRanking(){
   const top3=ranking.slice(0,Math.min(3,ranking.length));
   document.getElementById("podiumRow").innerHTML=top3.map((u,i)=>{
     const ct=CHAMPION_TEAMS.find(t=>t.id===u.champion);
+    const sp=SCORER_PLAYERS.find(p=>p.id===u.scorer);
     return `<div class="podium-card ${pCls[i]}"><span class="podium-medal">${medals[i]}</span>
       <div class="podium-name">${u.name}${u.id===currentUser.id?" 👈":""}</div>
       <div class="podium-pts">${u.pts}</div><div class="podium-pts-lbl">puntos</div>
-      <div class="podium-champ">${ct?ct.id+" "+ct.name:"Sin campeón"}</div></div>`;
+      <div class="podium-champ">🏆 ${ct?ct.id+" "+ct.name:"Sin campeón"}</div>
+      <div class="podium-champ">⚽ ${sp?sp.name:"Sin goleador"}</div></div>`;
   }).join("");
   if(!ranking.length){document.getElementById("rankingList").innerHTML=`<div class="empty"><div class="empty-icon">🏁</div>Aún no hay participantes.</div>`;return;}
   renderCompareSelector();
   document.getElementById("rankingList").innerHTML=ranking.map((u,i)=>{
-    const ct=CHAMPION_TEAMS.find(t=>t.id===u.champion),isMe=u.id===currentUser.id;
+    const ct=CHAMPION_TEAMS.find(t=>t.id===u.champion);
+    const sp=SCORER_PLAYERS.find(p=>p.id===u.scorer);
+    const isMe=u.id===currentUser.id;
     const streaks=calcStreaks(u);
     let streakBadge="";
     if(streaks.pos>=2)streakBadge=`<span class="streak-badge ${streaks.pos>=4?"fire":""}">${streaks.pos>=4?"🔥":"⚡"} ${streaks.pos} seguidos</span>`;
@@ -2493,7 +2534,7 @@ function renderRanking(){
         <div class="rank-pos ${i<3?"top":""}">${i+1}</div>
         <div class="rank-info">
           <div class="rank-name">${u.name}${isMe?" 👈":""} ${streakBadge}</div>
-          <div class="rank-sub">${ct?ct.id+" "+ct.name:"Sin campeón"} · ${(()=>{const sp=SCORER_PLAYERS.find(p=>p.id===u.scorer);return sp?sp.name:"Sin goleador";})()}</div>
+          <div class="rank-sub">🏆 ${ct?ct.id+" "+ct.name:"Sin campeón"} · ⚽ ${sp?sp.name:"Sin goleador"}</div>
         </div>
         <div class="rank-pts-block"><div class="rank-pts">${u.pts}</div><div class="rank-pts-lbl">pts</div></div>
       </div>
