@@ -1132,7 +1132,7 @@ let DB = { users:[], matches:[], picks:[], championWinner:null, scorerWinner:nul
 /* ── CARGA DE DATOS ──────────────────────────────────────────────────────── */
 async function loadAll() {
   const [users, matchResults, picks, settings, extraMatches] = await Promise.all([
-    supabase.get("users","?order=created_at"),
+    supabase.get("users","?select=id,name,is_admin,champion,scorer,created_at&order=created_at").catch(()=>supabase.get("users","?order=created_at")),
     supabase.get("match_results","?select=*"),
     supabase.get("picks","?select=*"),
     supabase.get("settings","?select=*"),
@@ -1140,16 +1140,6 @@ async function loadAll() {
   ]);
 
   DB.users = users;
-
-  // Enriquecer con scorer en query separada (protegida — no rompe login si falla)
-  try {
-    const scorerRows = await supabase.get("users","?select=id,scorer");
-    scorerRows.forEach(row => {
-      if (!row.scorer) return;
-      const u = DB.users.find(u => u.id === row.id);
-      if (u) u.scorer = row.scorer;
-    });
-  } catch(_) { /* columna scorer no existe — el fallback de settings actúa luego */ }
 
   const resultMap = Object.fromEntries(matchResults.map(r=>[r.match_id,r]));
 
