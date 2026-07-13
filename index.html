@@ -1140,6 +1140,17 @@ async function loadAll() {
   ]);
 
   DB.users = users;
+
+  // Enriquecer con scorer en query separada (protegida — no rompe login si falla)
+  try {
+    const scorerRows = await supabase.get("users","?select=id,scorer");
+    scorerRows.forEach(row => {
+      if (!row.scorer) return;
+      const u = DB.users.find(u => u.id === row.id);
+      if (u) u.scorer = row.scorer;
+    });
+  } catch(_) { /* columna scorer no existe — el fallback de settings actúa luego */ }
+
   const resultMap = Object.fromEntries(matchResults.map(r=>[r.match_id,r]));
 
   const baseMatches = MATCHES.map(m => {
