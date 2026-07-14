@@ -1268,9 +1268,9 @@ function calcUserStats(user) {
     ot+=p.ot; exact+=p.exact; advance+=p.advance; pts+=p.total;
   });
   if(DB.championWinner&&user.champion===DB.championWinner){champ=5;pts+=5;}
-  let scorer=0;
-  if(DB.scorerWinner&&user.scorer===DB.scorerWinner){scorer=5;pts+=5;}
-  return {pts,ot,exact,advance,champ,scorer};
+  let scorerPts=0;
+  if(DB.scorerWinner&&user.scorer===DB.scorerWinner){scorerPts=5;pts+=5;}
+  return {pts,ot,exact,advance,champ,scorerPts};
 }
 
 // Puntos de un usuario en una fase específica
