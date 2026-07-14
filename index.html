@@ -425,7 +425,7 @@
 
     /* PARTICIPANTS */
     .participants-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 8px; margin-bottom: 10px; }
-    .participant-card { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: var(--rs); padding: 11px 12px; cursor: pointer; transition: border-color 0.15s; }
+    .participant-card { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: var(--rs); padding: 11px 12px; cursor: pointer; transition: border-color 0.15s; position: relative; }
     .participant-card:active { border-color: var(--gray-3); }
     .participant-card.admin-user { border-color: var(--gold-dim); }
     .participant-name { font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1179,12 +1179,20 @@ async function loadAll() {
     }
   });
 
+  // Prioridad 3: picks con match_id="scorer_pick" (último recurso)
+  const scorerFromPicks = {};
+  picks.filter(p => p.match_id === "scorer_pick" && p.ot).forEach(p => {
+    scorerFromPicks[p.user_id] = p.ot;
+  });
+
   DB.users.forEach(u => {
-    // Prioridad 1: columna scorer en tabla users (si existe y tiene valor)
+    // Prioridad 1: columna scorer en tabla users
     if (u.scorer && typeof u.scorer === "string" && u.scorer.length > 0) return;
     // Prioridad 2: settings scorer_pick_{userId}
     if (scorerPickMap[u.id]) { u.scorer = scorerPickMap[u.id]; return; }
-    // Sin pick de goleador
+    // Prioridad 3: picks con match_id especial
+    if (scorerFromPicks[u.id]) { u.scorer = scorerFromPicks[u.id]; return; }
+    // Sin pick
     u.scorer = null;
   });
 
@@ -2024,24 +2032,41 @@ async function selectScorer(playerId) {
   currentUser.scorer = currentUser.scorer === playerId ? null : playerId;
   const u = DB.users.find(u => u.id === currentUser.id);
   if (u) u.scorer = currentUser.scorer;
+
+  const sp = SCORER_PLAYERS.find(p=>p.id===currentUser.scorer);
+  let saved = false;
+
+  // Intento 1: columna scorer en users
   try {
     await supabase.patch("users", `?id=eq.${currentUser.id}`, { scorer: currentUser.scorer });
-    showToast(currentUser.scorer
-      ? `✅ ${SCORER_PLAYERS.find(p=>p.id===currentUser.scorer)?.name} guardado`
-      : "Selección eliminada", "success");
-  } catch(e) {
-    // Si falla por columna inexistente, guardar en settings como fallback
+    saved = true;
+  } catch(e) { /* columna no existe, continuar */ }
+
+  // Intento 2: settings como respaldo
+  if (!saved) {
     try {
-      const key = `scorer_pick_${currentUser.id}`;
-      // Guardar como string limpio (no JSON) para facilitar lectura en loadAll
-      await supabase.upsert("settings", { key, value: currentUser.scorer || null });
-      showToast(currentUser.scorer
-        ? `✅ ${SCORER_PLAYERS.find(p=>p.id===currentUser.scorer)?.name} guardado`
-        : "Selección eliminada", "success");
-    } catch(e2) {
-      showToast("Error al guardar. Verifica la conexión.", "error");
-      console.error("selectScorer error:", e2);
-    }
+      await supabase.upsert("settings", { key: `scorer_pick_${currentUser.id}`, value: currentUser.scorer });
+      saved = true;
+    } catch(e) { /* también falló */ }
+  }
+
+  // Intento 3: picks con match_id especial "scorer_pick" como último recurso
+  if (!saved) {
+    try {
+      await supabase.upsert("picks", {
+        user_id: currentUser.id,
+        match_id: "scorer_pick",
+        ot: currentUser.scorer || "",
+        home_score: null, away_score: null
+      });
+      saved = true;
+    } catch(e) { console.error("selectScorer todos los intentos fallaron:", e); }
+  }
+
+  if (saved) {
+    showToast(sp ? `✅ ${sp.name} guardado` : "Selección eliminada", "success");
+  } else {
+    showToast("Error al guardar. Verifica la conexión.", "error");
   }
   renderScorer();
 }
@@ -3310,8 +3335,7 @@ function renderAdmin(){
       ${renderPhaseSummaries()||`<div style="font-size:11px;color:var(--muted)">Aún no hay partidos finalizados.</div>`}
     </div>
     <button class="recalc-btn" onclick="recalcAll()">🔄 ACTUALIZAR TABLA DE POSICIONES</button>
-    <button class="recalc-btn" style="margin-top:6px;background:var(--gray-2);color:var(--muted);border:1px solid var(--gray-3)" onclick="/* diag removed */">🔍 DIAGNÓSTICO GOLEADOR</button>
-    <div id="scorerDiag" style="display:none;margin-top:8px;background:var(--gray-1);border:1px solid var(--gray-2);border-radius:var(--rs);padding:12px;font-size:11px;font-family:monospace;line-height:1.7;word-break:break-all"></div>`;
+`;
 }
 
 function toggleAdminAcc(id){
