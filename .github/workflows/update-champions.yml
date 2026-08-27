@@ -1,0 +1,80 @@
+name: Actualizar resultados Champions League
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # cada 30 minutos, todo el día (GitHub puede demorar el disparo unos minutos)
+  workflow_dispatch:          # permite correrlo manualmente desde la pestaña Actions
+
+jobs:
+  update-scores:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Consultar resultados y actualizar Supabase
+        env:
+          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
+          SUPABASE_URL: "https://kiiaaczyagnmyiednacw.supabase.co"
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          # 1. Traer partidos de Champions League (competición CL en football-data.org) de hoy y ayer
+          TODAY=$(date -u +%Y-%m-%d)
+          YESTERDAY=$(date -u -d "yesterday" +%Y-%m-%d)
+
+          curl -s -H "X-Auth-Token: $FOOTBALL_API_KEY" \
+            "https://api.football-data.org/v4/competitions/CL/matches?dateFrom=$YESTERDAY&dateTo=$TODAY" \
+            -o matches.json
+
+          # 2. Traer el mapeo match_id <-> equipos desde champions_matches (para encontrar el match_id interno)
+          curl -s "$SUPABASE_URL/rest/v1/champions_matches?select=match_id,home,away" \
+            -H "apikey: $SUPABASE_SERVICE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+            -o internal_matches.json
+
+          # 3. Cruzar por nombre de equipo (normalizado) y hacer upsert de los resultados finalizados
+          node -e '
+            const fs = require("fs");
+            const apiMatches = JSON.parse(fs.readFileSync("matches.json")).matches || [];
+            const internal = JSON.parse(fs.readFileSync("internal_matches.json"));
+
+            const norm = s => (s||"").toLowerCase()
+              .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+              .replace(/fc|cf|real|club|de|athletic/g,"").trim();
+
+            const finished = apiMatches.filter(m => m.status === "FINISHED");
+
+            (async () => {
+              for (const m of finished) {
+                const homeN = norm(m.homeTeam.name);
+                const awayN = norm(m.awayTeam.name);
+                const match = internal.find(im =>
+                  norm(im.home).includes(homeN.slice(0,5)) && norm(im.away).includes(awayN.slice(0,5))
+                );
+                if (!match) { console.log("Sin match interno para:", m.homeTeam.name, "vs", m.awayTeam.name); continue; }
+
+                const hs = m.score.fullTime.home, as = m.score.fullTime.away;
+                const payload = {
+                  match_id: match.match_id,
+                  home_score: hs, away_score: as,
+                  winner: hs>as?"home":as>hs?"away":null,
+                  done: true,
+                  competition: "champions"
+                };
+
+                const res = await fetch(`${process.env.SUPABASE_URL}/rest/v1/match_results`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "apikey": process.env.SUPABASE_SERVICE_KEY,
+                    "Authorization": `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+                    "Prefer": "resolution=merge-duplicates"
+                  },
+                  body: JSON.stringify(payload)
+                });
+                console.log(match.match_id, res.status, hs, "-", as);
+              }
+            })();
+          '
